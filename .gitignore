@@ -5,3 +5,13 @@
 .DS_Store
 /build
 /captures
+
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+proguard/
+*.log
+.navigation/
