@@ -10,7 +10,7 @@ public enum Channel
 	biology("生物", "从生物分子到生态系统的生命科学集锦", true),
 	tech("技术", "你为什么不问问神奇海螺呢？", true),
 	test("公测", "试验功能、报告问题", false),
-	others("其他", "语言、社科",true);
+	others("其他", "语言、社科", true);
 
 	private String name;
 	private String detail;

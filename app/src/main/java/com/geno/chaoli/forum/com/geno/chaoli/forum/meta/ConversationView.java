@@ -9,6 +9,7 @@ public class ConversationView
 	public Channel channel;
 	public String title;
 	public String excerpt;
+	public String link;
 	public String senderMember;
 	public Drawable senderAvatar;
 	public String lastPostMember;
@@ -20,35 +21,41 @@ public class ConversationView
 
 	public ConversationView()
 	{
-		this.channel = null;
-		this.title = "";
-		this.excerpt = "";
-		this.senderMember = "";
-		this.senderAvatar = null;
-		this.lastPostMember = "";
-		this.lastPostAvatar = null;
-		this.lastPostTime = "";
-		this.replies = 0;
+		this(null, "", "", "", "", null, "", null, "", 0);
 	}
 
-	// TODO: 2016/2/4 0247 What if any avatar is null? (Use a self-made widget.)
-	public ConversationView(Channel channel, String title, String excerpt,
+	public ConversationView(Channel channel, String title, String excerpt, String link,
 			String senderMember, Drawable senderAvatar,
 			String lastPostMember, Drawable lastPostAvatar,
 			String lastPostTime, int replies)
 	{
+		 this(channel, title, excerpt, link, senderMember, senderAvatar, lastPostMember,
+				lastPostAvatar, lastPostTime, replies, false, false);
+	}
+
+	// TODO: 2016/2/4 0247 What if any avatar is null? (Use a self-made widget.)
+	public ConversationView(Channel channel, String title, String excerpt, String link,
+			String senderMember, Drawable senderAvatar,
+			String lastPostMember, Drawable lastPostAvatar,
+			String lastPostTime, int replies,
+			boolean isSticky, boolean isFeatured)
+	{
 		this.channel = channel;
 		this.title = title;
 		this.excerpt = excerpt;
+		this.link = link;
 		this.senderMember = senderMember;
 		this.senderAvatar = senderAvatar;
 		this.lastPostMember = lastPostMember;
 		this.lastPostAvatar = lastPostAvatar;
 		this.lastPostTime = lastPostTime;
 		this.replies = replies;
+		this.isSticky = isSticky;
+		this.isFeatured = isFeatured;
 	}
 
-	public Channel getChannel() {
+	public Channel getChannel()
+	{
 		return channel;
 	}
 
@@ -75,6 +82,16 @@ public class ConversationView
 	public void setExcerpt(String excerpt)
 	{
 		this.excerpt = excerpt;
+	}
+
+	public String getLink()
+	{
+		return link;
+	}
+
+	public void setLink(String link)
+	{
+		this.link = link;
 	}
 
 	public String getSenderMember()
