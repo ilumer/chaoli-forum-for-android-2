@@ -1,10 +1,16 @@
-package com.geno.chaoli.forum.com.geno.chaoli.forum.meta;
+package com.geno.chaoli.forum.meta;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.ImageView;
 
-public class ConversationView
+public class ConversationView extends View
 {
 	private static final String TAG = "ConversationView";
+
+	public static final String namespace = "http://schemas.geno1024.com";
 
 	public Channel channel;
 	public String title;
@@ -20,24 +26,25 @@ public class ConversationView
 
 	public ConversationView()
 	{
-		this(null, "", "", "", "", null, "", null, "", 0);
+		this(null, null, "", "", "", "", null, "", null, "", 0);
 	}
 
-	public ConversationView(Channel channel, String title, String excerpt, String link,
+	public ConversationView(Context context, Channel channel, String title, String excerpt, String link,
 			String senderMember, Drawable senderAvatar,
 			String lastPostMember, Drawable lastPostAvatar,
 			String lastPostTime, int replies)
 	{
-		 this(channel, title, excerpt, link, senderMember, senderAvatar, lastPostMember,
+		 this(context, channel, title, excerpt, link, senderMember, senderAvatar, lastPostMember,
 				lastPostAvatar, lastPostTime, replies, ConversationState.normal);
 	}
 
 	// TODO: 2016/2/4 0247 What if any avatar is null? (Use a self-made widget.)
-	public ConversationView(Channel channel, String title, String excerpt, String link,
+	public ConversationView(Context context, Channel channel, String title, String excerpt, String link,
 			String senderMember, Drawable senderAvatar,
 			String lastPostMember, Drawable lastPostAvatar,
 			String lastPostTime, int replies, ConversationState state)
 	{
+		this(context);
 		this.channel = channel;
 		this.title = title;
 		this.excerpt = excerpt;
@@ -49,6 +56,29 @@ public class ConversationView
 		this.lastPostTime = lastPostTime;
 		this.replies = replies;
 		this.state = state;
+	}
+
+	public ConversationView(Context context)
+	{
+		this(context, null);
+	}
+
+	public ConversationView(Context context, AttributeSet attrs)
+	{
+		this(context, attrs, 0);
+	}
+
+	public ConversationView(Context context, AttributeSet attrs, int defStyleAttr)
+	{
+		super(context, attrs, defStyleAttr);
+		if (attrs != null)
+		{
+			this.channel = Channel.valueOf(attrs.getAttributeValue(namespace, "channel"));
+			this.title = attrs.getAttributeValue(namespace, "title");
+			this.excerpt = attrs.getAttributeValue(namespace, "excerpt");
+			this.link = attrs.getAttributeValue(namespace, "link");
+			this.senderMember = attrs.getAttributeValue(namespace, "senderMember");
+		}
 	}
 
 	public Channel getChannel()

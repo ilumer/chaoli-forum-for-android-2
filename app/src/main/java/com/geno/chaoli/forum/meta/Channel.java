@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum.com.geno.chaoli.forum.meta;
+package com.geno.chaoli.forum.meta;
 
 public enum Channel
 {
@@ -39,4 +39,6 @@ public enum Channel
 	{
 		return this.name;
 	}
+
+
 }
