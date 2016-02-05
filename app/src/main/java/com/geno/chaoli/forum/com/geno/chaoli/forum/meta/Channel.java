@@ -23,12 +23,6 @@ public enum Channel
 		this.isGuestVisible = isGuestVisible;
 	}
 
-	@Override
-	public String toString()
-	{
-		return this.name;
-	}
-
 	public String getDetail()
 	{
 		return this.detail;
@@ -38,5 +32,11 @@ public enum Channel
 	public boolean isGuestVisible()
 	{
 		return isGuestVisible;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.name;
 	}
 }

@@ -16,8 +16,7 @@ public class ConversationView
 	public Drawable lastPostAvatar;
 	public String lastPostTime;
 	public int replies;
-	public boolean isSticky;
-	public boolean isFeatured;
+	public ConversationState state;
 
 	public ConversationView()
 	{
@@ -30,15 +29,14 @@ public class ConversationView
 			String lastPostTime, int replies)
 	{
 		 this(channel, title, excerpt, link, senderMember, senderAvatar, lastPostMember,
-				lastPostAvatar, lastPostTime, replies, false, false);
+				lastPostAvatar, lastPostTime, replies, ConversationState.normal);
 	}
 
 	// TODO: 2016/2/4 0247 What if any avatar is null? (Use a self-made widget.)
 	public ConversationView(Channel channel, String title, String excerpt, String link,
 			String senderMember, Drawable senderAvatar,
 			String lastPostMember, Drawable lastPostAvatar,
-			String lastPostTime, int replies,
-			boolean isSticky, boolean isFeatured)
+			String lastPostTime, int replies, ConversationState state)
 	{
 		this.channel = channel;
 		this.title = title;
@@ -50,8 +48,7 @@ public class ConversationView
 		this.lastPostAvatar = lastPostAvatar;
 		this.lastPostTime = lastPostTime;
 		this.replies = replies;
-		this.isSticky = isSticky;
-		this.isFeatured = isFeatured;
+		this.state = state;
 	}
 
 	public Channel getChannel()
