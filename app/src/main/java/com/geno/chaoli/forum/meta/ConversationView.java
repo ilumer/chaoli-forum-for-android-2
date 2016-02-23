@@ -5,10 +5,16 @@ import android.app.Dialog;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.geno.chaoli.forum.R;
 
 // TODO: 2016/2/12 0012 2226 Unable to debug this class... Now...
-public class ConversationView extends View
+public class ConversationView extends RelativeLayout
 {
 	private static final String TAG = "ConversationView";
 
@@ -17,16 +23,20 @@ public class ConversationView extends View
 	public ConversationView(final Context context, Conversation conversation)
 	{
 		this(context);
+		View.inflate(context, R.layout.conversationview, this);
 		this.conversation = conversation;
+		((TextView) findViewById(R.id.conversationTextView)).setText(conversation.getConversationId() + "");
 		this.setOnClickListener(new OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
 				// TODO: 2016/2/12 0012 2123 Jump to post view.
+//				Toast.makeText(context, ((ConversationView) v).conversation.getConversationId(), Toast.LENGTH_SHORT).show();
 			}
 		});
-		this.setOnLongClickListener(new OnLongClickListener() {
+		this.setOnLongClickListener(new OnLongClickListener()
+		{
 			@Override
 			public boolean onLongClick(View v)
 			{
