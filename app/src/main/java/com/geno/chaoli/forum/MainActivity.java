@@ -42,10 +42,10 @@ public class MainActivity extends Activity
 			{
 				case 0:
 					// TODO: 2016/2/23 0023 1405 Update UI
-					Log.v(TAG, "deal UI start: " + activity.sp.getString("listJSON", ""));
+					Log.v(TAG, "deal UI start");
 					for (ConversationView c : Methods.dealList(activity, activity.sp.getString("listJSON", "")))
 					{
-						((LinearLayout) activity.findViewById(R.id.main)).addView(c);
+						((LinearLayout) activity.findViewById(R.id.mainView)).addView(c);
 
 					}
 					break;

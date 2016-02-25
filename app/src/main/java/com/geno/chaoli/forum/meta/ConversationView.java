@@ -25,14 +25,20 @@ public class ConversationView extends RelativeLayout
 		this(context);
 		View.inflate(context, R.layout.conversationview, this);
 		this.conversation = conversation;
-		((TextView) findViewById(R.id.conversationTextView)).setText(conversation.getConversationId() + "");
+		((TextView) findViewById(R.id.conversationId)).setText(conversation.getConversationId() + "");
+		((TextView) findViewById(R.id.title)).setText(conversation.getTitle());
+		String excerpt = conversation.getExcerpt().split("\\n")[0];
+		((TextView) findViewById(R.id.excerpt)).setText(excerpt.length() > 50 ?
+				excerpt.substring(0, 50) + "…" : excerpt);
+		((TextView) findViewById(R.id.replies)).setText(conversation.getReplies() + "");
+		((LinearLayout) findViewById(R.id.channel)).addView(new ChannelTextView(context, conversation.getChannel()));
 		this.setOnClickListener(new OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
 				// TODO: 2016/2/12 0012 2123 Jump to post view.
-//				Toast.makeText(context, ((ConversationView) v).conversation.getConversationId(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, ((ConversationView) v).conversation.getConversationId() + "", Toast.LENGTH_SHORT).show();
 			}
 		});
 		this.setOnLongClickListener(new OnLongClickListener()

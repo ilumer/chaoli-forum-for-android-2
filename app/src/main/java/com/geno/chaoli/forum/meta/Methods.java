@@ -27,33 +27,13 @@ public class Methods
 {
 	public static final String TAG = "Methods";
 
-	public Channel getChannel(int channelId)
+	public static final Channel getChannel(int channelId)
 	{
 		for (Channel c : Channel.values())
 			if (c.getChannelId() == channelId) return c;
 		return null;
 	}
 
-	public static TextView ChannelView(Context context, Channel channel)
-	{
-		TextView channelView = new TextView(context);
-		int textColor;
-		switch (channel.getChannelId())
-		{
-			case 4: textColor = 0xFF4030A0; break;
-			case 5: textColor = 0xFFA00020; break;
-			case 6: textColor = 0xFFE04000; break;
-			case 7: textColor = 0xFF008000; break;
-			case 8: textColor = 0xFF0040D0; break;
-			case 9: textColor = 0xFF202020; break;
-			case 36: textColor = 0xFFE04000; break;
-			case 40: textColor = 0xFF9030C0; break;
-			default: textColor = 0xFFA0A0A0;
-		}
-		channelView.setTextColor(textColor);
-		channelView.setText(channel.toString());
-		return channelView;
-	}
 /*
 	public static void getList(final Context context, final Handler handler)
 	{
@@ -116,6 +96,7 @@ public class Methods
 							InputStream i = connection.getInputStream();
 							BufferedReader br = new BufferedReader(new InputStreamReader(i));
 							result = br.readLine();
+							// TODO: 2016/2/24 0024 0144 Save metadata of a conversation instead of a JSON string.
 							editor.putString("listJSON", result);
 							editor.apply();
 							Log.v(TAG, result);
@@ -146,11 +127,13 @@ public class Methods
 		Log.v(TAG, array.size() + "");
 		for (int i = 0; i < array.size(); i++)
 		{
-			/*result[i] = new ConversationView(context);
-			result[i].conversation = new Conversation();
-			result[i].conversation.conversationId = array.getJSONObject(i).getInteger("conversationId");*/
+			JSONObject sub = array.getJSONObject(i);
 			Conversation conversation = new Conversation();
-			conversation.conversationId = array.getJSONObject(i).getInteger("conversationId");
+			conversation.conversationId = sub.getInteger("conversationId");
+			conversation.title = sub.getString("title");
+			conversation.excerpt = sub.getString("firstPost");
+			conversation.replies = sub.getInteger("replies");
+			conversation.channel = Methods.getChannel(Integer.parseInt(sub.getString("channelId")));
 			result[i] = new ConversationView(context, conversation);
 		}
 		return result;
