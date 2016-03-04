@@ -6,5 +6,13 @@ public class Constants
 	public static final int paddingTop = 16;
 	public static final int paddingRight = 16;
 	public static final int paddingBottom = 16;
-	public static final String conversationListURL = "https://chaoli.club/conversations/result.json";
+
+	public static final String conversationListURL = "https://chaoli.club/conversations/index.json";
+	public static final String postListURL = "https://chaoli.club/conversation/index.json/";
+
+	public static final String conversationSP = "conversationList";
+	public static final String conversationSPKey = "listJSON";
+
+	public static final String postSP = "postList";
+	public static final String postSPKey = "listJSON";
 }

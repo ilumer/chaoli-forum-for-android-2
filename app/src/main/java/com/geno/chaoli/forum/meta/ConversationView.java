@@ -25,6 +25,7 @@ public class ConversationView extends RelativeLayout
 		this(context);
 		View.inflate(context, R.layout.conversationview, this);
 		this.conversation = conversation;
+
 		((TextView) findViewById(R.id.conversationId)).setText(conversation.getConversationId() + "");
 		((TextView) findViewById(R.id.title)).setText(conversation.getTitle());
 		String excerpt = conversation.getExcerpt().split("\\n")[0];
@@ -32,6 +33,7 @@ public class ConversationView extends RelativeLayout
 				excerpt.substring(0, 50) + "…" : excerpt);
 		((TextView) findViewById(R.id.replies)).setText(conversation.getReplies() + "");
 		((LinearLayout) findViewById(R.id.channel)).addView(new ChannelTextView(context, conversation.getChannel()));
+
 		this.setOnClickListener(new OnClickListener()
 		{
 			@Override
@@ -41,6 +43,7 @@ public class ConversationView extends RelativeLayout
 				Toast.makeText(context, ((ConversationView) v).conversation.getConversationId() + "", Toast.LENGTH_SHORT).show();
 			}
 		});
+
 		this.setOnLongClickListener(new OnLongClickListener()
 		{
 			@Override
