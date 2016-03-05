@@ -1,5 +1,7 @@
 package com.geno.chaoli.forum;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,6 +36,29 @@ public class MainActivity extends FragmentActivity
 	public List<Fragment> mainFragments;
 	public List<String> mainFragementsTitles;
 
+	public static class MainHandler extends Handler
+	{
+		WeakReference<Activity> mainActivity;
+
+		public MainHandler(Activity activity)
+		{
+			mainActivity = new WeakReference<Activity>(activity);
+		}
+
+		@Override
+		public void handleMessage(Message msg)
+		{
+			super.handleMessage(msg);
+			switch (msg.what)
+			{
+				case Constants.FINISH_CONVERSATION_LIST_ANALYSIS:
+					ConversationListFragment.deal();
+			}
+		}
+	}
+
+	public Handler mainHandler = new MainHandler(this);
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -54,19 +79,34 @@ public class MainActivity extends FragmentActivity
 		mainFragementsTitles.add(Channel.chem.toString());
 		mainFragementsTitles.add(Channel.biology.toString());
 		mainFragementsTitles.add(Channel.tech.toString());
+		mainFragementsTitles.add(Channel.court.toString());
 		mainFragementsTitles.add(Channel.announ.toString());
+		mainFragementsTitles.add(Channel.others.toString());
 		mainFragementsTitles.add(Channel.socsci.toString());
 		mainFragementsTitles.add(Channel.lang.toString());
 
-		ConversationListFragment[] frag = new ConversationListFragment[8];
-		for (int i = 0; i < 8; i++)
+		ConversationListFragment[] frag = new ConversationListFragment[10];
+
+		boolean loggedIn = false;
+
+		Channel[] available = new Channel[loggedIn ? 14 : 10];
+		int loopCnt = 0;
+
+		for (int i = 0; i < 14; i++)
 		{
-			frag[i] = new ConversationListFragment();
-			frag[i].setChannel(mainFragementsTitles.get(i));
-			mainFragments.add(frag[i]);
+			if (Channel.values()[i].isGuestVisible())
+			{
+				available[loopCnt] = Channel.values()[i];
+				loopCnt++;
+			}
 		}
 
-
+		for (int i = 0; i < 10; i++)
+		{
+			frag[i] = new ConversationListFragment();
+			frag[i].setChannel(available[i].name());
+			mainFragments.add(frag[i]);
+		}
 
 		mainPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
 		{
@@ -88,6 +128,5 @@ public class MainActivity extends FragmentActivity
 				return mainFragementsTitles.get(position);
 			}
 		});
-		//Methods.getList(this);
 	}
 }

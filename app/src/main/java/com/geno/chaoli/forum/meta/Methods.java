@@ -2,29 +2,20 @@ package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.geno.chaoli.forum.ApplicationHandler;
-import com.geno.chaoli.forum.ConversationListFragment;
 import com.geno.chaoli.forum.MainActivity;
+import com.geno.chaoli.forum.PostActivity;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class Methods
 {
@@ -114,7 +105,7 @@ public class Methods
 	}
 */
 
-	public static void getConversationList(final Context context, final String getMsg, final Handler handler, SharedPreferences sp)
+	public static void getConversationList(final Context context, final String getMsg)
 	{
 		Thread t = new Thread()
 		{
@@ -143,8 +134,7 @@ public class Methods
 					}
 					connection.disconnect();
 					Looper.prepare();
-					//((MainActivity) context).mainHandler.sendEmptyMessage(0);
-					handler.sendEmptyMessage(ApplicationHandler.FINISH_CONVERSATION_LIST_ANALYSIS);
+					((MainActivity) context).mainHandler.sendEmptyMessage(Constants.FINISH_CONVERSATION_LIST_ANALYSIS);
 					Log.v(TAG, "Method finish");
 				}
 				catch (Exception e)
@@ -177,6 +167,7 @@ public class Methods
 							InputStream i = connection.getInputStream();
 							BufferedReader br = new BufferedReader(new InputStreamReader(i));
 							result = br.readLine();
+							Log.v(TAG, result);
 							editor.putString("listJSON", result);
 							editor.apply();
 							break;
@@ -185,7 +176,7 @@ public class Methods
 					connection.disconnect();
 					Looper.prepare();
 					// TODO: 16-3-3 2101 Make a common(for whole application) Handler
-
+					((PostActivity) context).postHandler.sendEmptyMessage(Constants.FINISH_POST_LIST_ANALYSIS);
 				}
 				catch (Exception e)
 				{
@@ -212,6 +203,24 @@ public class Methods
 			conversation.replies = sub.getInteger("replies");
 			conversation.channel = Methods.getChannel(Integer.parseInt(sub.getString("channelId")));
 			result[i] = new ConversationView(context, conversation);
+		}
+		return result;
+	}
+
+	public static PostView[] dealPostList(Context context, String string)
+	{
+		JSONObject o = JSON.parseObject(string);
+		JSONArray array = o.getJSONArray("posts");
+		PostView[] result = new PostView[array.size()];
+		for (int i = 0; i < array.size(); i++)
+		{
+			JSONObject sub = array.getJSONObject(i);
+			Post post = new Post();
+			post.username = sub.getString("username");
+			post.floor = sub.getInteger("floor");
+			post.time = sub.getInteger("time");
+			post.content = sub.getString("content");
+			result[i] = new PostView(context, post);
 		}
 		return result;
 	}
