@@ -224,4 +224,10 @@ public class Methods
 		}
 		return result;
 	}
+
+	public static void login(String username, String password)
+	{
+
+	}
+
 }

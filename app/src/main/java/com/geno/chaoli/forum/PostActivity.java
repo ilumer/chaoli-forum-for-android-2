@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -70,5 +71,14 @@ public class PostActivity extends Activity
 		Bundle data = getIntent().getExtras();
 		int conversationId = data.getInt("conversationId");
 		Methods.getPostList(this, "/" + conversationId);
+
+		replySubmit.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+
+			}
+		});
 	}
 }

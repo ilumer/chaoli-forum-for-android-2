@@ -1,7 +1,6 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,12 +10,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.ConversationView;
-import com.geno.chaoli.forum.meta.Methods;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -65,7 +62,7 @@ public class MainActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		sp = getSharedPreferences(Constants.conversationSP, MODE_PRIVATE);
 		e = sp.edit();
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.main_activity);
 		mainPager = (ViewPager) findViewById(R.id.mainPager);
 		mainTabStrip = (PagerTabStrip) findViewById(R.id.mainTabStrip);
 		mainTabStrip.setDrawFullUnderline(false);
