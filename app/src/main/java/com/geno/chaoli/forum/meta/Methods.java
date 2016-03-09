@@ -3,6 +3,7 @@ package com.geno.chaoli.forum.meta;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -12,6 +13,7 @@ import com.geno.chaoli.forum.MainActivity;
 import com.geno.chaoli.forum.PostActivity;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -25,6 +27,13 @@ public class Methods
 	{
 		for (Channel c : Channel.values())
 			if (c.getChannelId() == channelId) return c;
+		return null;
+	}
+
+	public static final Channel getChannel(String channelName)
+	{
+		for (Channel c : Channel.values())
+			if (c.toString().equals(channelName)) return c;
 		return null;
 	}
 
@@ -225,9 +234,53 @@ public class Methods
 		return result;
 	}
 
-	public static void login(String username, String password)
+	public static void login(final Context context, final String username, final String password)
 	{
+		Thread t = new Thread()
+		{
+			@Override
+			public void run()
+			{
+				super.run();
+				try
+				{
+					String token = "3efef991639a0";
+					SharedPreferences sp = context.getSharedPreferences(Constants.loginSP, Context.MODE_PRIVATE);
+					SharedPreferences.Editor e = sp.edit();
+					URL url = new URL(Constants.loginURL);
+					HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+					connection.setDoOutput(true);
+					connection.setDoInput(true);
+					connection.setRequestMethod("POST");
+					connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+					connection.connect();
 
+					DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
+					String content = "token=" + token + "&username=" + username + "&password=" + password;
+					outputStream.writeBytes(content);
+					outputStream.flush();
+					outputStream.close();
+
+					InputStream inputStream = connection.getInputStream();
+					BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+					String ret = "", temp;
+					while ((temp = reader.readLine()) != null)
+					{
+						ret += temp;
+					}
+
+					e.putString(Constants.loginSPKey, ret);
+					e.apply();
+					reader.close();
+					inputStream.close();
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		};
+		t.start();
 	}
 
 }

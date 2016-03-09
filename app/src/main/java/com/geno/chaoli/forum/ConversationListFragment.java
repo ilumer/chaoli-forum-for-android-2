@@ -57,9 +57,7 @@ public class ConversationListFragment extends Fragment
 	public static final void deal()
 	{
 		for (ConversationView c : Methods.dealConversationList(context, sp.getString(Constants.conversationSPKey, "")))
-		{
 			l.addView(c);
-		}
 	}
 /*
 	@Override

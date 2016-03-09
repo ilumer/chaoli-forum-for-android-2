@@ -43,7 +43,4 @@
   <component name="ProjectType">
     <option name="id" value="Android" />
   </component>
-  <component name="UnicodeBrowser">
-    <option name="fontName" value="Consolas" />
-  </component>
 </project>

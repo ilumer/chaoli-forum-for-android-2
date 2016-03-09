@@ -10,10 +10,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.ConversationView;
+import com.geno.chaoli.forum.meta.Methods;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class MainActivity extends FragmentActivity
 	public ViewPager mainPager;
 	public PagerTabStrip mainTabStrip;
 	public List<Fragment> mainFragments;
-	public List<String> mainFragementsTitles;
+	public List<String> mainFragmentsTitles;
 
 	public static class MainHandler extends Handler
 	{
@@ -50,6 +52,9 @@ public class MainActivity extends FragmentActivity
 			{
 				case Constants.FINISH_CONVERSATION_LIST_ANALYSIS:
 					ConversationListFragment.deal();
+					break;
+				case Constants.FINISH_LOGIN:
+					Toast.makeText(mainActivity.get(), "Finish Login", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -70,38 +75,27 @@ public class MainActivity extends FragmentActivity
 
 		mainFragments = new ArrayList<>();
 
-		mainFragementsTitles = new ArrayList<>();
-		mainFragementsTitles.add(Channel.maths.toString());
-		mainFragementsTitles.add(Channel.physics.toString());
-		mainFragementsTitles.add(Channel.chem.toString());
-		mainFragementsTitles.add(Channel.biology.toString());
-		mainFragementsTitles.add(Channel.tech.toString());
-		mainFragementsTitles.add(Channel.court.toString());
-		mainFragementsTitles.add(Channel.announ.toString());
-		mainFragementsTitles.add(Channel.others.toString());
-		mainFragementsTitles.add(Channel.socsci.toString());
-		mainFragementsTitles.add(Channel.lang.toString());
+		boolean loggedIn = sp.getBoolean(Constants.loginBool, false);
 
-		ConversationListFragment[] frag = new ConversationListFragment[10];
+		mainFragmentsTitles = new ArrayList<>();
 
-		boolean loggedIn = false;
+		if (loggedIn) mainFragmentsTitles.add(Channel.caff.toString());
+		mainFragmentsTitles.add(Channel.maths.toString());
+		mainFragmentsTitles.add(Channel.physics.toString());
+		mainFragmentsTitles.add(Channel.chem.toString());
+		mainFragmentsTitles.add(Channel.biology.toString());
+		mainFragmentsTitles.add(Channel.tech.toString());
+		mainFragmentsTitles.add(Channel.court.toString());
+		mainFragmentsTitles.add(Channel.announ.toString());
+		mainFragmentsTitles.add(Channel.others.toString());
+		mainFragmentsTitles.add(Channel.socsci.toString());
+		mainFragmentsTitles.add(Channel.lang.toString());
 
-		Channel[] available = new Channel[loggedIn ? 14 : 10];
-		int loopCnt = 0;
+		ConversationListFragment[] frag = new ConversationListFragment[loggedIn ? 11 : 10];
 
-		for (int i = 0; i < 14; i++)
+		for (int i = 0; i < frag.length; i++)
 		{
-			if (Channel.values()[i].isGuestVisible())
-			{
-				available[loopCnt] = Channel.values()[i];
-				loopCnt++;
-			}
-		}
-
-		for (int i = 0; i < 10; i++)
-		{
-			frag[i] = new ConversationListFragment();
-			frag[i].setChannel(available[i].name());
+			(frag[i] = new ConversationListFragment()).setChannel(Methods.getChannel(mainFragmentsTitles.get(i)).name());
 			mainFragments.add(frag[i]);
 		}
 
@@ -122,7 +116,7 @@ public class MainActivity extends FragmentActivity
 			@Override
 			public CharSequence getPageTitle(int position)
 			{
-				return mainFragementsTitles.get(position);
+				return mainFragmentsTitles.get(position);
 			}
 		});
 	}
