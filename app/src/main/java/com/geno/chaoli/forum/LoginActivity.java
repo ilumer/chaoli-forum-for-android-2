@@ -61,7 +61,6 @@ public class LoginActivity extends Activity
 			{
 				String name = loginName.getText().toString();
 				String pwd = loginPwd.getText().toString();
-				Methods.login(LoginActivity.this, name, pwd);
 			}
 		});
 	}
