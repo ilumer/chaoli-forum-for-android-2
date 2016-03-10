@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.PersistentCookieStore;
@@ -15,6 +16,12 @@ import cz.msebera.android.httpclient.cookie.Cookie;
  */
 public class CookieUtils {
     private static List<Cookie> cookies;
+    private static PersistentCookieStore loginCookieStore;
+
+    /* 存下登录页面对应的PersistentCookieStore，注销时使用 */
+    public static void setLoginCookieStore(Context loginContext) {
+        loginCookieStore = new PersistentCookieStore(loginContext);
+    }
 
     /* 返回cookies列表 */
     public static List<Cookie> getCookies() {
@@ -44,4 +51,12 @@ public class CookieUtils {
         PersistentCookieStore cookieStore = new PersistentCookieStore(context);
         cookieStore.clear();
     }
-}
+
+    public static void clearLoginCookie(){
+        loginCookieStore.clear();
+    }
+
+    public static void clearCookies(){
+        cookies = null;
+    }
+ }
