@@ -18,11 +18,12 @@ public class PostView extends RelativeLayout
 	public PostView(final Context context, Post post)
 	{
 		this(context);
-		View.inflate(context, R.layout.postview, this);
+		View.inflate(context, R.layout.post_view, this);
 		this.post = post;
+
 		((TextView) findViewById(R.id.username)).setText(post.getUsername());
-		((TextView) findViewById(R.id.floor)).setText(post.getFloor() + "");
-		((TextView) findViewById(R.id.time)).setText(post.getTime() + "");
+		((TextView) findViewById(R.id.floor)).setText(String.format("%d", post.getFloor()));
+		((TextView) findViewById(R.id.time)).setText(String.format("%d", post.getTime()));
 		((TextView) findViewById(R.id.content)).setText(post.getContent());
 
 		this.setOnClickListener(new OnClickListener()
