@@ -25,6 +25,19 @@ public class ConversationUtils {
     public static final String removeMemberURL = "https://chaoli.club/index.php/?p=conversation/removeMember.ajax/";
     public static final String getMembersAllowedURL = "https://chaoli.club/index.php/";
 
+    public static final int CAFF_ID = 1;
+    public static final int MATH_ID = 4;
+    public static final int PHYS_ID = 5;
+    public static final int CHEM_ID = 6;
+    public static final int BIO_ID = 7;
+    public static final int TECH_ID = 8;
+    public static final int ANNOUN_ID = 28;
+    public static final int COURT_ID = 25;
+    public static final int RECYCLED_ID = 27;
+    public static final int LANG_ID = 40;
+    public static final int SOCSCI_ID = 34;
+
+
     public static final int RETURN_ERROR = -1;
     public static final int NO_THIS_MEMBER = -2;
 
@@ -32,11 +45,11 @@ public class ConversationUtils {
 
     private static ArrayList<Integer> memberList = new ArrayList<>();
 
-    public static void setChannel(final Context context, int channel, SetChannelObverser obverser){
-        setChannel(context, channel, 0, obverser);
+    public static void setChannel(final Context context, int channel, SetChannelObserver Observer){
+        setChannel(context, channel, 0, Observer);
     }
 
-    public static void setChannel(final Context context, int channel, int conversationId, final SetChannelObverser obverser){
+    public static void setChannel(final Context context, int channel, int conversationId, final SetChannelObserver Observer){
         CookieUtils.saveCookie(client, context);
         String url = setChannelURL + String.valueOf(conversationId);
         RequestParams params = new RequestParams();
@@ -48,24 +61,24 @@ public class ConversationUtils {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
                 if (response.startsWith("{\"allowedSummary\"")) {
-                    obverser.onSetChannelSuccess();
+                    Observer.onSetChannelSuccess();
                 } else {
-                    obverser.onSetChannelFailure(RETURN_ERROR);
+                    Observer.onSetChannelFailure(RETURN_ERROR);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                obverser.onSetChannelFailure(statusCode);
+                Observer.onSetChannelFailure(statusCode);
             }
         });
     }
 
-    public static void addMember(final Context context, String member, AddMemberObverser obverser){
-        addMember(context, member, 0, obverser);
+    public static void addMember(final Context context, String member, AddMemberObserver Observer){
+        addMember(context, member, 0, Observer);
     }
 
-    public static void addMember(final Context context, String member, int conversationId, final AddMemberObverser obverser){
+    public static void addMember(final Context context, String member, int conversationId, final AddMemberObserver Observer){
         CookieUtils.saveCookie(client, context);
         String url = addMemberURL + String.valueOf(conversationId);
         RequestParams params = new RequestParams();
@@ -76,18 +89,18 @@ public class ConversationUtils {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
-                Log.i("addMember", response);
+                //Log.i("addMember", response);
                 String idFormat = "data-id='(\\d+)'";
                 Pattern pattern = Pattern.compile(idFormat);
                 Matcher matcher = pattern.matcher(response);
-                Log.i("response", String.valueOf(response.length()));
+                //Log.i("response", String.valueOf(response.length()));
                 if (matcher.find()) {
-                    Log.i("id", matcher.group(1));
+                    //Log.i("id", matcher.group(1));
                     int userIdAdded = Integer.parseInt(matcher.group(1));
                     memberList.add(userIdAdded);
-                    obverser.onAddMemberSuccess();
+                    Observer.onAddMemberSuccess();
                 } else {
-                    obverser.onAddMemberFailure(RETURN_ERROR);
+                    Observer.onAddMemberFailure(RETURN_ERROR);
                 }
             }
 
@@ -98,12 +111,12 @@ public class ConversationUtils {
         });
     }
 
-    public static void removeMember(final Context context, int userId, RemoveMemberObverser obverser){
-        removeMember(context, userId, 0, obverser);
+    public static void removeMember(final Context context, int userId, RemoveMemberObserver Observer){
+        removeMember(context, userId, 0, Observer);
     }
 
     public static void removeMember(final Context context, final int userId,
-                                    int conversationId, final RemoveMemberObverser obverser){
+                                    int conversationId, final RemoveMemberObserver Observer){
         CookieUtils.saveCookie(client, context);
         String url = removeMemberURL + String.valueOf(conversationId);
         RequestParams params = new RequestParams();
@@ -118,25 +131,25 @@ public class ConversationUtils {
                 if (response.startsWith("{\"allowedSummary\"")) {
                     if (memberList.contains(Integer.valueOf(userId))) {
                         memberList.remove(Integer.valueOf(userId));
-                        obverser.onRemoveMemberSuccess();
+                        Observer.onRemoveMemberSuccess();
                     } else {
-                        obverser.onRemoveMemberFailure(NO_THIS_MEMBER);
+                        Observer.onRemoveMemberFailure(NO_THIS_MEMBER);
                     }
                 } else {
-                    obverser.onRemoveMemberFailure(RETURN_ERROR);
+                    Observer.onRemoveMemberFailure(RETURN_ERROR);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 Log.e("removeMemberError", String.valueOf(statusCode));
-                obverser.onRemoveMemberFailure(statusCode);
+                Observer.onRemoveMemberFailure(statusCode);
             }
         });
     }
 
     public static void postConversation(Context context, String title, String content,
-                                        final PostConversationObverser obverser){
+                                        final PostConversationObserver Observer){
         CookieUtils.saveCookie(client, context);
 
         final RequestParams params = new RequestParams();
@@ -147,30 +160,31 @@ public class ConversationUtils {
         client.post(context, postConversationURL, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Log.i("postConversation", new String(responseBody));
+                //Log.i("postConversation", new String(responseBody));
                 String response = new String(responseBody);
                 if(response.startsWith("{\"redirect\"")){
                     String conIdFormat = "/(\\d+)";
                     Pattern pattern = Pattern.compile(conIdFormat);
                     Matcher matcher = pattern.matcher(response);
                     if(matcher.find()){
-                        Log.i("conId", matcher.group(1));
-                        obverser.onPostConversationSuccess(Integer.parseInt(matcher.group(1)));
+                        Observer.onPostConversationSuccess(Integer.parseInt(matcher.group(1)));
+                    }else{
+                        Observer.onPostConversationFailure(RETURN_ERROR);
                     }
                 } else {
-                    obverser.onPostConversationFailure(RETURN_ERROR);
+                    Observer.onPostConversationFailure(RETURN_ERROR);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.e("postConversationError", String.valueOf(statusCode));
-                obverser.onPostConversationFailure(statusCode);
+                //Log.e("postConversationError", String.valueOf(statusCode));
+                Observer.onPostConversationFailure(statusCode);
             }
         });
     }
-
-    public static void getMembersAllowed(Context context, int conId, final GetMembersAllowedObverser obverser){
+    
+    public static void getMembersAllowed(Context context, int conId, final GetMembersAllowedObserver Observer){
         CookieUtils.saveCookie(client, context);
         final List<Integer> memberList = new ArrayList<>();
         String url = getMembersAllowedURL;
@@ -189,37 +203,42 @@ public class ConversationUtils {
                 while(matcher.find()){
                     memberList.add(Integer.valueOf(matcher.group(1)));
                 }
-                obverser.onGetMembersAllowedSuccess(memberList);
+                
+                //返回的数据中，若可见用户只有自己，则返回自己的id，若有其他人，则不包含自己的id，所以要加上自己的id
+                if(memberList.size() > 1 || (memberList.size() == 1 && memberList.get(0) != LoginUtils.getUserId())){
+                    memberList.add(LoginUtils.getUserId());
+                }
+                Observer.onGetMembersAllowedSuccess(memberList);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                obverser.onGetMembersAllowedFailure(statusCode);
+                Observer.onGetMembersAllowedFailure(statusCode);
             }
         });
     }
 
-    public interface SetChannelObverser {
+    public interface SetChannelObserver {
         void onSetChannelSuccess();
         void onSetChannelFailure(int statusCode);
     }
 
-    public interface AddMemberObverser {
+    public interface AddMemberObserver {
         void onAddMemberSuccess();
         void onAddMemberFailure(int statusCode);
     }
 
-    public interface RemoveMemberObverser {
+    public interface RemoveMemberObserver {
         void onRemoveMemberSuccess();
         void onRemoveMemberFailure(int statusCode);
     }
 
-    public interface PostConversationObverser {
+    public interface PostConversationObserver {
         void onPostConversationSuccess(int conversationId);
         void onPostConversationFailure(int statusCode);
     }
 
-    public interface GetMembersAllowedObverser {
+    public interface GetMembersAllowedObserver {
         void onGetMembersAllowedSuccess(List<Integer> memberList);
         void onGetMembersAllowedFailure(int statusCode);
     }
