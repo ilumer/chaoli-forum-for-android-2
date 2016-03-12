@@ -1,7 +1,6 @@
 package com.geno.chaoli.forum.meta;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.loopj.android.http.*;
 
@@ -12,7 +11,7 @@ import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
 /**
- * 请在LoginObverser的onLoginFailure的实现中执行LoginUtils.clear()方法
+ * 请在LoginObserver的onLoginFailure的实现中执行LoginUtils.clear()方法
  * 可通过CookieUtils.getCookies()直接获取到登录后的cookie
  */
 public class LoginUtils {
@@ -55,23 +54,23 @@ public class LoginUtils {
 
     private static SharedPreferences sharedPreferences;
 
-    public static void begin_login(final Context context, String username, String password, LoginObverser loginObverser){
+    public static void begin_login(final Context context, String username, String password, LoginObserver loginObserver){
         //Log.i("login_1", "username = " + username + ", password = " + password);
         if(CookieUtils.getCookie(context).size() == 0){
             LoginUtils.username = username;
             LoginUtils.password = password;
             //Log.i("cookie", "doesn't exists");
-            pre_login(context, loginObverser);
+            pre_login(context, loginObserver);
         }
     }
 
-    public static void begin_login(final Context context, LoginObverser loginObverser){
+    public static void begin_login(final Context context, LoginObserver loginObserver){
         CookieUtils.setLoginCookieStore(context);
         CookieUtils.saveCookie(client, context);
 
         if(CookieUtils.getCookie(context).size() != 0){
             //Log.i("cookie", "exists");
-            getNewToken(context, loginObverser);
+            getNewToken(context, loginObserver);
             username = password = COOKIE_UN_AND_PW;
             return;
         }
@@ -82,14 +81,14 @@ public class LoginUtils {
         password = sharedPreferences.getString(SP_PASSWORD_KEY, "");
 
         if("".equals(username) || "".equals(password)){
-            loginObverser.onLoginFailure(EMPTY_UN_OR_PW);
+            loginObserver.onLoginFailure(EMPTY_UN_OR_PW);
             return;
         }
 
-        begin_login(context, username, password, loginObverser);
+        begin_login(context, username, password, loginObserver);
     }
 
-    private static void pre_login(final Context context, final LoginObverser loginObverser){//获取登录页面的token
+    private static void pre_login(final Context context, final LoginObserver loginObserver){//获取登录页面的token
         client.get(context, LOGIN_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -100,10 +99,10 @@ public class LoginUtils {
                 if (matcher.find()) {
                     //Log.i("login_token", matcher.group(1));
                     setToken(matcher.group(1));
-                    login(context, loginObverser);
+                    login(context, loginObserver);
                 } else {
                     //Log.e("regex_error", "regex_error");
-                    loginObverser.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
+                    loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
                 }
                 //Log.i("login_page", response);
             }
@@ -111,12 +110,12 @@ public class LoginUtils {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 //Log.e("login_error", "");
-                loginObverser.onLoginFailure(FAILED_AT_OPEN_LOGIN_PAGE);
+                loginObserver.onLoginFailure(FAILED_AT_OPEN_LOGIN_PAGE);
             }
         });
     }
 
-    private static void login(final Context context, final LoginObverser loginObverser){ //发送请求登录
+    private static void login(final Context context, final LoginObserver loginObserver){ //发送请求登录
         RequestParams params = new RequestParams();
         params.put("username", username);
         params.put("password", password);
@@ -127,7 +126,7 @@ public class LoginUtils {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 //Log.i("after_login", new String(responseBody));
-                loginObverser.onLoginFailure(WRONG_USERNAME_OR_PASSWORD);
+                loginObserver.onLoginFailure(WRONG_USERNAME_OR_PASSWORD);
             }
 
             @Override
@@ -137,15 +136,15 @@ public class LoginUtils {
                 error.printStackTrace(pw);
                 //Log.i("error", sw.toString());
                 if ("Moved Temporarily".equals(error.getMessage())) { //表示登陆成功，若在浏览器中将会跳转到首页
-                    getNewToken(context, loginObverser);
+                    getNewToken(context, loginObserver);
                 } else {
-                    loginObverser.onLoginFailure(FAILED_AT_LOGIN);
+                    loginObserver.onLoginFailure(FAILED_AT_LOGIN);
                 }
             }
         });
     }
 
-    private static void getNewToken(final Context context, final LoginObverser loginObverser){ //得到新的token
+    private static void getNewToken(final Context context, final LoginObserver loginObserver){ //得到新的token
         CookieUtils.saveCookie(client, context);
         client.get(context, HOMEPAGE_URL, new AsyncHttpResponseHandler() {
             @Override
@@ -165,25 +164,26 @@ public class LoginUtils {
                     //不是用cookie登录
                     if (!COOKIE_UN_AND_PW.equals(username)) {
                         editor.putString(SP_USERNAME_KEY, username);
-                        editor.putString(SP_PASSWORD_KEY, password);
+	                    // TODO: 16-3-11 1915 Encrypt saved password
+	                    editor.putString(SP_PASSWORD_KEY, password);
                         editor.apply();
                     }
                     CookieUtils.setCookies(CookieUtils.getCookie(context));
-                    loginObverser.onLoginSuccess(getUserId(), getToken());
+                    loginObserver.onLoginSuccess(getUserId(), getToken());
                 } else {
-                    loginObverser.onLoginFailure(COOKIE_EXPIRED);
+                    loginObserver.onLoginFailure(COOKIE_EXPIRED);
                     //Log.e("regex_error", "regex_error");
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                loginObverser.onLoginFailure(FAILED_AT_OPEN_HOMEPAGE);
+                loginObserver.onLoginFailure(FAILED_AT_OPEN_HOMEPAGE);
             }
         });
     }
 
-    public static void logout(final Context context, final LogoutObverser logoutObverser){
+    public static void logout(final Context context, final LogoutObserver logoutObserver){
         String logoutURL = LOGOUT_PRE_URL + getToken();
         client.get(context, logoutURL, new AsyncHttpResponseHandler() {
             @Override
@@ -191,12 +191,12 @@ public class LoginUtils {
                 clear();
                 //Log.i("logout", new String(responseBody));
                 //Log.i("cookie", String.valueOf(CookieUtils.getCookie(context).size()));
-                logoutObverser.onLogoutSuccess();
+                logoutObserver.onLogoutSuccess();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                logoutObverser.onLogoutFailure(statusCode);
+                logoutObserver.onLogoutFailure(statusCode);
             }
         });
     }
@@ -212,12 +212,14 @@ public class LoginUtils {
         }
     }
 
-    public interface LoginObverser{
+    public interface LoginObserver
+    {
         public void onLoginSuccess(int userId, String token);
         public void onLoginFailure(int statusCode);
     }
 
-    public interface LogoutObverser{
+    public interface LogoutObserver
+    {
         public void onLogoutSuccess();
         public void onLogoutFailure(int statusCode);
     }

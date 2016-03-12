@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.geno.chaoli.forum.PostActivity;
 import com.geno.chaoli.forum.R;
 
+import java.util.Locale;
+
 public class ConversationView extends RelativeLayout
 {
 	private static final String TAG = "ConversationView";
@@ -25,12 +27,12 @@ public class ConversationView extends RelativeLayout
 		View.inflate(context, R.layout.conversation_view, this);
 		this.conversation = conversation;
 
-		((TextView) findViewById(R.id.conversationId)).setText(String.format("%d", conversation.getConversationId()));
+		((TextView) findViewById(R.id.conversationId)).setText(String.format(Locale.getDefault(), "%d", conversation.getConversationId()));
 		((TextView) findViewById(R.id.title)).setText(conversation.getTitle());
 		String excerpt = conversation.getExcerpt().split("\\n")[0];
 		((TextView) findViewById(R.id.excerpt)).setText(excerpt.length() > 50 ?
 				excerpt.substring(0, 50) + "…" : excerpt);
-		((TextView) findViewById(R.id.replies)).setText(String.format("%d", conversation.getReplies()));
+		((TextView) findViewById(R.id.replies)).setText(String.format(Locale.getDefault(), "%d", conversation.getReplies()));
 		((LinearLayout) findViewById(R.id.channel)).addView(new ChannelTextView(context, conversation.getChannel()));
 
 		this.setOnClickListener(new OnClickListener()
