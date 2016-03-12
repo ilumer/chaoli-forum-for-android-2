@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.LoginUtils;
-import com.geno.chaoli.forum.meta.Methods;
 
 import java.lang.ref.WeakReference;
 
@@ -24,31 +23,6 @@ public class LoginActivity extends Activity
 	public SharedPreferences.Editor e;
 
 	public LoginUtils.LoginObserver observer;
-
-	public static class LoginHandler extends Handler
-	{
-		WeakReference<Activity> activity;
-
-		public LoginHandler(Activity activity)
-		{
-			this.activity = new WeakReference<>(activity);
-		}
-
-		@Override
-		public void handleMessage(Message msg)
-		{
-			super.handleMessage(msg);
-			switch (msg.what)
-			{
-				case Constants.FINISH_LOGIN_LIST_ANALYSIS:
-					activity.get().getSharedPreferences(Constants.conversationSP, MODE_PRIVATE).edit().putBoolean(Constants.loginBool, true).apply();
-					((MainActivity) new Activity()).mainHandler.sendEmptyMessage(Constants.FINISH_LOGIN);
-
-			}
-		}
-	}
-
-	public LoginHandler loginHandler = new LoginHandler(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -72,7 +46,7 @@ public class LoginActivity extends Activity
 				switch (statusCode)
 				{
 					case LoginUtils.FAILED_AT_OPEN_LOGIN_PAGE:
-						Toast.makeText(LoginActivity.this, "FAILED_AT_OEPN_LOGIN_PAGE", Toast.LENGTH_SHORT).show();
+						Toast.makeText(LoginActivity.this, "FAILED_AT_OPEN_LOGIN_PAGE", Toast.LENGTH_SHORT).show();
 						break;
 					case LoginUtils.FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE:
 						Toast.makeText(LoginActivity.this, "FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE", Toast.LENGTH_SHORT).show();
@@ -104,7 +78,6 @@ public class LoginActivity extends Activity
 				String name = loginName.getText().toString();
 				String pwd = loginPwd.getText().toString();
 				LoginUtils.begin_login(LoginActivity.this, name, pwd, observer);
-
 			}
 		});
 	}
