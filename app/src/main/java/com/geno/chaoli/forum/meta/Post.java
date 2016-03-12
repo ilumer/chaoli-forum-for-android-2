@@ -23,6 +23,8 @@ public class Post
 	public Map<Integer, String> groups;
 	public String groupNames;
 	public List<Attachment> attachments;
+
+	public Post(){};
 /*
 	public Post(int postId, int conversationId,
 			int memberId, long time,

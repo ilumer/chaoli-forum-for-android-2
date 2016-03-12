@@ -1,5 +1,6 @@
 package com.geno.chaoli.forum;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,7 +10,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.Constants;
@@ -19,6 +24,7 @@ import com.geno.chaoli.forum.meta.Methods;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends FragmentActivity
 {
@@ -32,7 +38,35 @@ public class MainActivity extends FragmentActivity
 	public ViewPager mainPager;
 	public PagerTabStrip mainTabStrip;
 	public List<Fragment> mainFragments;
-	public List<String> mainFragementsTitles;
+	public List<String> mainFragmentsTitles;
+
+	public LinearLayout slidingMenu;
+
+	public static class MainHandler extends Handler
+	{
+		WeakReference<Activity> mainActivity;
+
+		public MainHandler(Activity activity)
+		{
+			mainActivity = new WeakReference<Activity>(activity);
+		}
+
+		@Override
+		public void handleMessage(Message msg)
+		{
+			super.handleMessage(msg);
+			switch (msg.what)
+			{
+				case Constants.FINISH_CONVERSATION_LIST_ANALYSIS:
+					ConversationListFragment.deal();
+					break;
+				case Constants.FINISH_LOGIN:
+					Toast.makeText(mainActivity.get(), "Finish Login", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
+	public Handler mainHandler = new MainHandler(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -40,7 +74,25 @@ public class MainActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		sp = getSharedPreferences(Constants.conversationSP, MODE_PRIVATE);
 		e = sp.edit();
-		setContentView(R.layout.activity_main);
+
+		slidingMenu = new LinearLayout(this);
+		slidingMenu.setOrientation(LinearLayout.VERTICAL);
+
+		RelativeLayout avatarBox = new RelativeLayout(this);
+		avatarBox.setGravity(RelativeLayout.CENTER_IN_PARENT);
+		ImageView avatar = new ImageView(this);
+		avatarBox.addView(avatar);
+		slidingMenu.addView(avatarBox, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+		TextView userName = new TextView(this);
+		userName.setText("Username");
+		slidingMenu.addView(userName, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+		RelativeLayout loginBtn = new RelativeLayout(this);
+		ImageView loginImg = new ImageView(this);
+
+
+		setContentView(R.layout.main_activity);
 		mainPager = (ViewPager) findViewById(R.id.mainPager);
 		mainTabStrip = (PagerTabStrip) findViewById(R.id.mainTabStrip);
 		mainTabStrip.setDrawFullUnderline(false);
@@ -48,25 +100,30 @@ public class MainActivity extends FragmentActivity
 
 		mainFragments = new ArrayList<>();
 
-		mainFragementsTitles = new ArrayList<>();
-		mainFragementsTitles.add(Channel.maths.toString());
-		mainFragementsTitles.add(Channel.physics.toString());
-		mainFragementsTitles.add(Channel.chem.toString());
-		mainFragementsTitles.add(Channel.biology.toString());
-		mainFragementsTitles.add(Channel.tech.toString());
-		mainFragementsTitles.add(Channel.announ.toString());
-		mainFragementsTitles.add(Channel.socsci.toString());
-		mainFragementsTitles.add(Channel.lang.toString());
+		boolean loggedIn = sp.getBoolean(Constants.loginBool, false);
 
-		ConversationListFragment[] frag = new ConversationListFragment[8];
-		for (int i = 0; i < 8; i++)
+		mainFragmentsTitles = new ArrayList<>();
+
+		if (loggedIn) mainFragmentsTitles.add(Channel.caff.toString());
+		mainFragmentsTitles.add(Channel.maths.toString());
+		mainFragmentsTitles.add(Channel.physics.toString());
+		mainFragmentsTitles.add(Channel.chem.toString());
+		mainFragmentsTitles.add(Channel.biology.toString());
+		mainFragmentsTitles.add(Channel.tech.toString());
+		mainFragmentsTitles.add(Channel.court.toString());
+		mainFragmentsTitles.add(Channel.announ.toString());
+		mainFragmentsTitles.add(Channel.others.toString());
+		mainFragmentsTitles.add(Channel.socsci.toString());
+		mainFragmentsTitles.add(Channel.lang.toString());
+
+		ConversationListFragment[] frag = new ConversationListFragment[loggedIn ? 11 : 10];
+
+		for (int i = 0; i < frag.length; i++)
 		{
-			frag[i] = new ConversationListFragment();
-			frag[i].setChannel(mainFragementsTitles.get(i));
+			(frag[i] = new ConversationListFragment()).setChannel(Methods.getChannel(mainFragmentsTitles.get(i)).name());
+			frag[i].setI(i + "");
 			mainFragments.add(frag[i]);
 		}
-
-
 
 		mainPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
 		{
@@ -85,9 +142,8 @@ public class MainActivity extends FragmentActivity
 			@Override
 			public CharSequence getPageTitle(int position)
 			{
-				return mainFragementsTitles.get(position);
+				return mainFragmentsTitles.get(position);
 			}
 		});
-		//Methods.getList(this);
 	}
 }
