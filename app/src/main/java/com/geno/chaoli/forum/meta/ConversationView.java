@@ -3,35 +3,36 @@ package com.geno.chaoli.forum.meta;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.geno.chaoli.forum.PostActivity;
 import com.geno.chaoli.forum.R;
 
-// TODO: 2016/2/12 0012 2226 Unable to debug this class... Now...
+import java.util.Locale;
+
 public class ConversationView extends RelativeLayout
 {
 	private static final String TAG = "ConversationView";
 
 	public Conversation conversation;
 
-	public ConversationView(final Context context, Conversation conversation)
+	public ConversationView(final Context context, final Conversation conversation)
 	{
 		this(context);
-		View.inflate(context, R.layout.conversationview, this);
+		View.inflate(context, R.layout.conversation_view, this);
 		this.conversation = conversation;
 
-		((TextView) findViewById(R.id.conversationId)).setText(conversation.getConversationId() + "");
+		((TextView) findViewById(R.id.conversationId)).setText(String.format(Locale.getDefault(), "%d", conversation.getConversationId()));
 		((TextView) findViewById(R.id.title)).setText(conversation.getTitle());
 		String excerpt = conversation.getExcerpt().split("\\n")[0];
 		((TextView) findViewById(R.id.excerpt)).setText(excerpt.length() > 50 ?
 				excerpt.substring(0, 50) + "…" : excerpt);
-		((TextView) findViewById(R.id.replies)).setText(conversation.getReplies() + "");
+		((TextView) findViewById(R.id.replies)).setText(String.format(Locale.getDefault(), "%d", conversation.getReplies()));
 		((LinearLayout) findViewById(R.id.channel)).addView(new ChannelTextView(context, conversation.getChannel()));
 
 		this.setOnClickListener(new OnClickListener()
@@ -40,7 +41,11 @@ public class ConversationView extends RelativeLayout
 			public void onClick(View v)
 			{
 				// TODO: 2016/2/12 0012 2123 Jump to post view.
-				Toast.makeText(context, ((ConversationView) v).conversation.getConversationId() + "", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(context, ((ConversationView) v).conversation.getConversationId() + "", Toast.LENGTH_SHORT).show();
+				Intent jmp = new Intent();
+				jmp.putExtra("conversationId", ((ConversationView) v).conversation.getConversationId());
+				jmp.setClass(context, PostActivity.class);
+				context.startActivity(jmp);
 			}
 		});
 
