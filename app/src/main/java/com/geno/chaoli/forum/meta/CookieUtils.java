@@ -16,12 +16,12 @@ import cz.msebera.android.httpclient.cookie.Cookie;
  */
 public class CookieUtils {
     private static List<Cookie> cookies;
-    private static PersistentCookieStore loginCookieStore;
+    //private static PersistentCookieStore loginCookieStore;
 
     /* 存下登录页面对应的PersistentCookieStore，注销时使用 */
-    public static void setLoginCookieStore(Context loginContext) {
+    /*public static void setLoginCookieStore(Context loginContext) {
         loginCookieStore = new PersistentCookieStore(loginContext);
-    }
+    }*/
 
     /* 返回cookies列表 */
     public static List<Cookie> getCookies() {
@@ -52,9 +52,9 @@ public class CookieUtils {
         cookieStore.clear();
     }
 
-    public static void clearLoginCookie(){
+    /*public static void clearLoginCookie(){
         loginCookieStore.clear();
-    }
+    }*/
 
     public static void clearCookies(){
         cookies = null;
