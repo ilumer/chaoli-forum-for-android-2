@@ -54,14 +54,14 @@ public class LoginUtils {
 
     private static SharedPreferences sharedPreferences;
 
-    public static void begin_login(final Context context, String username, String password, LoginObserver loginObverser){
+    public static void begin_login(final Context context, String username, String password, LoginObserver loginObserver){
         CookieUtils.clearCookie(context); //正常情况下这句应该不会用到，但以防万一
         CookieUtils.saveCookie(client, context);
         if(CookieUtils.getCookie(context).size() == 0){
             LoginUtils.username = username;
             LoginUtils.password = password;
             //Log.i("cookie", "doesn't exists");
-            pre_login(context, loginObverser);
+            pre_login(context, loginObserver);
         }
     }
 
@@ -88,7 +88,6 @@ public class LoginUtils {
         begin_login(context, username, password, loginObserver);
     }
 
-
     private static void pre_login(final Context context, final LoginObserver loginObserver){//获取登录页面的token
         client.get(context, LOGIN_URL, new AsyncHttpResponseHandler() {
             @Override
@@ -98,7 +97,6 @@ public class LoginUtils {
                 Pattern pattern = Pattern.compile(tokenFormat);
                 Matcher matcher = pattern.matcher(response);
                 if (matcher.find()) {
-                    //Log.i("login_token", "token = " + matcher.group(1));
                     setToken(matcher.group(1));
                     login(context, loginObserver);
                 } else {
