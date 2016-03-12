@@ -77,7 +77,7 @@ public class PostActivity extends Activity
 			@Override
 			public void onClick(View v)
 			{
-
+				Toast.makeText(PostActivity.this, "Reply", Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
