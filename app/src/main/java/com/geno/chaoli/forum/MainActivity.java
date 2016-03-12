@@ -10,6 +10,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Channel;
@@ -20,6 +24,7 @@ import com.geno.chaoli.forum.meta.Methods;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends FragmentActivity
 {
@@ -34,6 +39,8 @@ public class MainActivity extends FragmentActivity
 	public PagerTabStrip mainTabStrip;
 	public List<Fragment> mainFragments;
 	public List<String> mainFragmentsTitles;
+
+	public LinearLayout slidingMenu;
 
 	public static class MainHandler extends Handler
 	{
@@ -67,6 +74,24 @@ public class MainActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		sp = getSharedPreferences(Constants.conversationSP, MODE_PRIVATE);
 		e = sp.edit();
+
+		slidingMenu = new LinearLayout(this);
+		slidingMenu.setOrientation(LinearLayout.VERTICAL);
+
+		RelativeLayout avatarBox = new RelativeLayout(this);
+		avatarBox.setGravity(RelativeLayout.CENTER_IN_PARENT);
+		ImageView avatar = new ImageView(this);
+		avatarBox.addView(avatar);
+		slidingMenu.addView(avatarBox, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+		TextView userName = new TextView(this);
+		userName.setText("Username");
+		slidingMenu.addView(userName, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+		RelativeLayout loginBtn = new RelativeLayout(this);
+		ImageView loginImg = new ImageView(this);
+
+
 		setContentView(R.layout.main_activity);
 		mainPager = (ViewPager) findViewById(R.id.mainPager);
 		mainTabStrip = (PagerTabStrip) findViewById(R.id.mainTabStrip);
@@ -96,6 +121,7 @@ public class MainActivity extends FragmentActivity
 		for (int i = 0; i < frag.length; i++)
 		{
 			(frag[i] = new ConversationListFragment()).setChannel(Methods.getChannel(mainFragmentsTitles.get(i)).name());
+			frag[i].setI(i + "");
 			mainFragments.add(frag[i]);
 		}
 

@@ -19,6 +19,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
 public class Methods
 {
 	public static final String TAG = "Methods";
@@ -232,5 +235,21 @@ public class Methods
 			result[i] = new PostView(context, post);
 		}
 		return result;
+	}
+
+	public static String encryptPwd(String pwd, String key)
+	{
+		String enc = "";
+		try
+		{
+			SecretKeySpec spec = new SecretKeySpec(key.getBytes(), "AES");
+			Cipher cipher = Cipher.getInstance("AES/CBC");
+			cipher.init(Cipher.ENCRYPT_MODE, spec);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return enc;
 	}
 }
