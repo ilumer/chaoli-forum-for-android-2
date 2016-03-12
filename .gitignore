@@ -19,3 +19,6 @@ proguard/
 # Test files are stored as
 *.json
 *.html
+
+*.iml
+
