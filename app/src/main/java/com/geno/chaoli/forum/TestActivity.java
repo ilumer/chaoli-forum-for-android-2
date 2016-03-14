@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * Created by jianhao on 16-3-12.
  */
-public class TestActivity extends Activity implements View.OnClickListener, LoginUtils.LoginObverser,
-        ConversationUtils.PostConversationObverser, ConversationUtils.SetChannelObverser,
-        ConversationUtils.AddMemberObverser, ConversationUtils.GetMembersAllowedObverser{
+public class TestActivity extends Activity implements View.OnClickListener, LoginUtils.LoginObserver,
+        ConversationUtils.PostConversationObserver, ConversationUtils.SetChannelObserver,
+        ConversationUtils.AddMemberObserver, ConversationUtils.GetMembersAllowedObserver{
     EditText username_txt, password_txt;
     TextView user_id_txt;
     @Override

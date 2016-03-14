@@ -25,17 +25,17 @@ public class ConversationUtils {
     public static final String removeMemberURL = "https://chaoli.club/index.php/?p=conversation/removeMember.ajax/";
     public static final String getMembersAllowedURL = "https://chaoli.club/index.php/";
 
-    public static final int CAFF_ID = 1;
-    public static final int MATH_ID = 4;
-    public static final int PHYS_ID = 5;
-    public static final int CHEM_ID = 6;
-    public static final int BIO_ID = 7;
-    public static final int TECH_ID = 8;
-    public static final int ANNOUN_ID = 28;
-    public static final int COURT_ID = 25;
-    public static final int RECYCLED_ID = 27;
-    public static final int LANG_ID = 40;
-    public static final int SOCSCI_ID = 34;
+    public static final int CAFF_ID = 1;            //茶馆
+    public static final int MATH_ID = 4;            //数学
+    public static final int PHYS_ID = 5;            //物理
+    public static final int CHEM_ID = 6;            //化学
+    public static final int BIO_ID = 7;             //生物
+    public static final int TECH_ID = 8;            //技术
+    public static final int ANNOUN_ID = 28;         //公告
+    public static final int COURT_ID = 25;          //申诉
+    public static final int RECYCLED_ID = 27;       //回收站
+    public static final int LANG_ID = 40;           //语言
+    public static final int SOCSCI_ID = 34;         //社科
 
 
     public static final int RETURN_ERROR = -1;
@@ -49,6 +49,8 @@ public class ConversationUtils {
         setChannel(context, channel, 0, Observer);
     }
 
+    //conversationId为0时，会设置正在编辑、还未发出的conversation的板块
+    //addMember, removeMember也是同样
     public static void setChannel(final Context context, int channel, int conversationId, final SetChannelObserver Observer){
         CookieUtils.saveCookie(client, context);
         String url = setChannelURL + String.valueOf(conversationId);
@@ -63,7 +65,7 @@ public class ConversationUtils {
                 if (response.startsWith("{\"allowedSummary\"")) {
                     Observer.onSetChannelSuccess();
                 } else {
-                    Observer.onSetChannelFailure(RETURN_ERROR);
+                    Observer.onSetChannelFailure(RETURN_ERROR);                 //返回数据错误
                 }
             }
 
@@ -74,6 +76,7 @@ public class ConversationUtils {
         });
     }
 
+    //添加可见用户（默认任何人均可见）
     public static void addMember(final Context context, String member, AddMemberObserver Observer){
         addMember(context, member, 0, Observer);
     }
@@ -100,7 +103,7 @@ public class ConversationUtils {
                     memberList.add(userIdAdded);
                     Observer.onAddMemberSuccess();
                 } else {
-                    Observer.onAddMemberFailure(RETURN_ERROR);
+                    Observer.onAddMemberFailure(RETURN_ERROR);              //返回数据错误
                 }
             }
 
@@ -133,7 +136,7 @@ public class ConversationUtils {
                         memberList.remove(Integer.valueOf(userId));
                         Observer.onRemoveMemberSuccess();
                     } else {
-                        Observer.onRemoveMemberFailure(NO_THIS_MEMBER);
+                        Observer.onRemoveMemberFailure(NO_THIS_MEMBER);         //无此会员
                     }
                 } else {
                     Observer.onRemoveMemberFailure(RETURN_ERROR);
@@ -197,7 +200,7 @@ public class ConversationUtils {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
                 Log.i("get", response);
-                String idFormat = "data-id='(\\d+)'";
+                String idFormat = "data-id='(\\d+)'";           //按此格式从返回的数据中获取id
                 Pattern pattern = Pattern.compile(idFormat);
                 Matcher matcher = pattern.matcher(response);
                 while(matcher.find()){

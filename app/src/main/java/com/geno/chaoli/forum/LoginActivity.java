@@ -93,7 +93,7 @@ public class LoginActivity extends Activity
 						Toast.makeText(LoginActivity.this, "EMPTY_UN_OR_PW", Toast.LENGTH_SHORT).show();
 						break;
 				}
-				LoginUtils.clear();
+				LoginUtils.clear(getApplicationContext());
 			}
 		};
 		loginBtn.setOnClickListener(new View.OnClickListener()
