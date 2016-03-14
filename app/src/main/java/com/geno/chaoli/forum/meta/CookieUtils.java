@@ -23,20 +23,24 @@ public class CookieUtils {
         loginCookieStore = new PersistentCookieStore(loginContext);
     }*/
 
+    //以下两个函数貌似完全没有用
     /* 返回cookies列表 */
-    public static List<Cookie> getCookies() {
+    /*public static List<Cookie> getCookies() {
         return cookies;//cookies != null ? cookies : new ArrayList<Cookie>();
-    }
+    }*/
 
     /* 设置cookies列表 */
-    public static void setCookies(List<Cookie> cookies) {
+    /*public static void setCookies(List<Cookie> cookies) {
         CookieUtils.cookies = cookies;
-    }
+    }*/
 
     /* 存储cookie */
+    //context参数只是产生SharedPreference对象时使用，无论传递哪个context对象，都会返回一个拥有所有Cookie的CookieStore
     public static void saveCookie(AsyncHttpClient client, Context context) {
         PersistentCookieStore cookieStore = new PersistentCookieStore(context);
-        client.setCookieStore(cookieStore);
+        client.setCookieStore(cookieStore);             //执行setCookieStore之后，CookieStore对象会保存Client对象
+                                                        //产生的Cookie，同时Client对象也会使用CookieStore对象保存的Cookie
+                                                        //来进行网络访问
     }
 
     /* 得到cookie */
