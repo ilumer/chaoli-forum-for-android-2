@@ -19,11 +19,20 @@ import cz.msebera.android.httpclient.cookie.Cookie;
  * Created by jianhao on 16-3-11.
  */
 public class ConversationUtils {
+    /* 给帖子设置版块 */
     public static final String setChannelURL = "https://chaoli.club/index.php/?p=conversation/save.json/";
+    /* 发表帖子 */
     public static final String postConversationURL = "https://chaoli.club/index.php/?p=conversation/start.ajax";
+    /* 添加可见用户 */
     public static final String addMemberURL = "https://chaoli.club/index.php/?p=conversation/addMember.ajax/";
+    /* 给帖子设置版块 */
     public static final String removeMemberURL = "https://chaoli.club/index.php/?p=conversation/removeMember.ajax/";
+    /* 给帖子设置版块 */
     public static final String getMembersAllowedURL = "https://chaoli.club/index.php/";
+    /* 给帖子设置版块 */
+    public static final String ignoreConversationURL = "https://chaoli.club/index.php/?p=conversation/ignore.ajax/";
+    /* 给帖子设置版块 */   
+    public static final String starConversationURL = "https://chaoli.club/index.php/?p=conversation/star.json/";
 
     public static final int CAFF_ID = 1;            //茶馆
     public static final int MATH_ID = 4;            //数学
