@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.ConversationUtils;
 import com.geno.chaoli.forum.meta.CookieUtils;
@@ -19,7 +20,8 @@ import java.util.List;
  */
 public class TestActivity extends Activity implements View.OnClickListener, LoginUtils.LoginObserver,
         ConversationUtils.PostConversationObserver, ConversationUtils.SetChannelObserver,
-        ConversationUtils.AddMemberObserver, ConversationUtils.GetMembersAllowedObserver{
+        ConversationUtils.AddMemberObserver, ConversationUtils.GetMembersAllowedObserver,
+        ConversationUtils.IgnoreAndStarConversationObserver{
     EditText username_txt, password_txt;
     TextView user_id_txt;
     @Override
@@ -48,8 +50,7 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
                         password_txt.getText().toString(), this);
                 break;
             case R.id.set_channel_btn:
-                //ConversationUtils.setChannel(this, 1, this);
-                ConversationUtils.getMembersAllowed(this, 2254, this);
+                ConversationUtils.starConversation(this, 2237, this);
                 break;
             default:
                 break;
@@ -110,5 +111,35 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
              memberList) {
             Log.i("member", i.toString());
         }
+    }
+
+    @Override
+    public void onIgnoreConversationFailure(int statusCode) {
+        Log.e("ignore", String.valueOf(statusCode));
+    }
+
+    @Override
+    public void onIgnoreConversationSuccess(Boolean isIgnored) {
+        if(isIgnored){
+            Toast.makeText(this, "已被隐藏", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "已取消隐藏", Toast.LENGTH_SHORT).show();
+        }
+        Log.i("ignore", String.valueOf(isIgnored));
+    }
+
+    @Override
+    public void onStarConversationFailure(int statusCode) {
+        Log.e("star", String.valueOf(statusCode));
+    }
+
+    @Override
+    public void onStarConversationSuccess(Boolean isStarred) {
+        if(isStarred){
+            Toast.makeText(this, "已关注", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "已取消关注", Toast.LENGTH_SHORT).show();
+        }
+        Log.i("ignore", String.valueOf(isStarred));
     }
 }

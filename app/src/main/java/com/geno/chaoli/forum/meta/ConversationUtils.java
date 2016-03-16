@@ -19,35 +19,47 @@ import cz.msebera.android.httpclient.cookie.Cookie;
  * Created by jianhao on 16-3-11.
  */
 public class ConversationUtils {
-    /* 给帖子设置版块 */
+    /* 给主题设置版块 */
     public static final String setChannelURL = "https://chaoli.club/index.php/?p=conversation/save.json/";
-    /* 发表帖子 */
+    /* 发表主题 */
     public static final String postConversationURL = "https://chaoli.club/index.php/?p=conversation/start.ajax";
     /* 添加可见用户 */
     public static final String addMemberURL = "https://chaoli.club/index.php/?p=conversation/addMember.ajax/";
-    /* 给帖子设置版块 */
+    /* 取消可见用户 */
     public static final String removeMemberURL = "https://chaoli.club/index.php/?p=conversation/removeMember.ajax/";
-    /* 给帖子设置版块 */
+    /* 获取可见用户列表 */
     public static final String getMembersAllowedURL = "https://chaoli.club/index.php/";
-    /* 给帖子设置版块 */
+    /* 隐藏主题 */
     public static final String ignoreConversationURL = "https://chaoli.club/index.php/?p=conversation/ignore.ajax/";
-    /* 给帖子设置版块 */   
+    /* 关注主题 */
     public static final String starConversationURL = "https://chaoli.club/index.php/?p=conversation/star.json/";
 
-    public static final int CAFF_ID = 1;            //茶馆
-    public static final int MATH_ID = 4;            //数学
-    public static final int PHYS_ID = 5;            //物理
-    public static final int CHEM_ID = 6;            //化学
-    public static final int BIO_ID = 7;             //生物
-    public static final int TECH_ID = 8;            //技术
-    public static final int ANNOUN_ID = 28;         //公告
-    public static final int COURT_ID = 25;          //申诉
-    public static final int RECYCLED_ID = 27;       //回收站
-    public static final int LANG_ID = 40;           //语言
-    public static final int SOCSCI_ID = 34;         //社科
+    /* 茶馆 */
+    public static final int CAFF_ID = 1;
+    /* 数学 */
+    public static final int MATH_ID = 4;
+    /* 物理 */
+    public static final int PHYS_ID = 5;
+    /* 化学 */
+    public static final int CHEM_ID = 6;
+    /* 生物 */
+    public static final int BIO_ID = 7;
+    /* 技术 */
+    public static final int TECH_ID = 8;
+    /* 公告 */
+    public static final int ANNOUN_ID = 28;
+    /* 申诉 */
+    public static final int COURT_ID = 25;
+    /* 回收站 */
+    public static final int RECYCLED_ID = 27;
+    /* 语言 */
+    public static final int LANG_ID = 40;
+    /* 社科 */
+    public static final int SOCSCI_ID = 34;
 
-
+    /* 返回的数据错误 */
     public static final int RETURN_ERROR = -1;
+    /* 取消可见用户时没有可见用户列表没有这个用户 */
     public static final int NO_THIS_MEMBER = -2;
 
     private static AsyncHttpClient client = new AsyncHttpClient();
@@ -58,8 +70,9 @@ public class ConversationUtils {
         setChannel(context, channel, 0, Observer);
     }
 
-    //conversationId为0时，会设置正在编辑、还未发出的conversation的板块
-    //addMember, removeMember也是同样
+    /*  设置主题的板块
+    *   conversationId为0时，会设置正在编辑、还未发出的conversation的板块
+    *   addMember, removeMember也是同样*/
     public static void setChannel(final Context context, int channel, int conversationId, final SetChannelObserver Observer){
         CookieUtils.saveCookie(client, context);
         String url = setChannelURL + String.valueOf(conversationId);
@@ -85,7 +98,7 @@ public class ConversationUtils {
         });
     }
 
-    //添加可见用户（默认任何人均可见）
+    /*  添加可见用户（默认任何人均可见）    */
     public static void addMember(final Context context, String member, AddMemberObserver Observer){
         addMember(context, member, 0, Observer);
     }
@@ -123,6 +136,7 @@ public class ConversationUtils {
         });
     }
 
+    /*  取消可见用户  */
     public static void removeMember(final Context context, int userId, RemoveMemberObserver Observer){
         removeMember(context, userId, 0, Observer);
     }
@@ -160,6 +174,7 @@ public class ConversationUtils {
         });
     }
 
+    /*  发表主题    */
     public static void postConversation(Context context, String title, String content,
                                         final PostConversationObserver Observer){
         CookieUtils.saveCookie(client, context);
@@ -195,7 +210,8 @@ public class ConversationUtils {
             }
         });
     }
-    
+
+    /*  获取可见用户列表    */
     public static void getMembersAllowed(Context context, int conId, final GetMembersAllowedObserver Observer){
         CookieUtils.saveCookie(client, context);
         final List<Integer> memberList = new ArrayList<>();
@@ -212,12 +228,12 @@ public class ConversationUtils {
                 String idFormat = "data-id='(\\d+)'";           //按此格式从返回的数据中获取id
                 Pattern pattern = Pattern.compile(idFormat);
                 Matcher matcher = pattern.matcher(response);
-                while(matcher.find()){
+                while (matcher.find()) {
                     memberList.add(Integer.valueOf(matcher.group(1)));
                 }
-                
+
                 //返回的数据中，若可见用户只有自己，则返回自己的id，若有其他人，则不包含自己的id，所以要加上自己的id
-                if(memberList.size() > 1 || (memberList.size() == 1 && memberList.get(0) != LoginUtils.getUserId())){
+                if (memberList.size() > 1 || (memberList.size() == 1 && memberList.get(0) != LoginUtils.getUserId())) {
                     memberList.add(LoginUtils.getUserId());
                 }
                 Observer.onGetMembersAllowedSuccess(memberList);
@@ -226,6 +242,65 @@ public class ConversationUtils {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 Observer.onGetMembersAllowedFailure(statusCode);
+            }
+        });
+    }
+
+    /*  隐藏/取消隐藏该主题
+    *   执行操作后主题的状态为隐藏，则isIgnored为true，否则为false*/
+    public static void ignoreConversation(Context context, int conversationId,
+                                          final IgnoreAndStarConversationObserver observer){
+        CookieUtils.saveCookie(client, context);
+        String url = ignoreConversationURL + conversationId;
+        RequestParams params = new RequestParams();
+        params.put("userId", LoginUtils.getUserId());
+        params.put("token", LoginUtils.getToken());
+        client.get(context, url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String response = new String(responseBody);
+                if(response.contains("\"ignored\":true")) {
+                    observer.onIgnoreConversationSuccess(true);
+                }else if(response.contains("\"ignored\":false")){
+                    observer.onIgnoreConversationSuccess(false);
+                }else{
+                    Log.e("ignore", "response = " + response);
+                    observer.onIgnoreConversationFailure(RETURN_ERROR);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                observer.onIgnoreConversationFailure(statusCode);
+            }
+        });
+    }
+
+    /*  关注/取消关注该主题
+    *   执行操作后主题的状态为被关注，则isStarred为true，否则为false*/
+    public static void starConversation(Context context, int conversationId,
+                                        final IgnoreAndStarConversationObserver observer) {
+        CookieUtils.saveCookie(client, context);
+        String url = starConversationURL + conversationId;
+        RequestParams params = new RequestParams();
+        params.put("userId", LoginUtils.getUserId());
+        params.put("token", LoginUtils.getToken());
+        client.get(context, url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String response = new String(responseBody);
+                if (response.contains("\"starred\":true")) {
+                    observer.onStarConversationSuccess(true);
+                } else if (response.contains("\"starred\":false")) {
+                    observer.onStarConversationSuccess(false);
+                } else {
+                    observer.onStarConversationFailure(RETURN_ERROR);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                observer.onStarConversationFailure(statusCode);
             }
         });
     }
@@ -253,5 +328,12 @@ public class ConversationUtils {
     public interface GetMembersAllowedObserver {
         void onGetMembersAllowedSuccess(List<Integer> memberList);
         void onGetMembersAllowedFailure(int statusCode);
+    }
+
+    public interface IgnoreAndStarConversationObserver{
+        void onIgnoreConversationSuccess(Boolean isIgnored);
+        void onIgnoreConversationFailure(int statusCode);
+        void onStarConversationSuccess(Boolean isStarred);
+        void onStarConversationFailure(int statusCode);
     }
 }

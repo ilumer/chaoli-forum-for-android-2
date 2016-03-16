@@ -206,7 +206,6 @@ public class LoginUtils {
     public static void clear(Context context){
         //CookieUtils.clearLoginCookie();
         CookieUtils.clearCookie(context);
-        CookieUtils.clearCookies();
         if(sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove(SP_USERNAME_KEY);
