@@ -167,7 +167,7 @@ public class LoginUtils {
 	                    editor.putString(SP_PASSWORD_KEY, password);
                         editor.apply();
                     }
-                    CookieUtils.setCookies(CookieUtils.getCookie(context));
+                    //CookieUtils.setCookies(CookieUtils.getCookie(context));
                     loginObserver.onLoginSuccess(getUserId(), getToken());
                 } else {
                     CookieUtils.clearCookie(context);
@@ -204,7 +204,6 @@ public class LoginUtils {
     public static void clear(Context context){
         //CookieUtils.clearLoginCookie();
         CookieUtils.clearCookie(context);
-        CookieUtils.clearCookies();
         if(sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove(SP_USERNAME_KEY);
