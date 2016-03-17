@@ -59,4 +59,19 @@ public enum Channel
 	{
 		return this.name;
 	}
+
+
+	public static final Channel getChannel(int channelId)
+	{
+		for (Channel c : Channel.values())
+			if (c.getChannelId() == channelId) return c;
+		return null;
+	}
+
+	public static final Channel getChannel(String channelName)
+	{
+		for (Channel c : Channel.values())
+			if (c.toString().equals(channelName)) return c;
+		return null;
+	}
 }
