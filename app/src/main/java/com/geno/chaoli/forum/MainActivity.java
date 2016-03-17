@@ -1,30 +1,33 @@
 package com.geno.chaoli.forum;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.VelocityTracker;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.ConversationView;
-import com.geno.chaoli.forum.meta.Methods;
 
-import java.lang.ref.WeakReference;
+import net.simonvt.menudrawer.MenuDrawer;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class MainActivity extends FragmentActivity
 {
@@ -42,41 +45,39 @@ public class MainActivity extends FragmentActivity
 
 	public LinearLayout slidingMenu;
 
-	public static class MainHandler extends Handler
-	{
-		WeakReference<Activity> mainActivity;
+	public RelativeLayout.LayoutParams slidingMenuParam;
 
-		public MainHandler(Activity activity)
-		{
-			mainActivity = new WeakReference<Activity>(activity);
-		}
+	private float xDown, xMove, xUp;
+	private VelocityTracker vt;
+	private float vX;
+	private boolean menuIsShown = false;
 
-		@Override
-		public void handleMessage(Message msg)
-		{
-			super.handleMessage(msg);
-			switch (msg.what)
-			{
-				case Constants.FINISH_CONVERSATION_LIST_ANALYSIS:
-					ConversationListFragment.deal();
-					break;
-				case Constants.FINISH_LOGIN:
-					Toast.makeText(mainActivity.get(), "Finish Login", Toast.LENGTH_SHORT).show();
-			}
-		}
-	}
-
-	public Handler mainHandler = new MainHandler(this);
+	public static final int VELOCITY = 400;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main_activity);
 		sp = getSharedPreferences(Constants.conversationSP, MODE_PRIVATE);
 		e = sp.edit();
 
+		initFragments();
+		initSlidingMenu();
+
+
+	}
+
+	private void initSlidingMenu()
+	{
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
 		slidingMenu = new LinearLayout(this);
+		slidingMenu.setBackgroundColor(0x80000000);
+		slidingMenu.setLayoutParams(new RelativeLayout.LayoutParams((int) (dm.widthPixels / 2.5), ViewGroup.LayoutParams.MATCH_PARENT));
 		slidingMenu.setOrientation(LinearLayout.VERTICAL);
+
 
 		RelativeLayout avatarBox = new RelativeLayout(this);
 		avatarBox.setGravity(RelativeLayout.CENTER_IN_PARENT);
@@ -88,11 +89,35 @@ public class MainActivity extends FragmentActivity
 		userName.setText(R.string.username);
 		slidingMenu.addView(userName, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
-		RelativeLayout loginBtn = new RelativeLayout(this);
+		LinearLayout loginBtn = new LinearLayout(this);
+		loginBtn.setOrientation(LinearLayout.HORIZONTAL);
 		ImageView loginImg = new ImageView(this);
+		loginImg.setImageResource(R.mipmap.ic_menu_login);
+		TextView loginStr = new TextView(this);
+		loginStr.setText("Login");
+		loginBtn.addView(loginImg);
+		loginBtn.addView(loginStr);
+		loginBtn.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				startActivity(new Intent(MainActivity.this, LoginActivity.class));
+			}
+		});
+		slidingMenu.addView(loginBtn);
 
+		slidingMenuParam = (RelativeLayout.LayoutParams) slidingMenu.getLayoutParams();
+		slidingMenuParam.leftMargin = 0;
 
-		setContentView(R.layout.main_activity);
+		slidingMenu.setLayoutParams(slidingMenuParam);
+		MenuDrawer m = MenuDrawer.attach(this);
+		m.setMenuView(slidingMenu);
+		m.setContentView(R.layout.main_activity);
+	}
+
+	private void initFragments()
+	{
 		mainPager = (ViewPager) findViewById(R.id.mainPager);
 		mainTabStrip = (PagerTabStrip) findViewById(R.id.mainTabStrip);
 		mainTabStrip.setDrawFullUnderline(false);
@@ -116,14 +141,17 @@ public class MainActivity extends FragmentActivity
 		mainFragmentsTitles.add(Channel.socsci.toString());
 		mainFragmentsTitles.add(Channel.lang.toString());
 
-		ConversationListFragment[] frag = new ConversationListFragment[loggedIn ? 11 : 10];
-
-		for (int i = 0; i < frag.length; i++)
-		{
-			(frag[i] = new ConversationListFragment()).setChannel(Methods.getChannel(mainFragmentsTitles.get(i)).name());
-			frag[i].setI(i + "");
-			mainFragments.add(frag[i]);
-		}
+		if (loggedIn) mainFragments.add(new ConversationListFragment().setChannel(Channel.caff.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.maths.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.physics.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.chem.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.biology.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.tech.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.court.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.announ.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.others.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.socsci.name()));
+		mainFragments.add(new ConversationListFragment().setChannel(Channel.lang.name()));
 
 		mainPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
 		{
