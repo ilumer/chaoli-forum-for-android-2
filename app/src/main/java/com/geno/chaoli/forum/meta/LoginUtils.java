@@ -55,7 +55,8 @@ public class LoginUtils {
     private static SharedPreferences sharedPreferences;
 
     public static void begin_login(final Context context, String username, String password, LoginObserver loginObserver){
-        //Log.i("login_1", "username = " + username + ", password = " + password);
+        CookieUtils.clearCookie(context); //正常情况下这句应该不会用到，但以防万一
+        CookieUtils.saveCookie(client, context);
         if(CookieUtils.getCookie(context).size() == 0){
             LoginUtils.username = username;
             LoginUtils.password = password;
@@ -65,7 +66,6 @@ public class LoginUtils {
     }
 
     public static void begin_login(final Context context, LoginObserver loginObserver){
-        CookieUtils.setLoginCookieStore(context);
         CookieUtils.saveCookie(client, context);
 
         if(CookieUtils.getCookie(context).size() != 0){
@@ -97,7 +97,6 @@ public class LoginUtils {
                 Pattern pattern = Pattern.compile(tokenFormat);
                 Matcher matcher = pattern.matcher(response);
                 if (matcher.find()) {
-                    //Log.i("login_token", matcher.group(1));
                     setToken(matcher.group(1));
                     login(context, loginObserver);
                 } else {
@@ -126,6 +125,7 @@ public class LoginUtils {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 //Log.i("after_login", new String(responseBody));
+                CookieUtils.clearCookie(context);
                 loginObserver.onLoginFailure(WRONG_USERNAME_OR_PASSWORD);
             }
 
@@ -134,7 +134,6 @@ public class LoginUtils {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 error.printStackTrace(pw);
-                //Log.i("error", sw.toString());
                 if ("Moved Temporarily".equals(error.getMessage())) { //表示登陆成功，若在浏览器中将会跳转到首页
                     getNewToken(context, loginObserver);
                 } else {
@@ -168,9 +167,10 @@ public class LoginUtils {
 	                    editor.putString(SP_PASSWORD_KEY, password);
                         editor.apply();
                     }
-                    CookieUtils.setCookies(CookieUtils.getCookie(context));
+                    //CookieUtils.setCookies(CookieUtils.getCookie(context));
                     loginObserver.onLoginSuccess(getUserId(), getToken());
                 } else {
+                    CookieUtils.clearCookie(context);
                     loginObserver.onLoginFailure(COOKIE_EXPIRED);
                     //Log.e("regex_error", "regex_error");
                 }
@@ -188,7 +188,7 @@ public class LoginUtils {
         client.get(context, logoutURL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                clear();
+                clear(context);
                 //Log.i("logout", new String(responseBody));
                 //Log.i("cookie", String.valueOf(CookieUtils.getCookie(context).size()));
                 logoutObserver.onLogoutSuccess();
@@ -201,9 +201,9 @@ public class LoginUtils {
         });
     }
 
-    public static void clear(){
-        CookieUtils.clearLoginCookie();
-        CookieUtils.clearCookies();
+    public static void clear(Context context){
+        //CookieUtils.clearLoginCookie();
+        CookieUtils.clearCookie(context);
         if(sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove(SP_USERNAME_KEY);
