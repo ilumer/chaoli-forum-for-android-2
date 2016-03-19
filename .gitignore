@@ -1,7 +1,8 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
+#/.idea/workspace.xml
+#/.idea/libraries
+.idea/
 .DS_Store
 /build
 /captures
@@ -19,3 +20,6 @@ proguard/
 # Test files are stored as
 *.json
 *.html
+
+*.iml
+

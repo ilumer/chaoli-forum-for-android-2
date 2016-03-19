@@ -86,7 +86,7 @@ public class MainActivity extends FragmentActivity
 		slidingMenu.addView(avatarBox, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
 		TextView userName = new TextView(this);
-		userName.setText("Username");
+		userName.setText(R.string.username);
 		slidingMenu.addView(userName, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
 		LinearLayout loginBtn = new LinearLayout(this);
