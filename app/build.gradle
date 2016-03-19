@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion '24 rc1'
 
     defaultConfig {
         applicationId "com.geno.chaoli.forum"
@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.alibaba:fastjson:1.1.46.android'
     compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'net.simonvt.menudrawer:menudrawer:3.0.6'
 }

@@ -25,6 +25,7 @@ import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.ConversationView;
 
 import net.simonvt.menudrawer.MenuDrawer;
+import net.simonvt.menudrawer.Position;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,29 +48,29 @@ public class MainActivity extends FragmentActivity
 
 	public RelativeLayout.LayoutParams slidingMenuParam;
 
-	private float xDown, xMove, xUp;
-	private VelocityTracker vt;
-	private float vX;
-	private boolean menuIsShown = false;
-
-	public static final int VELOCITY = 400;
+	public MenuDrawer m;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_activity);
+		m = MenuDrawer.attach(this, Position.LEFT);
+		//setContentView(R.layout.main_activity);
 		sp = getSharedPreferences(Constants.conversationSP, MODE_PRIVATE);
 		e = sp.edit();
 
+		m.setContentView(R.layout.main_activity);
 		initFragments();
+
 		initSlidingMenu();
+		m.setMenuView(slidingMenu);
 
 
 	}
 
 	private void initSlidingMenu()
 	{
+		// TODO: 2016/3/17 0017 0033 Some of these lines are unused. 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -111,9 +112,6 @@ public class MainActivity extends FragmentActivity
 		slidingMenuParam.leftMargin = 0;
 
 		slidingMenu.setLayoutParams(slidingMenuParam);
-		MenuDrawer m = MenuDrawer.attach(this);
-		m.setMenuView(slidingMenu);
-		m.setContentView(R.layout.main_activity);
 	}
 
 	private void initFragments()
