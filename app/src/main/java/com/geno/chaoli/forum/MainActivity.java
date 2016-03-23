@@ -30,11 +30,9 @@ import net.simonvt.menudrawer.Position;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends FragmentActivity
+public final class MainActivity extends FragmentActivity
 {
 	public static final String TAG = "MainActivity";
-
-	public ConversationView[] c;
 
 	public SharedPreferences sp;
 	public SharedPreferences.Editor e;
@@ -95,7 +93,7 @@ public class MainActivity extends FragmentActivity
 		ImageView loginImg = new ImageView(this);
 		loginImg.setImageResource(R.mipmap.ic_menu_login);
 		TextView loginStr = new TextView(this);
-		loginStr.setText("Login");
+		loginStr.setText(R.string.login);
 		loginBtn.addView(loginImg);
 		loginBtn.addView(loginStr);
 		loginBtn.setOnClickListener(new View.OnClickListener()

@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">超理論壇</string>
     <string name="username">用戶名</string>
+    <string name="reply"></string>
+    <string name="login">登入</string>
+    <string name="password"></string>
 </resources>

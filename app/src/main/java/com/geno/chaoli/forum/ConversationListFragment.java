@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -70,7 +71,6 @@ public class ConversationListFragment extends Fragment
 				@Override
 				public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 				{
-					//String response = new String(responseBody);
 					JSONObject o = JSON.parseObject(new String(responseBody));
 					JSONArray array = o.getJSONArray("results");
 					for (int i = 0; i < array.size(); i++)
@@ -89,7 +89,7 @@ public class ConversationListFragment extends Fragment
 				@Override
 				public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
 				{
-
+					Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
 				}
 			});
 		}
