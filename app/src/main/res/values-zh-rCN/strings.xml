@@ -51,4 +51,6 @@
 	<string name="ignore_this">隐藏该主题</string>
 	<string name="cancel_author_only">取消只看楼主</string>
 	<string name="save_as_draft">存为草稿</string>
+	<string name="purge">丢弃</string>
+	<string name="click_login">点击头像登录</string>
 </resources>

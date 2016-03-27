@@ -1,15 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/main">
-	<android.support.v4.view.ViewPager
+<android.support.v4.widget.DrawerLayout
+	android:id="@+id/drawer_main"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context="com.geno.chaoli.forum.MainActivity">
+
+	<FrameLayout
+		android:id="@+id/main_view"
 		android:layout_width="match_parent"
+		android:layout_height="match_parent"/>
+
+	<fragment
+		android:id="@+id/drawer"
+		android:name="com.geno.chaoli.forum.NavigationDrawerFragment"
+		android:layout_width="@dimen/navigation_drawer_width"
 		android:layout_height="match_parent"
-		android:id="@+id/mainPager">
-		<android.support.v4.view.PagerTabStrip
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/mainTabStrip"/>
-	</android.support.v4.view.ViewPager>
-</RelativeLayout>
+		android:layout_gravity="start"
+		tools:layout="@layout/drawer_new_main"/>
+
+</android.support.v4.widget.DrawerLayout>

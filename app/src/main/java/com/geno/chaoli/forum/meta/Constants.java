@@ -10,6 +10,7 @@ public class Constants
 	public static final String conversationListURL = "https://chaoli.club/conversations/index.json";
 	public static final String postListURL = "https://chaoli.club/conversation/index.json";
 	public static final String loginURL = "https://chaoli.club/index.php/user/login";
+	public static final String replyURL = "https://chaoli.club/index.php/?p=conversation/reply.ajax";
 
 	public static final String conversationSP = "conversationList";
 	public static final String conversationSPKey = "listJSON";

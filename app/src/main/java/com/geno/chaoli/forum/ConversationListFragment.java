@@ -3,7 +3,7 @@ package com.geno.chaoli.forum;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,11 +41,36 @@ public class ConversationListFragment extends Fragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View conversationListView = inflater.inflate(R.layout.conversation_list_fragment, container, false);
-		context = getContext();
 		l = (LinearLayout) conversationListView.findViewById(R.id.conversationList);
 		Log.v(TAG, this.toString());
 		sp = getActivity().getSharedPreferences(Constants.conversationSP, Context.MODE_PRIVATE);
 		Log.v(TAG, channel + ".");
+		client.get(context, Constants.conversationListURL + "/" + channel, new AsyncHttpResponseHandler()
+		{
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
+			{
+				JSONObject o = JSON.parseObject(new String(responseBody));
+				JSONArray array = o.getJSONArray("results");
+				for (int i = 0; i < array.size(); i++)
+				{
+					JSONObject sub = array.getJSONObject(i);
+					Conversation c = new Conversation();
+					c.conversationId = sub.getInteger("conversationId");
+					c.title = sub.getString("title");
+					c.excerpt = sub.getString("firstPost");
+					c.replies = sub.getInteger("replies");
+					c.channel = Channel.getChannel(sub.getInteger("channelId"));
+					l.addView(new ConversationView(getActivity(), c));
+				}
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
+			{
+				Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
+			}
+		});
 		return conversationListView;
 	}
 
@@ -60,38 +85,8 @@ public class ConversationListFragment extends Fragment
 		return this;
 	}
 
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser)
+	public static ConversationListFragment newInstance(String channel)
 	{
-		super.setUserVisibleHint(isVisibleToUser);
-		if (getUserVisibleHint())
-		{
-			client.get(context, Constants.conversationListURL + "/" + channel, new AsyncHttpResponseHandler()
-			{
-				@Override
-				public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
-				{
-					JSONObject o = JSON.parseObject(new String(responseBody));
-					JSONArray array = o.getJSONArray("results");
-					for (int i = 0; i < array.size(); i++)
-					{
-						JSONObject sub = array.getJSONObject(i);
-						Conversation c = new Conversation();
-						c.conversationId = sub.getInteger("conversationId");
-						c.title = sub.getString("title");
-						c.excerpt = sub.getString("firstPost");
-						c.replies = sub.getInteger("replies");
-						c.channel = Channel.getChannel(sub.getInteger("channelId"));
-						l.addView(new ConversationView(context, c));
-					}
-				}
-
-				@Override
-				public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
-				{
-					Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
-				}
-			});
-		}
+		return new ConversationListFragment().setChannel(channel);
 	}
 }

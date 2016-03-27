@@ -1,38 +1,62 @@
 package com.geno.chaoli.forum;
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerTabStrip;
-import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.VelocityTracker;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 
 import com.geno.chaoli.forum.meta.Channel;
-import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.ConversationView;
 
-import net.simonvt.menudrawer.MenuDrawer;
-import net.simonvt.menudrawer.Position;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends FragmentActivity
+public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks
 {
 	public static final String TAG = "MainActivity";
+
+	private NavigationDrawerFragment fragment;
+
+	private CharSequence title;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main_activity);
+
+		fragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.drawer);
+		title = getTitle();
+
+		fragment.setUp(R.id.drawer, (DrawerLayout) findViewById(R.id.drawer_main));
+	}
+
+	@Override
+	public void onNavigationDrawerItemSelected(int position)
+	{
+		FragmentManager fm = getFragmentManager();
+		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position));
+		fm.beginTransaction().replace(R.id.main_view, c).commit();
+	}
+
+	public String getChannel(int position)
+	{
+		String[] channel =
+		new String[]
+				{
+						Channel.maths.toString(),
+						Channel.physics.toString(),
+						Channel.chem.toString(),
+						Channel.biology.toString(),
+						Channel.tech.toString(),
+						Channel.court.toString(),
+						Channel.announ.toString(),
+						Channel.others.toString(),
+						Channel.socsci.toString(),
+						Channel.lang.toString(),
+				};
+		return channel[position];
+	}
+
+
+	/*	public static final String TAG = "MainActivity";
 
 	public SharedPreferences sp;
 	public SharedPreferences.Editor e;
@@ -169,5 +193,5 @@ public class MainActivity extends FragmentActivity
 				return mainFragmentsTitles.get(position);
 			}
 		});
-	}
+	}*/
 }
