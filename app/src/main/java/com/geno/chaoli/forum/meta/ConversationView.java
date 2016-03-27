@@ -44,6 +44,7 @@ public class ConversationView extends RelativeLayout
 				//Toast.makeText(context, ((ConversationView) v).conversation.getConversationId() + "", Toast.LENGTH_SHORT).show();
 				Intent jmp = new Intent();
 				jmp.putExtra("conversationId", ((ConversationView) v).conversation.getConversationId());
+				jmp.putExtra("title", ((ConversationView) v).conversation.getTitle());
 				jmp.setClass(context, PostActivity.class);
 				context.startActivity(jmp);
 			}

@@ -49,5 +49,7 @@
     <string name="star">Star</string>
     <string name="ignore_this">Ignore this post</string>
     <string name="mark_as_unread">Mark as unread</string>
+    <string name="cancel_author_only">Cancel author only</string>
+    <string name="save_as_draft">Save as draft</string>
 
 </resources>

@@ -20,11 +20,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'junit:junit:4.12'
     compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.alibaba:fastjson:1.1.46.android'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'net.simonvt.menudrawer:menudrawer:3.0.6'
+    compile 'com.android.support:design:23.2.1'
 }

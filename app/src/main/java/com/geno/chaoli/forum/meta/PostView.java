@@ -2,8 +2,10 @@ package com.geno.chaoli.forum.meta;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,7 +53,27 @@ public class PostView extends RelativeLayout
 			{
 				// TODO: 16-3-3 0805 Reply.
 				AlertDialog.Builder ab = new AlertDialog.Builder(context);
-				Toast.makeText(context, post.floor + " get long click", Toast.LENGTH_SHORT).show();
+
+				LinearLayout menu = new LinearLayout(context);
+
+				TextView title = new TextView(context);
+				title.setTextSize(20);
+				title.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+				menu.addView(title);
+
+				TextView replyTV = new TextView(context);
+				replyTV.setText(context.getString(R.string.reply));
+				replyTV.setOnClickListener(new OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+
+					}
+				});
+
+				ab.setTitle("What do you want to do?").setView(menu);
+				//Toast.makeText(context, post.floor + " get long click", Toast.LENGTH_SHORT).show();
 				return true;
 			}
 		});

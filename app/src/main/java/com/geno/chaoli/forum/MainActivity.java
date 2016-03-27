@@ -30,7 +30,7 @@ import net.simonvt.menudrawer.Position;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class MainActivity extends FragmentActivity
+public class MainActivity extends FragmentActivity
 {
 	public static final String TAG = "MainActivity";
 

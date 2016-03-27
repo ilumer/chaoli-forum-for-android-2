@@ -47,4 +47,8 @@
 	<string name="share">分享</string>
 	<string name="author_only">只看楼主</string>
 	<string name="star">关注</string>
+	<string name="mark_as_unread">标为未读</string>
+	<string name="ignore_this">隐藏该主题</string>
+	<string name="cancel_author_only">取消只看楼主</string>
+	<string name="save_as_draft">存为草稿</string>
 </resources>

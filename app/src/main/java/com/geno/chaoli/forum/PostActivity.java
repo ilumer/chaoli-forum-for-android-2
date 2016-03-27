@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.Post;
 import com.geno.chaoli.forum.meta.PostView;
@@ -27,7 +30,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import cz.msebera.android.httpclient.Header;
 
-public class PostActivity extends Activity
+public class PostActivity extends AppCompatActivity
 {
 	/* TODO: 2016/3/5 0005 1502 Reply function maybe extended as a full activity.
 	 * TODO: DO NOT HARDCODE.
@@ -38,9 +41,7 @@ public class PostActivity extends Activity
 	public static final int menu_author_only = 2;
 	public static final int menu_star = 3;
 
-	public Button replySubmit;
-
-	public EditText replyMsg;
+	public FloatingActionButton reply;
 
 	public static LinearLayout postList;
 
@@ -49,7 +50,9 @@ public class PostActivity extends Activity
 
 	public int conversationId;
 
-	public String intentToPage;
+	public String title, intentToPage;
+
+	public boolean isAuthorOnly;
 
 	public static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -59,34 +62,26 @@ public class PostActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_activity);
 		postList = (LinearLayout) findViewById(R.id.postList);
-		replyMsg = (EditText) findViewById(R.id.reply);
-		replySubmit = (Button) findViewById(R.id.replySubmit);
 		Bundle data = getIntent().getExtras();
 		conversationId = data.getInt("conversationId");
-		intentToPage = data.getString("intentToPage");
+		title = data.getString("title", "");
+		setTitle(title);
+		intentToPage = data.getString("intentToPage", "");
+		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
 		sp = getSharedPreferences(Constants.postSP + conversationId, MODE_PRIVATE);
 		e = sp.edit();
-		replyMsg.setText(sp.getString(getString(R.string.reply), ""));
-		replyMsg.addTextChangedListener(new TextWatcher()
+		reply = (FloatingActionButton) findViewById(R.id.reply);
+		reply.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			public void onClick(View v)
 			{
-
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count)
-			{
-				e.putString(getString(R.string.reply), s.toString()).apply();
-			}
-
-			@Override
-			public void afterTextChanged(Editable s)
-			{
-
+				Intent toReply = new Intent(PostActivity.this, ReplyAction.class);
+				toReply.putExtra("conversationId", conversationId);
+				startActivity(toReply);
 			}
 		});
+
 		client.get(this, Constants.postListURL + "/" + conversationId + intentToPage, new AsyncHttpResponseHandler()
 		{
 			@Override
@@ -112,14 +107,6 @@ public class PostActivity extends Activity
 
 			}
 		});
-		replySubmit.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				Toast.makeText(PostActivity.this, "Reply", Toast.LENGTH_SHORT).show();
-			}
-		});
 	}
 
 	@Override
@@ -127,16 +114,16 @@ public class PostActivity extends Activity
 	{
 		super.onCreateOptionsMenu(menu);
 		menu.add(Menu.NONE, Menu.NONE, menu_settings, R.string.settings).setIcon(android.R.drawable.ic_menu_manage);
-		menu.add(Menu.NONE, Menu.NONE, menu_share, R.string.share).setIcon(android.R.drawable.ic_menu_share);
-		menu.add(Menu.NONE, Menu.NONE, menu_author_only, R.string.author_only).setIcon(android.R.drawable.ic_menu_view);
-		menu.add(Menu.NONE, Menu.NONE, menu_star, R.string.star).setIcon(R.drawable.ic_menu_star);
+		menu.add(Menu.NONE, Menu.NONE, menu_share, R.string.share).setIcon(android.R.drawable.ic_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(Menu.NONE, Menu.NONE, menu_author_only, isAuthorOnly ? R.string.cancel_author_only : R.string.author_only).setIcon(android.R.drawable.ic_menu_view);
+		menu.add(Menu.NONE, Menu.NONE, menu_star, R.string.star).setIcon(R.drawable.ic_menu_star).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		return true;
 	}
 
 	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item)
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
-		super.onMenuItemSelected(featureId, item);
+		super.onOptionsItemSelected(item);
 		switch (item.getOrder())
 		{
 			case menu_settings:
@@ -173,7 +160,9 @@ public class PostActivity extends Activity
 				finish();
 				Intent author_only = new Intent(PostActivity.this, PostActivity.class);
 				author_only.putExtra("conversationId", conversationId);
-				author_only.putExtra("intentToPage", "?author=lz");
+				author_only.putExtra("intentToPage", isAuthorOnly ? "" : "?author=lz");
+				author_only.putExtra("title", title);
+				author_only.putExtra("isAuthorOnly", !isAuthorOnly);
 				startActivity(author_only);
 				break;
 			case menu_star:

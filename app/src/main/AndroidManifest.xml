@@ -19,6 +19,7 @@
 		<activity android:name=".TestActivity">
 		</activity>
 		<activity android:name=".LoginActivity"/>
-		<activity android:name=".PostActivity"/>
+		<activity android:name=".PostActivity" android:theme="@style/Theme.AppCompat"/>
+		<activity android:name=".ReplyAction" android:theme="@style/Theme.AppCompat"/>
 	</application>
 </manifest>
