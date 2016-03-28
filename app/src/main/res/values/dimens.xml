@@ -10,4 +10,5 @@
 
 	<dimen name="avatar_marginLeft">16dp</dimen>
 	<dimen name="avatar_diameter">72dp</dimen>
+	<dimen name="conversationListMargin">8dp</dimen>
 </resources>

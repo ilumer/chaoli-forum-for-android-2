@@ -1,10 +1,12 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.DisplayMetrics;
+import android.widget.RelativeLayout;
 
 import com.geno.chaoli.forum.meta.Channel;
 
@@ -12,9 +14,12 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 {
 	public static final String TAG = "MainActivity";
 
-	private NavigationDrawerFragment fragment;
+	public NavigationDrawerFragment fragment;
 
-	private CharSequence title;
+	public CharSequence title;
+
+	public SharedPreferences sp;
+	public SharedPreferences.Editor e;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)

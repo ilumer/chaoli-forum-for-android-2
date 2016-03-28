@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -29,13 +30,10 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import cz.msebera.android.httpclient.Header;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 
-public class PostActivity extends AppCompatActivity
+public class PostActivity extends SwipeBackActivity
 {
-	/* TODO: 2016/3/5 0005 1502 Reply function maybe extended as a full activity.
-	 * TODO: DO NOT HARDCODE.
-	 */
-
 	public static final int menu_settings = 0;
 	public static final int menu_share = 1;
 	public static final int menu_author_only = 2;
@@ -61,6 +59,7 @@ public class PostActivity extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_activity);
+		//setSupportActionBar((Toolbar) findViewById(R.id.titleBar));
 		postList = (LinearLayout) findViewById(R.id.postList);
 		Bundle data = getIntent().getExtras();
 		conversationId = data.getInt("conversationId");
@@ -70,6 +69,7 @@ public class PostActivity extends AppCompatActivity
 		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
 		sp = getSharedPreferences(Constants.postSP + conversationId, MODE_PRIVATE);
 		e = sp.edit();
+		getSwipeBackLayout();
 		reply = (FloatingActionButton) findViewById(R.id.reply);
 		reply.setOnClickListener(new View.OnClickListener()
 		{

@@ -4,5 +4,6 @@
 	</style>
 
 	<style name="AppTheme" parent="AppBaseTheme">
+		<item name="android:windowIsTranslucent">true</item>
 	</style>
 </resources>
