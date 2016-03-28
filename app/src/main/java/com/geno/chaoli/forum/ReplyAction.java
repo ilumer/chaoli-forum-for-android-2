@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.CookieUtils;
+import com.geno.chaoli.forum.meta.LoginUtils;
+import com.geno.chaoli.forum.meta.PostUtils;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -81,35 +83,18 @@ public class ReplyAction extends AppCompatActivity
 				finish();
 				break;
 			case menu_reply:
-				Map<String, String> requestParam = new HashMap<>();
-				requestParam.put("conversationId", conversationId + "");
-				requestParam.put("content", replyText.getText().toString());
-				requestParam.put("userId", "3013");
-				requestParam.put("token", "a321073f737aa");
-				client.post(Constants.replyURL + "/" + conversationId, new RequestParams(requestParam), new AsyncHttpResponseHandler()
+				PostUtils.reply(ReplyAction.this, conversationId, replyText.getText().toString(), new PostUtils.ReplyObserver()
 				{
 					@Override
-					public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
+					public void onReplySuccess()
 					{
-						Toast.makeText(ReplyAction.this, "Hello", Toast.LENGTH_SHORT).show();
-						String resp = "";
-						for (int i = 0; i < responseBody.length; i++)
-						{
-							resp += responseBody[i];
-						}
-						String head = "";
-						for (int i = 0; i < headers.length; i++)
-						{
-							head += headers[i].toString() + "\n";
-						}
-						Log.d(TAG, "onSuccess: " + resp.length() + resp);
-						Log.d(TAG, "onSuccess: " + head.length() + head);
+						Toast.makeText(ReplyAction.this, "", Toast.LENGTH_SHORT).show();
 					}
 
 					@Override
-					public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
+					public void onReplyFailure(int statusCode)
 					{
-						Toast.makeText(ReplyAction.this, "Hi", Toast.LENGTH_SHORT).show();
+
 					}
 				});
 				break;

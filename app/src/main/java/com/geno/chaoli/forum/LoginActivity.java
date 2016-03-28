@@ -44,7 +44,7 @@ public class LoginActivity extends Activity
 			{
 				e.putBoolean(Constants.loginBool, true);
 				e.apply();
-				Log.d(TAG, "onLoginSuccess: " + userId + ", " + token);
+				Toast.makeText(LoginActivity.this, userId + ", " + token, Toast.LENGTH_SHORT).show();
 				finish();
 			}
 

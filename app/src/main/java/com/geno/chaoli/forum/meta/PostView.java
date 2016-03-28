@@ -3,8 +3,10 @@ package com.geno.chaoli.forum.meta;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,6 +37,7 @@ public class PostView extends RelativeLayout
 		DateFormat sdf = SimpleDateFormat.getDateTimeInstance();
 		((TextView) findViewById(R.id.time)).setText(sdf.format(new Time(t * 1000)));
 		((TextView) findViewById(R.id.content)).setText(post.getContent());
+		((RelativeLayout) findViewById(R.id.avatar)).addView(post.avatarView);
 
 		this.setOnClickListener(new OnClickListener()
 		{

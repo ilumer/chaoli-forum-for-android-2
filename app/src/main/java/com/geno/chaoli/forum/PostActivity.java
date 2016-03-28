@@ -1,6 +1,5 @@
 package com.geno.chaoli.forum;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,31 +7,30 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
+import com.geno.chaoli.forum.meta.ConversationUtils;
+import com.geno.chaoli.forum.meta.CookieUtils;
+import com.geno.chaoli.forum.meta.LoginUtils;
 import com.geno.chaoli.forum.meta.Post;
 import com.geno.chaoli.forum.meta.PostView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import cz.msebera.android.httpclient.Header;
-import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 
-public class PostActivity extends SwipeBackActivity
+public class PostActivity extends AppCompatActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
 	public static final int menu_settings = 0;
 	public static final int menu_share = 1;
@@ -41,7 +39,7 @@ public class PostActivity extends SwipeBackActivity
 
 	public FloatingActionButton reply;
 
-	public static LinearLayout postList;
+	public static ListView postList;
 
 	public static SharedPreferences sp;
 	public SharedPreferences.Editor e;
@@ -54,13 +52,15 @@ public class PostActivity extends SwipeBackActivity
 
 	public static AsyncHttpClient client = new AsyncHttpClient();
 
+	public PostView[] v;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_activity);
 		//setSupportActionBar((Toolbar) findViewById(R.id.titleBar));
-		postList = (LinearLayout) findViewById(R.id.postList);
+		postList = (ListView) findViewById(R.id.postList);
 		Bundle data = getIntent().getExtras();
 		conversationId = data.getInt("conversationId");
 		title = data.getString("title", "");
@@ -68,8 +68,7 @@ public class PostActivity extends SwipeBackActivity
 		intentToPage = data.getString("intentToPage", "");
 		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
 		sp = getSharedPreferences(Constants.postSP + conversationId, MODE_PRIVATE);
-		e = sp.edit();
-		getSwipeBackLayout();
+//		e = sp.edit();
 		reply = (FloatingActionButton) findViewById(R.id.reply);
 		reply.setOnClickListener(new View.OnClickListener()
 		{
@@ -81,7 +80,7 @@ public class PostActivity extends SwipeBackActivity
 				startActivity(toReply);
 			}
 		});
-
+		CookieUtils.saveCookie(client, this);
 		client.get(this, Constants.postListURL + "/" + conversationId + intentToPage, new AsyncHttpResponseHandler()
 		{
 			@Override
@@ -89,16 +88,48 @@ public class PostActivity extends SwipeBackActivity
 			{
 				JSONObject o = JSON.parseObject(new String(responseBody));
 				JSONArray array = o.getJSONArray("posts");
+				v = new PostView[array.size()];
 				for (int i = 0; i < array.size(); i++)
 				{
 					JSONObject sub = array.getJSONObject(i);
-					Post p = new Post();
-					p.username = sub.getString("username");
-					p.floor = sub.getInteger("floor");
-					p.time = sub.getInteger("time");
-					p.content = sub.getString("content");
-					postList.addView(new PostView(PostActivity.this, p));
+					Post p = new Post(PostActivity.this, sub.getInteger("postId"), sub.getInteger("conversationId"),
+							sub.getInteger("memberId"), sub.getLong("time"), /*sub.getInteger("editMemberId")*/0,
+							/*sub.getLong("editTime")*/0, /*sub.getInteger("deleteMemberId")*/0, /*sub.getLong("deleteTime")*/0,
+							sub.getString("title"), sub.getString("content"), sub.getInteger("floor"),
+							sub.getString("username"), sub.getString("avatarFormat"), null, sub.getString("groupNames"), null);
+//					Post p = new Post();
+//					p.username = sub.getString("username");
+//					p.floor = sub.getInteger("floor");
+//					p.time = sub.getInteger("time");
+//					p.content = sub.getString("content");
+					v[i] = new PostView(PostActivity.this, p);
 				}
+				postList.setAdapter(new BaseAdapter()
+				{
+					@Override
+					public int getCount()
+					{
+						return v.length;
+					}
+
+					@Override
+					public Object getItem(int position)
+					{
+						return v[position];
+					}
+
+					@Override
+					public long getItemId(int position)
+					{
+						return v[position].post.postId;
+					}
+
+					@Override
+					public View getView(int position, View convertView, ViewGroup parent)
+					{
+						return v[position];
+					}
+				});
 			}
 
 			@Override
@@ -139,7 +170,7 @@ public class PostActivity extends SwipeBackActivity
 								switch (which)
 								{
 									case 0:
-										Toast.makeText(PostActivity.this, R.string.ignore_this, Toast.LENGTH_SHORT).show();
+										ConversationUtils.ignoreConversation(PostActivity.this, conversationId, PostActivity.this);
 										break;
 									case 1:
 										Toast.makeText(PostActivity.this, R.string.mark_as_unread, Toast.LENGTH_SHORT).show();
@@ -152,7 +183,7 @@ public class PostActivity extends SwipeBackActivity
 			case menu_share:
 				Intent share = new Intent();
 				share.setAction(Intent.ACTION_SEND);
-				share.putExtra(Intent.EXTRA_TEXT, Constants.postSP + conversationId);
+				share.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + "/" + conversationId);
 				share.setType("text/plain");
 				startActivity(Intent.createChooser(share, getString(R.string.share)));
 				break;
@@ -166,8 +197,34 @@ public class PostActivity extends SwipeBackActivity
 				startActivity(author_only);
 				break;
 			case menu_star:
+				// TODO: 16-3-28 2201 Star light
+				ConversationUtils.starConversation(PostActivity.this, conversationId, PostActivity.this);
 				break;
 		}
 		return true;
+	}
+
+	@Override
+	public void onIgnoreConversationSuccess(Boolean isIgnored)
+	{
+		Toast.makeText(PostActivity.this, isIgnored ? R.string.ignore_this_success : R.string.ignore_this_cancel_success, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onIgnoreConversationFailure(int statusCode)
+	{
+		Toast.makeText(PostActivity.this, getString(R.string.failed, statusCode), Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onStarConversationSuccess(Boolean isStarred)
+	{
+		Toast.makeText(PostActivity.this, isStarred ? R.string.star_success : R.string.star_cancel_success, Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onStarConversationFailure(int statusCode)
+	{
+		Toast.makeText(PostActivity.this, getString(R.string.failed, statusCode), Toast.LENGTH_SHORT).show();
 	}
 }

@@ -53,4 +53,16 @@
 	<string name="save_as_draft">存为草稿</string>
 	<string name="purge">丢弃</string>
 	<string name="click_login">点击头像登录</string>
+	<string name="ignore_this.failure">隐藏该主题失败。状态码：$1%d。</string>
+	<string name="ignore_this.success">隐藏该主题成功。</string>
+	<string name="star.failure">关注失败。状态码：$1%d。</string>
+	<string name="star.success">关注成功。</string>
+	<string name="ignore_this.cancel.failure">取消隐藏该主题失败。状态码：$1%d。</string>
+	<string name="ignore_this.cancel.success">取消隐藏该主题成功。</string>
+	<string name="star.cancel.failure">取消关注失败。状态码：$1%d。</string>
+	<string name="star.cancel.success">取消关注成功。</string>
+	<string name="failed">失败。状态码：$1%d。</string>
+	<string name="navigation_drawer_clode">关闭抽屉</string>
+	<string name="navigation_drawer_open">打开抽屉</string>
+	<string name="channel.all">所有板块</string>
 </resources>

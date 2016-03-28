@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.Conversation;
 import com.geno.chaoli.forum.meta.ConversationView;
+import com.geno.chaoli.forum.meta.CookieUtils;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -40,14 +42,34 @@ public class ConversationListFragment extends Fragment
 
 	public ConversationView[] v;
 
+	public SwipeRefreshLayout swipeRefreshLayout;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View conversationListView = inflater.inflate(R.layout.conversation_list_fragment, container, false);
+		context = getActivity();
 		l = (ListView) conversationListView.findViewById(R.id.conversationList);
 		Log.v(TAG, getActivity() + "");
 		sp = getActivity().getSharedPreferences(Constants.conversationSP, Context.MODE_PRIVATE);
 		Log.v(TAG, channel + ".");
+		getList();
+		swipeRefreshLayout = (SwipeRefreshLayout) conversationListView.findViewById(R.id.conversationListRefreshLayout);
+		swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+		{
+			@Override
+			public void onRefresh()
+			{
+				getList();
+			}
+		});
+
+		return conversationListView;
+	}
+
+	public void getList()
+	{
+		CookieUtils.saveCookie(client, context);
 		client.get(context, Constants.conversationListURL + "/" + channel, new AsyncHttpResponseHandler()
 		{
 			@Override
@@ -93,6 +115,7 @@ public class ConversationListFragment extends Fragment
 						return v[position];
 					}
 				});
+				swipeRefreshLayout.setRefreshing(false);
 			}
 
 			@Override
@@ -101,7 +124,6 @@ public class ConversationListFragment extends Fragment
 				Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
 			}
 		});
-		return conversationListView;
 	}
 
 	public String getChannel()

@@ -5,10 +5,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.util.DisplayMetrics;
-import android.widget.RelativeLayout;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
+import com.geno.chaoli.forum.meta.LoginUtils;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks
 {
@@ -21,6 +25,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	public SharedPreferences sp;
 	public SharedPreferences.Editor e;
 
+	public boolean loggedIn = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -31,21 +37,61 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		title = getTitle();
 
 		fragment.setUp(R.id.drawer, (DrawerLayout) findViewById(R.id.drawer_main));
+		LoginUtils.begin_login(this, new LoginUtils.LoginObserver()
+		{
+			@Override
+			public void onLoginSuccess(int userId, String token)
+			{
+				loggedIn = true;
+				((TextView) fragment.getActivity().findViewById(R.id.loginHWndUsername)).setText(
+						getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "")
+				);
+				ListView channelSelect = (ListView) fragment.getActivity().findViewById(R.id.channelSelect);
+				channelSelect.setAdapter(new ArrayAdapter<String>(
+						getActionBar().getThemedContext(),
+						android.R.layout.simple_list_item_1,
+						android.R.id.text1,
+						new String[]
+								{
+										getString(R.string.channel_all),
+										loggedIn ? getString(R.string.channel_caff) : null,
+										getString(R.string.channel_maths),
+										getString(R.string.channel_physics),
+										getString(R.string.channel_chem),
+										getString(R.string.channel_biology),
+										getString(R.string.channel_tech),
+										getString(R.string.channel_court),
+										getString(R.string.channel_announ),
+										getString(R.string.channel_others),
+										getString(R.string.channel_socsci),
+										getString(R.string.channel_lang),
+								}
+				));
+			}
+
+			@Override
+			public void onLoginFailure(int statusCode)
+			{
+
+			}
+		});
 	}
 
 	@Override
 	public void onNavigationDrawerItemSelected(int position)
 	{
 		FragmentManager fm = getFragmentManager();
-		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position));
+		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
 		fm.beginTransaction().replace(R.id.main_view, c).commit();
 	}
 
-	public String getChannel(int position)
+	public String getChannel(int position, boolean loggedIn)
 	{
 		String[] channel =
 		new String[]
 				{
+						"",
+						loggedIn ? Channel.caff.toString() : null,
 						Channel.maths.toString(),
 						Channel.physics.toString(),
 						Channel.chem.toString(),
@@ -59,144 +105,4 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				};
 		return channel[position];
 	}
-
-
-	/*	public static final String TAG = "MainActivity";
-
-	public SharedPreferences sp;
-	public SharedPreferences.Editor e;
-
-	public ViewPager mainPager;
-	public PagerTabStrip mainTabStrip;
-	public List<Fragment> mainFragments;
-	public List<String> mainFragmentsTitles;
-
-	public LinearLayout slidingMenu;
-
-	public RelativeLayout.LayoutParams slidingMenuParam;
-
-	public MenuDrawer m;
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		m = MenuDrawer.attach(this, Position.LEFT);
-		//setContentView(R.layout.main_activity);
-		sp = getSharedPreferences(Constants.conversationSP, MODE_PRIVATE);
-		e = sp.edit();
-
-		m.setContentView(R.layout.main_activity);
-		initFragments();
-
-		initSlidingMenu();
-		m.setMenuView(slidingMenu);
-
-
-	}
-
-	private void initSlidingMenu()
-	{
-		// TODO: 2016/3/17 0017 0033 Some of these lines are unused. 
-		DisplayMetrics dm = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-		slidingMenu = new LinearLayout(this);
-		slidingMenu.setBackgroundColor(0x80000000);
-		slidingMenu.setLayoutParams(new RelativeLayout.LayoutParams((int) (dm.widthPixels / 2.5), ViewGroup.LayoutParams.MATCH_PARENT));
-		slidingMenu.setOrientation(LinearLayout.VERTICAL);
-
-
-		RelativeLayout avatarBox = new RelativeLayout(this);
-		avatarBox.setGravity(RelativeLayout.CENTER_IN_PARENT);
-		ImageView avatar = new ImageView(this);
-		avatarBox.addView(avatar);
-		slidingMenu.addView(avatarBox, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-		TextView userName = new TextView(this);
-		userName.setText(R.string.username);
-		slidingMenu.addView(userName, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-		LinearLayout loginBtn = new LinearLayout(this);
-		loginBtn.setOrientation(LinearLayout.HORIZONTAL);
-		ImageView loginImg = new ImageView(this);
-		loginImg.setImageResource(R.mipmap.ic_menu_login);
-		TextView loginStr = new TextView(this);
-		loginStr.setText(R.string.login);
-		loginBtn.addView(loginImg);
-		loginBtn.addView(loginStr);
-		loginBtn.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				startActivity(new Intent(MainActivity.this, LoginActivity.class));
-			}
-		});
-		slidingMenu.addView(loginBtn);
-
-		slidingMenuParam = (RelativeLayout.LayoutParams) slidingMenu.getLayoutParams();
-		slidingMenuParam.leftMargin = 0;
-
-		slidingMenu.setLayoutParams(slidingMenuParam);
-	}
-
-	private void initFragments()
-	{
-		mainPager = (ViewPager) findViewById(R.id.mainPager);
-		mainTabStrip = (PagerTabStrip) findViewById(R.id.mainTabStrip);
-		mainTabStrip.setDrawFullUnderline(false);
-		mainTabStrip.setHorizontalScrollBarEnabled(true);
-
-		mainFragments = new ArrayList<>();
-
-		boolean loggedIn = sp.getBoolean(Constants.loginBool, false);
-
-		mainFragmentsTitles = new ArrayList<>();
-
-		if (loggedIn) mainFragmentsTitles.add(Channel.caff.toString());
-		mainFragmentsTitles.add(Channel.maths.toString());
-		mainFragmentsTitles.add(Channel.physics.toString());
-		mainFragmentsTitles.add(Channel.chem.toString());
-		mainFragmentsTitles.add(Channel.biology.toString());
-		mainFragmentsTitles.add(Channel.tech.toString());
-		mainFragmentsTitles.add(Channel.court.toString());
-		mainFragmentsTitles.add(Channel.announ.toString());
-		mainFragmentsTitles.add(Channel.others.toString());
-		mainFragmentsTitles.add(Channel.socsci.toString());
-		mainFragmentsTitles.add(Channel.lang.toString());
-
-		if (loggedIn) mainFragments.add(new ConversationListFragment().setChannel(Channel.caff.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.maths.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.physics.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.chem.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.biology.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.tech.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.court.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.announ.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.others.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.socsci.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.lang.name()));
-
-		mainPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
-		{
-			@Override
-			public android.support.v4.app.Fragment getItem(int position)
-			{
-				return mainFragments.get(position);
-			}
-
-			@Override
-			public int getCount()
-			{
-				return mainFragments.size();
-			}
-
-			@Override
-			public CharSequence getPageTitle(int position)
-			{
-				return mainFragmentsTitles.get(position);
-			}
-		});
-	}*/
 }
