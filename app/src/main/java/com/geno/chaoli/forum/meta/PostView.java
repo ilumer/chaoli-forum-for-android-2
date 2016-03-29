@@ -31,13 +31,12 @@ public class PostView extends RelativeLayout
 		View.inflate(context, R.layout.post_view, this);
 		this.post = post;
 
-		((TextView) findViewById(R.id.username)).setText(post.getUsername());
-		((TextView) findViewById(R.id.floor)).setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
-		long t = post.getTime();
-		DateFormat sdf = SimpleDateFormat.getDateTimeInstance();
-		((TextView) findViewById(R.id.time)).setText(sdf.format(new Time(t * 1000)));
-		((TextView) findViewById(R.id.content)).setText(post.getContent());
 		((RelativeLayout) findViewById(R.id.avatar)).addView(post.avatarView);
+		((TextView) findViewById(R.id.username)).setText(post.getUsername());
+		((TextView) findViewById(R.id.signature)).setText(post.preferences.getSignature());
+		((TextView) findViewById(R.id.floor)).setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
+		((TextView) findViewById(R.id.content)).setText(post.getContent());
+		((TextView) findViewById(R.id.time)).setText(SimpleDateFormat.getDateInstance().format(post.getTime() * 1000));
 
 		this.setOnClickListener(new OnClickListener()
 		{

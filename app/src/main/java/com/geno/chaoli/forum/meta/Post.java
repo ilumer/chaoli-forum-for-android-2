@@ -24,6 +24,7 @@ public class Post
 	public String avatarFormat;
 	public Map<Integer, String> groups;
 	public String groupNames;
+	public Preferences preferences;
 	public List<Attachment> attachments;
 
 	public AvatarView avatarView;
@@ -69,6 +70,7 @@ public class Post
 			int floor,
 			String username, String avatarFormat,
 			@Nullable Map<Integer, String> groups, @Nullable String groupNames,
+			@Nullable Preferences preferences,
 			@Nullable List<Attachment> attachments)
 	{
 		this.context = context;
@@ -87,6 +89,7 @@ public class Post
 		this.avatarFormat = avatarFormat;
 		this.groups = groups;
 		this.groupNames = groupNames;
+		this.preferences = preferences;
 		this.attachments = attachments;
 		this.avatarView = new AvatarView(context, avatarFormat, memberId, username);
 	}
@@ -231,6 +234,21 @@ public class Post
 		this.attachments = attachments;
 	}
 
+	public void setAvatarView(AvatarView avatarView)
+	{
+		this.avatarView = avatarView;
+	}
+
+	public void setAvatarView()
+	{
+		this.avatarView = new AvatarView(context, avatarFormat, memberId, username);
+	}
+
+	public AvatarView getAvatarView()
+	{
+		return avatarView;
+	}
+
 	public class Attachment
 	{
 		public int attachmentId;
@@ -319,6 +337,115 @@ public class Post
 		public void setDraftConversationId(int draftConversationId)
 		{
 			this.draftConversationId = draftConversationId;
+		}
+	}
+
+	public class Preferences
+	{
+		public boolean email_privateAdd;
+		public boolean email_post;
+		public boolean starOnReply;
+		public boolean StarPrivate;
+		public int notificationCheckTime;
+		public String language;
+		public boolean hideOnline;
+		public String signature;
+
+		public Preferences()
+		{
+
+		}
+
+		public Preferences(boolean email_privateAdd, boolean email_post, boolean starOnReply, boolean starPrivate, int notificationCheckTime, String language, boolean hideOnline, String signature)
+		{
+			this.email_privateAdd = email_privateAdd;
+			this.email_post = email_post;
+			this.starOnReply = starOnReply;
+			this.StarPrivate = starPrivate;
+			this.notificationCheckTime = notificationCheckTime;
+			this.language = language;
+			this.hideOnline = hideOnline;
+			this.signature = signature;
+		}
+
+		public boolean isEmail_privateAdd()
+		{
+			return email_privateAdd;
+		}
+
+		public void setEmail_privateAdd(boolean email_privateAdd)
+		{
+			this.email_privateAdd = email_privateAdd;
+		}
+
+		public boolean isEmail_post()
+		{
+			return email_post;
+		}
+
+		public void setEmail_post(boolean email_post)
+		{
+			this.email_post = email_post;
+		}
+
+		public boolean isStarOnReply()
+		{
+			return starOnReply;
+		}
+
+		public void setStarOnReply(boolean starOnReply)
+		{
+			this.starOnReply = starOnReply;
+		}
+
+		public boolean isStarPrivate()
+		{
+			return StarPrivate;
+		}
+
+		public void setStarPrivate(boolean starPrivate)
+		{
+			StarPrivate = starPrivate;
+		}
+
+		public int getNotificationCheckTime()
+		{
+			return notificationCheckTime;
+		}
+
+		public void setNotificationCheckTime(int notificationCheckTime)
+		{
+			this.notificationCheckTime = notificationCheckTime;
+		}
+
+		public String getLanguage()
+		{
+			return language;
+		}
+
+		public void setLanguage(String language)
+		{
+			this.language = language;
+		}
+
+		public boolean isHideOnline()
+		{
+			return hideOnline;
+		}
+
+		public void setHideOnline(boolean hideOnline)
+		{
+			this.hideOnline = hideOnline;
+		}
+
+		public String getSignature()
+		{
+			return signature;
+		}
+
+		public void setSignature(String signature)
+		{
+			this.signature = signature;
 		}
 	}
 }

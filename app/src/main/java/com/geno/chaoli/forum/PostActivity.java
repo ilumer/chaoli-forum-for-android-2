@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,10 +29,15 @@ import com.geno.chaoli.forum.meta.PostView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import cz.msebera.android.httpclient.Header;
 
 public class PostActivity extends AppCompatActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
+	public static final String TAG = "PostActivity";
+
 	public static final int menu_settings = 0;
 	public static final int menu_share = 1;
 	public static final int menu_author_only = 2;
@@ -92,16 +98,24 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 				for (int i = 0; i < array.size(); i++)
 				{
 					JSONObject sub = array.getJSONObject(i);
-					Post p = new Post(PostActivity.this, sub.getInteger("postId"), sub.getInteger("conversationId"),
-							sub.getInteger("memberId"), sub.getLong("time"), /*sub.getInteger("editMemberId")*/0,
-							/*sub.getLong("editTime")*/0, /*sub.getInteger("deleteMemberId")*/0, /*sub.getLong("deleteTime")*/0,
-							sub.getString("title"), sub.getString("content"), sub.getInteger("floor"),
-							sub.getString("username"), sub.getString("avatarFormat"), null, sub.getString("groupNames"), null);
-//					Post p = new Post();
-//					p.username = sub.getString("username");
-//					p.floor = sub.getInteger("floor");
-//					p.time = sub.getInteger("time");
-//					p.content = sub.getString("content");
+					Post p = new Post();
+					p.context = PostActivity.this;
+					p.username = sub.getString("username");
+					p.floor = sub.getInteger("floor");
+					p.time = sub.getInteger("time");
+					p.content = sub.getString("content");
+					p.preferences = p.new Preferences();
+					p.preferences.signature = "";
+					p.avatarFormat = sub.getString("avatarFormat");
+					p.memberId = sub.getInteger("memberId");
+					p.setAvatarView();
+					/*JSONObject prefer = sub.getJSONObject("preferences");
+					Log.d(TAG, "prefer: " + prefer);
+					if (!prefer.isEmpty())
+					{
+						Log.d(TAG, "Dealing prefer");
+						p.preferences.signature = prefer.getString("signature");
+					}*/
 					v[i] = new PostView(PostActivity.this, p);
 				}
 				postList.setAdapter(new BaseAdapter()

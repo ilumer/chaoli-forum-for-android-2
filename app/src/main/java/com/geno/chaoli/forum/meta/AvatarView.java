@@ -26,7 +26,7 @@ public class AvatarView extends ImageView
 
 	public AvatarView(final Context context, String imagePath, int userId, String username)
 	{
-		this(context, null);
+		super(context);
 		AsyncHttpClient client = new AsyncHttpClient();
 		if (imagePath == null)
 		{
@@ -58,7 +58,7 @@ public class AvatarView extends ImageView
 
 	public AvatarView(Context context, AttributeSet attrs)
 	{
-		this(context, attrs, 0);
+		super(context, attrs);
 	}
 
 	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr)
