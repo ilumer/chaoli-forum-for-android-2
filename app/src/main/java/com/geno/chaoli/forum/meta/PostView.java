@@ -2,6 +2,7 @@ package com.geno.chaoli.forum.meta;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -13,15 +14,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
+import com.geno.chaoli.forum.ReplyAction;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import cz.msebera.android.httpclient.Header;
+
 public class PostView extends RelativeLayout
 {
 	public static final String TAG = "PostView";
+
+	public AsyncHttpClient client;
 
 	public Post post;
 
@@ -29,11 +37,13 @@ public class PostView extends RelativeLayout
 	{
 		this(context);
 		View.inflate(context, R.layout.post_view, this);
+		this.client = new AsyncHttpClient();
+		CookieUtils.saveCookie(client, context);
 		this.post = post;
 
 		((RelativeLayout) findViewById(R.id.avatar)).addView(post.avatarView);
-		((TextView) findViewById(R.id.username)).setText(post.getUsername());
-		((TextView) findViewById(R.id.signature)).setText(post.preferences.getSignature());
+		((TextView) findViewById(R.id.username)).setText(post.username);
+		((TextView) findViewById(R.id.signature)).setText(post.signature);
 		((TextView) findViewById(R.id.floor)).setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
 		((TextView) findViewById(R.id.content)).setText(post.getContent());
 		((TextView) findViewById(R.id.time)).setText(SimpleDateFormat.getDateInstance().format(post.getTime() * 1000));
@@ -70,11 +80,26 @@ public class PostView extends RelativeLayout
 					@Override
 					public void onClick(View v)
 					{
+						PostUtils.quote(context, post, new PostUtils.QuoteObserver()
+						{
+							@Override
+							public void onQuoteSuccess()
+							{
 
+							}
+
+							@Override
+							public void onQuoteFailure(int statusCode)
+							{
+
+							}
+						});
 					}
 				});
+				menu.addView(replyTV);
 
 				ab.setTitle("What do you want to do?").setView(menu);
+				ab.show();
 				//Toast.makeText(context, post.floor + " get long click", Toast.LENGTH_SHORT).show();
 				return true;
 			}

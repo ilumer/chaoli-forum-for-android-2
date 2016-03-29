@@ -53,8 +53,8 @@ public class ConversationListFragment extends Fragment
 		Log.v(TAG, getActivity() + "");
 		sp = getActivity().getSharedPreferences(Constants.conversationSP, Context.MODE_PRIVATE);
 		Log.v(TAG, channel + ".");
-		getList();
 		swipeRefreshLayout = (SwipeRefreshLayout) conversationListView.findViewById(R.id.conversationListRefreshLayout);
+		swipeRefreshLayout.setRefreshing(true);
 		swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
 		{
 			@Override
@@ -63,6 +63,7 @@ public class ConversationListFragment extends Fragment
 				getList();
 			}
 		});
+		getList();
 
 		return conversationListView;
 	}
@@ -122,6 +123,7 @@ public class ConversationListFragment extends Fragment
 			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
 			{
 				Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
+				swipeRefreshLayout.setRefreshing(false);
 			}
 		});
 	}

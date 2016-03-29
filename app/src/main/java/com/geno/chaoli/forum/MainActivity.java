@@ -1,9 +1,12 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.FragmentManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
@@ -43,9 +46,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			public void onLoginSuccess(int userId, String token)
 			{
 				loggedIn = true;
-				((TextView) fragment.getActivity().findViewById(R.id.loginHWndUsername)).setText(
-						getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "")
-				);
+				((TextView) fragment.getActivity().findViewById(R.id.loginHWndUsername)).setText(getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", ""));
+				//((AvatarView) fragment.getActivity().findViewById(R.id.avatar)).setAvatarView(new AvatarView(MainActivity.this, "png", userId, getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "")));
 				ListView channelSelect = (ListView) fragment.getActivity().findViewById(R.id.channelSelect);
 				channelSelect.setAdapter(new ArrayAdapter<String>(
 						getActionBar().getThemedContext(),

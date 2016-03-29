@@ -2,49 +2,62 @@ package com.geno.chaoli.forum.meta;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.AttributeSet;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.felipecsl.gifimageview.library.GifImageView;
 import com.geno.chaoli.forum.R;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import cz.msebera.android.httpclient.Header;
 
-public class AvatarView extends ImageView
+// TODO: 16-3-29 2346 Buffer avatars.
+public class AvatarView extends RelativeLayout
 {
-	public Context context;
-	public String image;
-
-	public AvatarView(final Context context, String imagePath, int userId, String username)
+	public AvatarView(final Context context, final String imagePath, int userId, String username)
 	{
-		super(context);
+		this(context, null);
+		final int x = (int) context.getResources().getDimension(R.dimen.avatar_diameter);
 		AsyncHttpClient client = new AsyncHttpClient();
+		RelativeLayout v = (RelativeLayout) inflate(context, R.layout.avatar_view, this);
+		final TextView t = (TextView) v.findViewById(R.id.avatarTxt);
+		final ImageView i = (ImageView) v.findViewById(R.id.avatarImg);
+		final GifImageView g = (GifImageView) v.findViewById(R.id.avatarGIFImg);
+		t.setTextSize(20);
 		if (imagePath == null)
 		{
-			int x = (int) getResources().getDimension(R.dimen.avatar_diameter);
-			Bitmap b = Bitmap.createBitmap(x, x, Bitmap.Config.ARGB_8888);
-			Canvas c = new Canvas(b);
-			c.drawText(username.substring(0, 1), 0, 0, new Paint());
-			AvatarView.this.setImageBitmap(b);
+			t.setText(String.format("%s", username.toUpperCase().charAt(0)));
+			i.setVisibility(INVISIBLE);
 		}
 		else
-		{
-			String imageURL = Constants.avatarURL + "/avatar_" + userId + "." + imagePath;
-			client.get(context, imageURL, new AsyncHttpResponseHandler()
+			client.get(context, Constants.avatarURL + "/avatar_" + userId + "." + imagePath, new AsyncHttpResponseHandler()
 			{
 				@Override
 				public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 				{
-					AvatarView.this.setImageBitmap(BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length));
+					if (imagePath.toLowerCase().endsWith("gif"))
+					{
+						t.setVisibility(INVISIBLE);
+						i.setVisibility(INVISIBLE);
+						g.setVisibility(VISIBLE);
+						g.setBytes(responseBody);
+						g.startAnimation();
+					}
+					else
+					{
+						RoundedBitmapDrawable drawable = RoundedBitmapDrawableFactory.create(context.getResources(), BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length));
+						drawable.setCircular(true);
+						i.setImageDrawable(drawable);
+						t.setVisibility(INVISIBLE);
+					}
 				}
 
 				@Override
@@ -53,12 +66,11 @@ public class AvatarView extends ImageView
 					Toast.makeText(context, android.R.string.httpErrorBadUrl, Toast.LENGTH_SHORT).show();
 				}
 			});
-		}
 	}
 
 	public AvatarView(Context context, AttributeSet attrs)
 	{
-		super(context, attrs);
+		this(context, attrs, 0);
 	}
 
 	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr)
@@ -66,7 +78,7 @@ public class AvatarView extends ImageView
 		super(context, attrs, defStyleAttr);
 	}
 
-	@TargetApi(21)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes)
 	{
 		super(context, attrs, defStyleAttr, defStyleRes);

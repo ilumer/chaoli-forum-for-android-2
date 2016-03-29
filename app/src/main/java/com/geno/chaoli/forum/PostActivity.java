@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,7 +66,7 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_activity);
-		//setSupportActionBar((Toolbar) findViewById(R.id.titleBar));
+//		setSupportActionBar((Toolbar) findViewById(R.id.titleBar));
 		postList = (ListView) findViewById(R.id.postList);
 		Bundle data = getIntent().getExtras();
 		conversationId = data.getInt("conversationId");
@@ -104,10 +105,10 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 					p.floor = sub.getInteger("floor");
 					p.time = sub.getInteger("time");
 					p.content = sub.getString("content");
-					p.preferences = p.new Preferences();
-					p.preferences.signature = "";
+					p.signature = sub.getString("signature");
 					p.avatarFormat = sub.getString("avatarFormat");
 					p.memberId = sub.getInteger("memberId");
+					p.postId = sub.getInteger("postId");
 					p.setAvatarView();
 					/*JSONObject prefer = sub.getJSONObject("preferences");
 					Log.d(TAG, "prefer: " + prefer);

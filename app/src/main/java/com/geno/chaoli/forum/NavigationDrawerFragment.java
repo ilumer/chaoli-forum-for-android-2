@@ -30,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
 
 /**
@@ -103,7 +104,7 @@ public class NavigationDrawerFragment extends Fragment {
             Bundle savedInstanceState) {
 		slideViewLayout = (RelativeLayout) inflater.inflate(R.layout.drawer_new_main, container, false);
 		loginHWnd = (RelativeLayout) slideViewLayout.findViewById(R.id.loginHWnd);
-		ImageView avatar = (ImageView) slideViewLayout.findViewById(R.id.avatarView);
+		AvatarView avatar = (AvatarView) slideViewLayout.findViewById(R.id.avatarView);
 		TextView username = (TextView) slideViewLayout.findViewById(R.id.loginHWndUsername);
 		avatar.setOnClickListener(new View.OnClickListener()
 		{

@@ -18,6 +18,10 @@ public class Constants
 	public static final String editURL = "https://chaoli.club/index.php/?p=conversation/editPost.ajax";
 	public static final String notifyNewMsgURL = "https://chaoli.club/index.php/settings/notificationCheck";
 	public static final String avatarURL = "https://dn-chaoli-upload.qbox.me";
+	// .ajax/<conversationId>/<floor>&userId=<myId>&token=<token>
+	public static final String preQuoteURL = "https://chaoli.club/index.php/?p=conversation/index.ajax";
+	// .json/<postId>&userId=<myId>&token=<token>
+	public static final String quoteURL = "https://chaoli.club/index.php/?p=conversation/quotePost.json";
 
 	public static final String conversationSP = "conversationList";
 	public static final String conversationSPKey = "listJSON";

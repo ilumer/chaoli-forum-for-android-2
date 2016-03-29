@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,7 +46,6 @@ public class LoginActivity extends Activity
 				e.putBoolean(Constants.loginBool, true);
 				e.apply();
 				Toast.makeText(LoginActivity.this, userId + ", " + token, Toast.LENGTH_SHORT).show();
-				finish();
 			}
 
 			@Override

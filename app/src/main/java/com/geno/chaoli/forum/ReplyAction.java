@@ -55,7 +55,7 @@ public class ReplyAction extends AppCompatActivity
 		conversationId = data.getInt("conversationId");
 		replyMsg = data.getString("replyMsg", "");
 		replyText = (EditText) findViewById(R.id.replyText);
-		replyText.setText(sp.getString("replyText", "") + replyMsg);
+		replyText.setText(String.format("%s", sp.getString("replyText", "") + replyMsg));
 	}
 
 	@Override
