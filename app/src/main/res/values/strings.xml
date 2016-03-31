@@ -65,6 +65,7 @@
 	<string name="navigation_drawer_open">Open drawer</string>
 	<string name="navigation_drawer_close">Close drawer</string>
 	<string name="channel.all">All</string>
-	<string name="channel.all.detail" translatable="false"></string>
+	<string name="channel.all.detail" translatable="false"/>
+	<string name="edit">Edit</string>
 
 </resources>

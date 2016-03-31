@@ -7,8 +7,11 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,34 +76,45 @@ public class PostView extends RelativeLayout
 				title.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 				menu.addView(title);
 
-				TextView replyTV = new TextView(context);
-				replyTV.setText(context.getString(R.string.reply));
-				replyTV.setOnClickListener(new OnClickListener()
+				ListView list = new ListView(context);
+				list.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,
+						new String[]
+								{
+										context.getString(R.string.reply),
+										post.memberId == LoginUtils.getUserId() ? context.getString(R.string.edit) : null,
+								}
+				));
+
+				list.setOnItemClickListener(new AdapterView.OnItemClickListener()
 				{
 					@Override
-					public void onClick(View v)
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 					{
-						PostUtils.quote(context, post, new PostUtils.QuoteObserver()
+						Intent toWriteSth = new Intent(context, ReplyAction.class);
+						toWriteSth.putExtra("conversationId", post.conversationId);
+						toWriteSth.putExtra("postId", post.postId);
+						int actionFlag;
+						switch (position)
 						{
-							@Override
-							public void onQuoteSuccess()
-							{
-
-							}
-
-							@Override
-							public void onQuoteFailure(int statusCode)
-							{
-
-							}
-						});
+							case 0:
+								actionFlag = ReplyAction.FLAG_REPLY;
+								PostUtils.preQuote(context, post.postId);
+								toWriteSth.putExtra("replyMsg", "[quote=" + post.postId + ":@" + post.username + "]" + post.content.replaceAll("\\[quote\\S+\\]", "").trim() + "[/quote]");
+								break;
+							case 1:
+								actionFlag = ReplyAction.FLAG_EDIT;
+								break;
+							default:
+								actionFlag = ReplyAction.FLAG_NORMAL;
+						}
+						toWriteSth.putExtra("flag", actionFlag);
+						context.startActivity(toWriteSth);
 					}
 				});
-				menu.addView(replyTV);
+				menu.addView(list);
 
 				ab.setTitle("What do you want to do?").setView(menu);
 				ab.show();
-				//Toast.makeText(context, post.floor + " get long click", Toast.LENGTH_SHORT).show();
 				return true;
 			}
 		});

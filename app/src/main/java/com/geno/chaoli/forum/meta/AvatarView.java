@@ -25,7 +25,6 @@ public class AvatarView extends RelativeLayout
 	public AvatarView(final Context context, final String imagePath, int userId, String username)
 	{
 		this(context, null);
-		final int x = (int) context.getResources().getDimension(R.dimen.avatar_diameter);
 		AsyncHttpClient client = new AsyncHttpClient();
 		RelativeLayout v = (RelativeLayout) inflate(context, R.layout.avatar_view, this);
 		final TextView t = (TextView) v.findViewById(R.id.avatarTxt);
@@ -38,7 +37,7 @@ public class AvatarView extends RelativeLayout
 			i.setVisibility(INVISIBLE);
 		}
 		else
-			client.get(context, Constants.avatarURL + "/avatar_" + userId + "." + imagePath, new AsyncHttpResponseHandler()
+			client.get(context, Constants.avatarURL + "avatar_" + userId + "." + imagePath, new AsyncHttpResponseHandler()
 			{
 				@Override
 				public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)

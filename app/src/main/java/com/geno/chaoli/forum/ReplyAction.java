@@ -27,7 +27,13 @@ public class ReplyAction extends AppCompatActivity
 {
 	public static final String TAG = "ReplyAction";
 
-	public int conversationId;
+	public static final int FLAG_NORMAL = 0;
+	public static final int FLAG_REPLY = 1;
+	public static final int FLAG_EDIT = 2;
+
+	public int flag;
+
+	public int conversationId, postId;
 
 	public AsyncHttpClient client;
 
@@ -52,7 +58,9 @@ public class ReplyAction extends AppCompatActivity
 		sp = getSharedPreferences("draftList", MODE_PRIVATE);
 		e = sp.edit();
 		Bundle data = getIntent().getExtras();
+		flag = data.getInt("flag");
 		conversationId = data.getInt("conversationId");
+		postId = data.getInt("postId");
 		replyMsg = data.getString("replyMsg", "");
 		replyText = (EditText) findViewById(R.id.replyText);
 		replyText.setText(String.format("%s", sp.getString("replyText", "") + replyMsg));
@@ -75,28 +83,64 @@ public class ReplyAction extends AppCompatActivity
 		switch (item.getOrder())
 		{
 			case menu_draft:
-				e.putBoolean(conversationId + "", true);
-				e.commit();
+				e.putBoolean(conversationId + "", true).commit();
 				getSharedPreferences(conversationId + "", MODE_PRIVATE).edit()
 						.putString("replyText", replyText.getText().toString()).commit();
 				Toast.makeText(ReplyAction.this, R.string.save_as_draft, Toast.LENGTH_SHORT).show();
 				finish();
 				break;
 			case menu_reply:
-				PostUtils.reply(ReplyAction.this, conversationId, replyText.getText().toString(), new PostUtils.ReplyObserver()
+				switch (flag)
 				{
-					@Override
-					public void onReplySuccess()
-					{
-						Toast.makeText(ReplyAction.this, "", Toast.LENGTH_SHORT).show();
-					}
+					case FLAG_NORMAL:
+						PostUtils.reply(ReplyAction.this, conversationId, replyText.getText().toString(), new PostUtils.ReplyObserver()
+						{
+							@Override
+							public void onReplySuccess()
+							{
+								Toast.makeText(ReplyAction.this, R.string.reply, Toast.LENGTH_SHORT).show();
+								finish();
+							}
 
-					@Override
-					public void onReplyFailure(int statusCode)
-					{
+							@Override
+							public void onReplyFailure(int statusCode)
+							{
+								Toast.makeText(ReplyAction.this, "Fail: " + statusCode, Toast.LENGTH_SHORT).show();
+							}
+						});
+						break;
+					case FLAG_REPLY:
+						PostUtils.quote(ReplyAction.this, conversationId, replyText.getText().toString(), new PostUtils.QuoteObserver()
+						{
+							@Override
+							public void onQuoteSuccess()
+							{
 
-					}
-				});
+							}
+
+							@Override
+							public void onQuoteFailure(int statusCode)
+							{
+
+							}
+						});
+						break;
+					case FLAG_EDIT:
+						PostUtils.edit(ReplyAction.this, postId, replyText.getText().toString(), new PostUtils.EditObserver()
+						{
+							@Override
+							public void onEditSuccess()
+							{
+								Toast.makeText(ReplyAction.this, "Post", Toast.LENGTH_SHORT).show();
+							}
+
+							@Override
+							public void onEditFailure(int statusCode)
+							{
+								Toast.makeText(ReplyAction.this, "Fail: " + statusCode, Toast.LENGTH_SHORT).show();
+							}
+						});
+				}
 				break;
 			case menu_purge:
 				getSharedPreferences(conversationId + "", MODE_PRIVATE).edit().clear().apply();

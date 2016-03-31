@@ -88,7 +88,7 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 			}
 		});
 		CookieUtils.saveCookie(client, this);
-		client.get(this, Constants.postListURL + "/" + conversationId + intentToPage, new AsyncHttpResponseHandler()
+		client.get(this, Constants.postListURL + conversationId + intentToPage, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
@@ -198,7 +198,7 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 			case menu_share:
 				Intent share = new Intent();
 				share.setAction(Intent.ACTION_SEND);
-				share.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + "/" + conversationId);
+				share.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + conversationId);
 				share.setType("text/plain");
 				startActivity(Intent.createChooser(share, getString(R.string.share)));
 				break;

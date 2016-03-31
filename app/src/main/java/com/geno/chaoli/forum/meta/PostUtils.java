@@ -21,13 +21,12 @@ public class PostUtils
 	public static void reply(final Context context, int conversationId, String content, final ReplyObserver observer)
 	{
 		CookieUtils.saveCookie(client, context);
-		String url = Constants.replyURL + "/" + conversationId;
 		RequestParams param = new RequestParams();
 		param.put("conversationId", conversationId + "");
 		param.put("content", content);
 		param.put("userId", LoginUtils.getUserId());
 		param.put("token", LoginUtils.getToken());
-		client.post(context, url, param, new AsyncHttpResponseHandler()
+		client.post(context, Constants.replyURL + conversationId, param, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
@@ -49,42 +48,94 @@ public class PostUtils
 	public static void edit(final Context context, int postId, String content, final EditObserver observer)
 	{
 		CookieUtils.saveCookie(client, context);
-		String url = Constants.editURL + "/" + postId;
 		RequestParams param = new RequestParams();
 		param.put("content", content);
 		param.put("save", "true");
 		param.put("userId", LoginUtils.getUserId());
 		param.put("token", LoginUtils.getToken());
-		client.post(context, url, param, new AsyncHttpResponseHandler()
+		client.post(context, Constants.editURL + postId, param, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 			{
+				Toast.makeText(context, new String(responseBody), Toast.LENGTH_SHORT).show();
 				observer.onEditSuccess();
 			}
 
 			@Override
 			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
 			{
+				Toast.makeText(context, statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
 				observer.onEditFailure(statusCode);
 			}
 		});
 	}
 
-	public static void quote(final Context context, final Post post, final QuoteObserver observer)
+	public static void preQuote(final Context context, int postId)
 	{
-		client.get(context, Constants.preQuoteURL + "/" + post.conversationId + "/" + post.floor + "&userId=" + LoginUtils.getUserId() + "&token=" + LoginUtils.getToken(), new AsyncHttpResponseHandler()
+		CookieUtils.saveCookie(client, context);
+		RequestParams param = new RequestParams();
+		param.put("userId", LoginUtils.getUserId());
+		param.put("token", LoginUtils.getToken());
+		client.get(context, Constants.preQuoteURL + postId, param, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 			{
-				
+				Toast.makeText(context, "Pre Quote success. " + new String(responseBody), Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
 			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
 			{
+				Toast.makeText(context, "Pre Quote fail: " + statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
+				Log.d(TAG, "onFailure: " + new String(responseBody));
+			}
+		});
+	}
 
+	public static void quote(final Context context, int conversationId, String content, final QuoteObserver observer)
+	{
+		CookieUtils.saveCookie(client, context);
+		RequestParams param = new RequestParams();
+		param.put("conversationId", conversationId);
+		param.put("content", content);
+		param.put("userId", LoginUtils.getUserId());
+		param.put("token", LoginUtils.getToken());
+		client.post(context, Constants.quoteURL + conversationId, param, new AsyncHttpResponseHandler()
+		{
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
+			{
+				Toast.makeText(context, "Quote success.", Toast.LENGTH_SHORT).show();
+				Log.d(TAG, "onSuccess: " + new String(responseBody));
+				observer.onQuoteSuccess();
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
+			{
+				Toast.makeText(context, "Quote failed: " + statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
+				observer.onQuoteFailure(statusCode);
+			}
+		});
+	}
+
+	/*public static void quote(final Context context, final Post post, final QuoteObserver observer)
+	{
+		CookieUtils.saveCookie(client, context);
+		client.get(context, Constants.preQuoteURL + "/" + post.conversationId + "/" + post.floor + "&userId=" + LoginUtils.getUserId() + "&token=" + LoginUtils.getToken(), new AsyncHttpResponseHandler()
+		{
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
+			{
+				Toast.makeText(context, new String(responseBody), Toast.LENGTH_SHORT).show();
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
+			{
+				Toast.makeText(context, statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
 			}
 		});
 		client.get(context, Constants.quoteURL + "/" + post.postId + "&userId=" + LoginUtils.getUserId() + "&token=" + LoginUtils.getToken(), new AsyncHttpResponseHandler()
@@ -106,7 +157,7 @@ public class PostUtils
 				observer.onQuoteFailure(statusCode);
 			}
 		});
-	}
+	}*/
 
 	public interface ReplyObserver
 	{

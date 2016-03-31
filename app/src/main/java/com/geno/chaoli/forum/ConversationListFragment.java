@@ -71,7 +71,7 @@ public class ConversationListFragment extends Fragment
 	public void getList()
 	{
 		CookieUtils.saveCookie(client, context);
-		client.get(context, Constants.conversationListURL + "/" + channel, new AsyncHttpResponseHandler()
+		client.get(context, Constants.conversationListURL + channel, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
