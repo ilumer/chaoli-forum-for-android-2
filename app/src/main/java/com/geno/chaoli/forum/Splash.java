@@ -24,15 +24,15 @@ public class Splash extends Activity
 				try
 				{
 					sleep(0);
+					startActivity(new Intent(Splash.this, Class.forName("com.geno.chaoli.forum.MainActivity")));
 				}
-				catch (InterruptedException e)
+				catch (Exception e)
 				{
 					e.printStackTrace();
 				}
 				finally
 				{
 					finish();
-					startActivity(new Intent(Splash.this, MainActivity.class));
 				}
 			}
 		};

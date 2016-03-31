@@ -115,7 +115,7 @@ public class ReplyAction extends AppCompatActivity
 							@Override
 							public void onQuoteSuccess()
 							{
-
+								finish();
 							}
 
 							@Override
@@ -132,6 +132,7 @@ public class ReplyAction extends AppCompatActivity
 							public void onEditSuccess()
 							{
 								Toast.makeText(ReplyAction.this, "Post", Toast.LENGTH_SHORT).show();
+								finish();
 							}
 
 							@Override

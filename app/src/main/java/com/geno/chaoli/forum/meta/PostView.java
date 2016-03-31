@@ -78,11 +78,7 @@ public class PostView extends RelativeLayout
 
 				ListView list = new ListView(context);
 				list.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,
-						new String[]
-								{
-										context.getString(R.string.reply),
-										post.memberId == LoginUtils.getUserId() ? context.getString(R.string.edit) : null,
-								}
+						post.memberId == LoginUtils.getUserId() ? new String[]{context.getString(R.string.reply), context.getString(R.string.edit)} : new String[]{context.getString(R.string.reply)}
 				));
 
 				list.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -99,10 +95,11 @@ public class PostView extends RelativeLayout
 							case 0:
 								actionFlag = ReplyAction.FLAG_REPLY;
 								PostUtils.preQuote(context, post.postId);
-								toWriteSth.putExtra("replyMsg", "[quote=" + post.postId + ":@" + post.username + "]" + post.content.replaceAll("\\[quote\\S+\\]", "").trim() + "[/quote]");
+								toWriteSth.putExtra("replyMsg", "[quote=" + post.postId + ":@" + post.username + "]" + post.content.replaceAll("\\[quote\\S+\\]", "").trim() + "[/quote]\n");
 								break;
 							case 1:
 								actionFlag = ReplyAction.FLAG_EDIT;
+								toWriteSth.putExtra("replyMsg", post.content);
 								break;
 							default:
 								actionFlag = ReplyAction.FLAG_NORMAL;
