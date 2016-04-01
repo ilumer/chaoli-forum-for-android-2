@@ -8,6 +8,7 @@ import android.app.FragmentManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -49,8 +50,8 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 				((TextView) fragment.getActivity().findViewById(R.id.loginHWndUsername)).setText(getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", ""));
 				//((AvatarView) fragment.getActivity().findViewById(R.id.avatar)).setAvatarView(new AvatarView(MainActivity.this, "png", userId, getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "")));
 				ListView channelSelect = (ListView) fragment.getActivity().findViewById(R.id.channelSelect);
-				channelSelect.setAdapter(new ArrayAdapter<String>(
-						getActionBar().getThemedContext(),
+				channelSelect.setAdapter(new ArrayAdapter<>(
+						MainActivity.this,
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1,
 						new String[]
@@ -74,7 +75,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			@Override
 			public void onLoginFailure(int statusCode)
 			{
-
+				Log.d(TAG, "onLoginFailure: " + statusCode);
 			}
 		});
 	}

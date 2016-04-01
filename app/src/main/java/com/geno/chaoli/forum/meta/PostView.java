@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -55,6 +56,9 @@ public class PostView extends RelativeLayout
 
 		if (post.deleteMemberId != 0)
 		{
+			this.setBackgroundColor(0xFF808080);
+			avatar.setVisibility(GONE);
+			signature.setVisibility(GONE);
 			content.setVisibility(GONE);
 		}
 		avatar.addView(post.avatarView);
@@ -62,7 +66,7 @@ public class PostView extends RelativeLayout
 		signature.setText(post.signature);
 		floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
 		content.setText(post.getContent());
-		time.setText(SimpleDateFormat.getDateInstance().format(post.getTime() * 1000));
+		time.setText(SimpleDateFormat.getDateTimeInstance().format(post.getTime() * 1000));
 
 		this.setOnClickListener(new OnClickListener()
 		{
@@ -90,7 +94,7 @@ public class PostView extends RelativeLayout
 				menu.addView(title);
 
 				ListView list = new ListView(context);
-				list.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,
+				list.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_list_item_1,
 						post.memberId == LoginUtils.getUserId() ? new String[]{context.getString(R.string.reply), context.getString(R.string.edit), context.getString(R.string.delete)} : new String[]{context.getString(R.string.reply)}
 				));
 

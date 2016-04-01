@@ -101,6 +101,7 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 					JSONObject sub = array.getJSONObject(i);
 					Post p = new Post();
 					p.context = PostActivity.this;
+					p.conversationId = conversationId;
 					p.username = sub.getString("username");
 					p.floor = sub.getInteger("floor");
 					p.time = sub.getInteger("time");
@@ -109,8 +110,10 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 					p.avatarFormat = sub.getString("avatarFormat");
 					p.memberId = sub.getInteger("memberId");
 					p.postId = sub.getInteger("postId");
-//					p.deleteMemberId = (int) sub.getInteger("deleteMemberId");
-//					p.deleteTime = (long) sub.getLong("deleteTime");
+					String deleteMemberId = sub.getString("deleteMemberId");
+					p.deleteMemberId = Integer.parseInt(deleteMemberId == null ? "0" : deleteMemberId);
+					String deleteTime = sub.getString("deleteTime");
+					p.deleteTime = Long.parseLong(deleteTime == null ? "0" : deleteTime);
 					p.setAvatarView();
 					/*JSONObject prefer = sub.getJSONObject("preferences");
 					Log.d(TAG, "prefer: " + prefer);

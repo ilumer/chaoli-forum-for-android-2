@@ -102,6 +102,7 @@ public class PostUtils
 		param.put("content", content);
 		param.put("userId", LoginUtils.getUserId());
 		param.put("token", LoginUtils.getToken());
+		Log.d(TAG, "quote: " + Constants.quoteURL+ conversationId);
 		client.post(context, Constants.quoteURL + conversationId, param, new AsyncHttpResponseHandler()
 		{
 			@Override

@@ -35,9 +35,4 @@ public class Constants
 	public static final String loginSP = "loginReturn";
 	public static final String loginSPKey = "listJSON";
 	public static final String loginBool = "logged";
-
-	public static final int FINISH_CONVERSATION_LIST_ANALYSIS = 1;
-	public static final int FINISH_POST_LIST_ANALYSIS = 2;
-	public static final int FINISH_LOGIN_LIST_ANALYSIS = 3;
-	public static final int FINISH_LOGIN = 4;
 }
