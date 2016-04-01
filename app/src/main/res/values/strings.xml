@@ -67,5 +67,6 @@
 	<string name="channel.all">All</string>
 	<string name="channel.all.detail" translatable="false"/>
 	<string name="edit">Edit</string>
+	<string name="delete">Delete</string>
 
 </resources>

@@ -35,6 +35,8 @@ public class PostView extends RelativeLayout
 	public AsyncHttpClient client;
 
 	public Post post;
+	public RelativeLayout avatar;
+	public TextView username, signature, floor, content, time;
 
 	public PostView(final Context context, final Post post)
 	{
@@ -43,13 +45,24 @@ public class PostView extends RelativeLayout
 		this.client = new AsyncHttpClient();
 		CookieUtils.saveCookie(client, context);
 		this.post = post;
+		avatar = (RelativeLayout) findViewById(R.id.avatar);
+		username = (TextView) findViewById(R.id.username);
+		signature = (TextView) findViewById(R.id.signature);
+		floor = (TextView) findViewById(R.id.floor);
+		content = (TextView) findViewById(R.id.content);
+		time = (TextView) findViewById(R.id.time);
 
-		((RelativeLayout) findViewById(R.id.avatar)).addView(post.avatarView);
-		((TextView) findViewById(R.id.username)).setText(post.username);
-		((TextView) findViewById(R.id.signature)).setText(post.signature);
-		((TextView) findViewById(R.id.floor)).setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
-		((TextView) findViewById(R.id.content)).setText(post.getContent());
-		((TextView) findViewById(R.id.time)).setText(SimpleDateFormat.getDateInstance().format(post.getTime() * 1000));
+
+		if (post.deleteMemberId != 0)
+		{
+			content.setVisibility(GONE);
+		}
+		avatar.addView(post.avatarView);
+		username.setText(post.username);
+		signature.setText(post.signature);
+		floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
+		content.setText(post.getContent());
+		time.setText(SimpleDateFormat.getDateInstance().format(post.getTime() * 1000));
 
 		this.setOnClickListener(new OnClickListener()
 		{
@@ -78,7 +91,7 @@ public class PostView extends RelativeLayout
 
 				ListView list = new ListView(context);
 				list.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,
-						post.memberId == LoginUtils.getUserId() ? new String[]{context.getString(R.string.reply), context.getString(R.string.edit)} : new String[]{context.getString(R.string.reply)}
+						post.memberId == LoginUtils.getUserId() ? new String[]{context.getString(R.string.reply), context.getString(R.string.edit), context.getString(R.string.delete)} : new String[]{context.getString(R.string.reply)}
 				));
 
 				list.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -101,6 +114,22 @@ public class PostView extends RelativeLayout
 								actionFlag = ReplyAction.FLAG_EDIT;
 								toWriteSth.putExtra("replyMsg", post.content);
 								break;
+							case 2:
+								PostUtils.delete(context, post.postId, new PostUtils.DeleteObserver()
+								{
+									@Override
+									public void onDeleteSuccess()
+									{
+
+									}
+
+									@Override
+									public void onDeleteFailure(int statusCode)
+									{
+
+									}
+								});
+								return;
 							default:
 								actionFlag = ReplyAction.FLAG_NORMAL;
 						}

@@ -121,43 +121,56 @@ public class PostUtils
 		});
 	}
 
-	/*public static void quote(final Context context, final Post post, final QuoteObserver observer)
+	public static void delete(final Context context, int postId, final DeleteObserver observer)
 	{
 		CookieUtils.saveCookie(client, context);
-		client.get(context, Constants.preQuoteURL + "/" + post.conversationId + "/" + post.floor + "&userId=" + LoginUtils.getUserId() + "&token=" + LoginUtils.getToken(), new AsyncHttpResponseHandler()
+		RequestParams param = new RequestParams();
+		param.put("userId", LoginUtils.getUserId());
+		param.put("token", LoginUtils.getToken());
+		client.get(context, Constants.deleteURL + postId, param, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 			{
-				Toast.makeText(context, new String(responseBody), Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, "Delete", Toast.LENGTH_SHORT).show();
+				Log.d(TAG, "onSuccess: " + new String(responseBody));
+				observer.onDeleteSuccess();
 			}
 
 			@Override
 			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
 			{
-				Toast.makeText(context, statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
+				Toast.makeText(context, "Fail: " + statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
+				Log.d(TAG, "onFailure: " + new String(responseBody));
+				observer.onDeleteFailure(statusCode);
 			}
 		});
-		client.get(context, Constants.quoteURL + "/" + post.postId + "&userId=" + LoginUtils.getUserId() + "&token=" + LoginUtils.getToken(), new AsyncHttpResponseHandler()
+	}
+
+	public static void restore(final Context context, int postId, final RestoreObserver observer)
+	{
+		CookieUtils.saveCookie(client, context);
+		RequestParams param = new RequestParams();
+		param.put("userId", LoginUtils.getUserId());
+		param.put("token", LoginUtils.getToken());
+		client.get(context, Constants.restoreURL + postId, param, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 			{
-				Intent reply = new Intent(context, ReplyAction.class);
-				reply.putExtra("conversationId", post.conversationId);
-				reply.putExtra("replyMsg", "[quote=" + post.postId + ":@" + post.username + "]" + post.content + "[/quote]");
-				context.startActivity(reply);
-				observer.onQuoteSuccess();
+				Toast.makeText(context, "Restore", Toast.LENGTH_SHORT).show();
+				observer.onRestoreSuccess();
 			}
 
 			@Override
 			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
 			{
-				Toast.makeText(context, "Quote error " + statusCode + ": " + new String(responseBody), Toast.LENGTH_SHORT).show();
-				observer.onQuoteFailure(statusCode);
+				Toast.makeText(context, "Fail: " + statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
+				Log.d(TAG, "onFailure: " + new String(responseBody));
+				observer.onRestoreFailure(statusCode);
 			}
 		});
-	}*/
+	}
 
 	public interface ReplyObserver
 	{
@@ -175,5 +188,17 @@ public class PostUtils
 	{
 		void onQuoteSuccess();
 		void onQuoteFailure(int statusCode);
+	}
+
+	public interface DeleteObserver
+	{
+		void onDeleteSuccess();
+		void onDeleteFailure(int statusCode);
+	}
+
+	public interface RestoreObserver
+	{
+		void onRestoreSuccess();
+		void onRestoreFailure(int statusCode);
 	}
 }

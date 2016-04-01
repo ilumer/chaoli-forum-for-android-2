@@ -109,6 +109,8 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 					p.avatarFormat = sub.getString("avatarFormat");
 					p.memberId = sub.getInteger("memberId");
 					p.postId = sub.getInteger("postId");
+//					p.deleteMemberId = (int) sub.getInteger("deleteMemberId");
+//					p.deleteTime = (long) sub.getLong("deleteTime");
 					p.setAvatarView();
 					/*JSONObject prefer = sub.getJSONObject("preferences");
 					Log.d(TAG, "prefer: " + prefer);

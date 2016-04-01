@@ -23,6 +23,8 @@ public class Constants
 	public static final String preQuoteURL = "https://chaoli.club/index.php/?p=conversation/quotePost.json/";
 	// .json/<postId>&userId=<myId>&token=<token>
 	public static final String quoteURL = "https://chaoli.club/index.php/?p=conversation/reply.ajax/";
+	public static final String deleteURL = "https://chaoli.club/index.php/?p=conversation/deletePost.ajax/";
+	public static final String restoreURL = "https://chaoli.club/index.php/conversation/restorePost/";
 
 	public static final String conversationSP = "conversationList";
 	public static final String conversationSPKey = "listJSON";
