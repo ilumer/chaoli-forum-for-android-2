@@ -104,16 +104,16 @@ public class AccountUtils {
             params.put("avatar", avatar);
         } catch (FileNotFoundException e){
             Log.e("don't exist", "don't exist");
-            observer.onModifySettingsFailure(FILE_DOSENT_EXIST);
-            return;
+            //observer.onModifySettingsFailure(FILE_DOSENT_EXIST);
+            //return;
         }
         params.put("language", language);
         params.put("userStatus", userStatus);
         params.put("signature", signature);
-        params.put("hideOnline", hideOnline.toString());
-        params.put("starPrivate", starPrivate.toString());
-        params.put("starOnReply", starOnReply.toString());
-        params.put("privateAdd", privateAdd.toString());
+        if(hideOnline) params.put("hideOnline", hideOnline.toString());
+        if(starPrivate) params.put("starPrivate", starPrivate.toString());
+        if(starOnReply) params.put("starOnReply", starOnReply.toString());
+        if(privateAdd) params.put("privateAdd", privateAdd.toString());
         params.put("save", "保存更改");
         client.post(context, MODIFY_SETTINGS_URL, params, new AsyncHttpResponseHandler() {
             @Override
