@@ -1,21 +1,19 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.FragmentManager;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
+import com.geno.chaoli.forum.meta.CookieUtils;
 import com.geno.chaoli.forum.meta.LoginUtils;
 
 public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks
@@ -76,6 +74,11 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			public void onLoginFailure(int statusCode)
 			{
 				Log.d(TAG, "onLoginFailure: " + statusCode);
+				if (statusCode == 5)
+				{
+					Toast.makeText(MainActivity.this, "Cookie expired, please login again.", Toast.LENGTH_SHORT).show();
+					startActivity(new Intent(MainActivity.this, LoginActivity.class));
+				}
 			}
 		});
 	}

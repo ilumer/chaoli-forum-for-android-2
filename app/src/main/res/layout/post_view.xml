@@ -44,4 +44,8 @@
 		android:layout_height="wrap_content"
 		android:layout_below="@id/content"
 		android:id="@+id/time"/>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/deleteMember"/>
 </RelativeLayout>

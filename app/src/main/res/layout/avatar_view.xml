@@ -14,9 +14,4 @@
 		android:gravity="center"
 		android:background="@android:color/darker_gray"
 		android:textSize="@dimen/title_size"/>
-	<com.felipecsl.gifimageview.library.GifImageView
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:id="@+id/avatarGIFImg"
-		android:visibility="invisible"/>
 </RelativeLayout>

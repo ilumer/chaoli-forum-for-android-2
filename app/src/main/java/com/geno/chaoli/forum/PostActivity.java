@@ -115,13 +115,6 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 					String deleteTime = sub.getString("deleteTime");
 					p.deleteTime = Long.parseLong(deleteTime == null ? "0" : deleteTime);
 					p.setAvatarView();
-					/*JSONObject prefer = sub.getJSONObject("preferences");
-					Log.d(TAG, "prefer: " + prefer);
-					if (!prefer.isEmpty())
-					{
-						Log.d(TAG, "Dealing prefer");
-						p.preferences.signature = prefer.getString("signature");
-					}*/
 					v[i] = new PostView(PostActivity.this, p);
 				}
 				postList.setAdapter(new BaseAdapter()

@@ -53,6 +53,9 @@ public class PostView extends RelativeLayout
 		content = (TextView) findViewById(R.id.content);
 		time = (TextView) findViewById(R.id.time);
 
+		username.setText(post.username);
+		floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
+
 
 		if (post.deleteMemberId != 0)
 		{
@@ -62,9 +65,7 @@ public class PostView extends RelativeLayout
 			content.setVisibility(GONE);
 		}
 		avatar.addView(post.avatarView);
-		username.setText(post.username);
 		signature.setText(post.signature);
-		floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
 		content.setText(post.getContent());
 		time.setText(SimpleDateFormat.getDateTimeInstance().format(post.getTime() * 1000));
 
