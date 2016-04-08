@@ -1,14 +1,12 @@
 package com.geno.chaoli.forum.meta;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
+import com.geno.chaoli.forum.Me;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.alibaba.fastjson.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,10 +16,13 @@ import java.util.regex.Pattern;
 import cz.msebera.android.httpclient.Header;
 
 /**
- * Created by jianhao on 16-3-17.
+ * Created by daquexian on 16-3-17.
+ * 和账户相关的类，包括获取自己的用户信息、检查是否帖子更新、是否有新动态及更改账户设置
  */
 public class AccountUtils {
-    static AsyncHttpClient client = new AsyncHttpClient();
+    private static AsyncHttpClient client = new AsyncHttpClient();
+
+    public static String GET_PROFILE_URL = "https://chaoli.club/index.php/settings/general.json";
     public static String CHECK_NOTIFICATION_URL = "https://chaoli.club/index.php/?p=settings/notificationCheck.ajax";
     public static String UPDATE_URL = "https://chaoli.club/index.php/?p=conversations/update.ajax/all/";
     public static String MODIFY_SETTINGS_URL = "https://chaoli.club/index.php/settings/general";
@@ -29,7 +30,29 @@ public class AccountUtils {
     public static int RETURN_ERROR = -1;
     public static int FILE_DOSENT_EXIST = -2;
 
-    public static void checkNotification(Context context, final AccountObserver observer){
+    public static void getProfile(Context context, final GetProfileObserver observer){
+        CookieUtils.saveCookie(client, context);
+        client.get(context, GET_PROFILE_URL, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String response = new String(responseBody);
+                Log.i("response", response);
+                Me.setInstanceFromJSONStr(response);
+                Log.i("profile", Me.getMyStatus());
+                Log.i("profile", String.valueOf(Me.getMyHideOnline()));
+                //Log.i("profile", me.getPreferences().getSignature());
+                observer.onGetProfileSuccess();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                observer.onGetProfileFailure();
+            }
+        });
+    }
+
+    // TODO: 16-4-8  modify the callback function according to the new API which can show the content of notifications
+    public static void checkNotification(Context context, final MessageObserver observer){
         CookieUtils.saveCookie(client, context);
         RequestParams params = new RequestParams();
         params.put("userId", LoginUtils.getUserId());
@@ -57,7 +80,7 @@ public class AccountUtils {
         });
     }
 
-    public static void hasUpdate(Context context, int[] conversationIdArr, final AccountObserver observer){
+    public static void hasUpdate(Context context, int[] conversationIdArr, final MessageObserver observer){
         CookieUtils.saveCookie(client, context);
         String conversationIds = intJoin(conversationIdArr, ",");
         RequestParams params = new RequestParams();
@@ -94,7 +117,7 @@ public class AccountUtils {
     }
 
     public static void modifySettings(Context context, File avatar, String language, Boolean privateAdd, Boolean starOnReply, Boolean starPrivate, Boolean hideOnline,
-                                      final String signature, String userStatus, final AccountObserver observer){
+                                      final String signature, String userStatus, final ModifySettingsObserver observer){
         CookieUtils.saveCookie(client, context);
         client.setTimeout(60000);
         Log.i("begin", "b");
@@ -119,7 +142,7 @@ public class AccountUtils {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 Log.e("wrong", "wrong");
-                observer.onGetUpdateFailure(RETURN_ERROR);
+                observer.onModifySettingsFailure(RETURN_ERROR);
             }
 
             @Override
@@ -148,12 +171,20 @@ public class AccountUtils {
         return sbStr.toString();
     }
 
-    public interface AccountObserver{
-        void onGetUpdateSuccess(Boolean hasUpdate);
-        void onGetUpdateFailure(int statusCode);
+    public interface ModifySettingsObserver{
         void onModifySettingsSuccess();
         void onModifySettingsFailure(int statusCode);
+    }
+    
+    public interface MessageObserver {
+        void onGetUpdateSuccess(Boolean hasUpdate);
+        void onGetUpdateFailure(int statusCode);
         void onCheckNotificationSuccess(int noti_num);
         void onCheckNotificationFailure(int statusCode);
+    }
+
+    public interface GetProfileObserver{
+        void onGetProfileSuccess();
+        void onGetProfileFailure();
     }
 }
