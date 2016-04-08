@@ -19,5 +19,7 @@
     <string name="save_settings">Save</string>
     <string name="change_avatar">change avatar</string>
     <string name="submit">Submit</string>
-
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="retype_password">Retype password</string>
 </resources>

@@ -15,4 +15,6 @@
 	<string name="save_settings">保存更改</string>
 	<string name="change_avatar">更换头像</string>
 	<string name="submit">提交</string>
+	<string name="password">密码</string>
+	<string name="retype_password">验证密码</string>
 </resources>

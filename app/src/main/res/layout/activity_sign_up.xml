@@ -1,7 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/questions_list">
-
-</ListView>
+    android:layout_margin="20dp">
+    <EditText
+        android:id="@+id/edtTxt_username"
+        style="@style/EdtTxtInSignUp"
+        android:inputType="text"
+        android:hint="@string/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/edtTxt_email"
+        style="@style/EdtTxtInSignUp"
+        android:inputType="textEmailAddress"
+        android:hint="@string/email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/edtTxt_password"
+        style="@style/EdtTxtInSignUp"
+        android:inputType="textPassword"
+        android:hint="@string/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/edtTxt_retype_password"
+        style="@style/EdtTxtInSignUp"
+        android:inputType="textPassword"
+        android:hint="@string/retype_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/iv_captcha"
+        android:layout_width="120dp"
+        android:layout_height="50dp" />
+    <EditText
+        android:id="@+id/edtTxt_captcha"
+        style="@style/EdtTxtInSignUp"
+        android:inputType="number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_sign_up"
+        android:text="@string/submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

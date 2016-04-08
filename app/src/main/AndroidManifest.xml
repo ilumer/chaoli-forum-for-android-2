@@ -17,6 +17,8 @@
 		</activity>
 		<activity android:name=".SettingsActivity">
 		</activity>
+		<activity android:name=".AnswerQuestionsActivity">
+		</activity>
 		<activity android:name=".SignUpActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
