@@ -17,10 +17,8 @@ import android.widget.Toast;
 import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.ConversationUtils;
 import com.geno.chaoli.forum.meta.LoginUtils;
-import com.geno.chaoli.forum.meta.SignUpUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -35,43 +33,12 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
     TextView user_id_txt;
 
     File mAvatarFile;
-    AccountUtils.AccountObserver mAccountObserver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
-        mAccountObserver = new AccountUtils.AccountObserver() {
-            @Override
-            public void onGetUpdateSuccess(Boolean hasUpdate) {
-                Log.i("新动态", String.valueOf(hasUpdate));
-            }
-
-            @Override
-            public void onGetUpdateFailure(int statusCode) {
-                Log.i("失败", "error");
-            }
-
-            @Override
-            public void onModifySettingsSuccess() {
-
-            }
-
-            @Override
-            public void onModifySettingsFailure(int statusCode) {
-
-            }
-
-            @Override
-            public void onCheckNotificationSuccess(int noti_num) {
-
-            }
-
-            @Override
-            public void onCheckNotificationFailure(int statusCode) {
-
-            }
-        };
         Button login_btn = (Button) findViewById(R.id.login_btn);
         Button number_one_btn = (Button) findViewById(R.id.number_one_btn);
         Button number_two_btn = (Button) findViewById(R.id.number_two_btn);
@@ -147,7 +114,27 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
                 }else{
                     Log.i("null", "null");
                 }*/
-                AccountUtils.checkNotification(this, mAccountObserver);
+                AccountUtils.checkNotification(this, new AccountUtils.MessageObserver() {
+                    @Override
+                    public void onGetUpdateSuccess(Boolean hasUpdate) {
+                        Log.i("新动态", String.valueOf(hasUpdate));
+                    }
+
+                    @Override
+                    public void onGetUpdateFailure(int statusCode) {
+                        Log.i("失败", "error");
+                    }
+
+                    @Override
+                    public void onCheckNotificationSuccess(int noti_num) {
+
+                    }
+
+                    @Override
+                    public void onCheckNotificationFailure(int statusCode) {
+
+                    }
+                });
                 break;
             default:
                 break;

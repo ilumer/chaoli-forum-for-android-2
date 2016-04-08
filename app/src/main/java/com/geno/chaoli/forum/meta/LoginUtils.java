@@ -2,6 +2,7 @@ package com.geno.chaoli.forum.meta;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.geno.chaoli.forum.Me;
 import com.loopj.android.http.*;
 
 import java.io.PrintWriter;
@@ -10,10 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
-/**
- * 请在LoginObserver的onLoginFailure的实现中执行LoginUtils.clear()方法
- * 可通过CookieUtils.getCookies()直接获取到登录后的cookie
- */
+
 public class LoginUtils {
     public static final String LOGIN_URL = "https://chaoli.club/index.php/user/login?return=%2F";
     public static final String HOMEPAGE_URL = "https://chaoli.club/index.php";
@@ -154,10 +152,12 @@ public class LoginUtils {
                 Pattern pattern = Pattern.compile(tokenFormat);
                 Matcher matcher = pattern.matcher(response);
                 if (matcher.find()) {
-                    setUserId(Integer.parseInt(matcher.group(1)));
+                    int userId = Integer.parseInt(matcher.group(1));
+                    setUserId(userId);
+                    Me.setUserId(userId);
+
                     setToken(matcher.group(2));
-                    //Log.i("newToken", getToken());
-                    //Log.i("userId", String.valueOf(getUserId()));
+
                     sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     //不是用cookie登录

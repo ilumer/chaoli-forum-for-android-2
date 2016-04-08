@@ -52,17 +52,17 @@
             android:layout_height="wrap_content"
             android:text="@string/notification"/>
         <CheckBox
-            android:id="@+id/chk_0_in_notification"
+            android:id="@+id/chk_private_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/notify_me_when_receiving_personal_conversation"/>
         <CheckBox
-            android:id="@+id/chk_1_in_notification"
+            android:id="@+id/chk_star_on_reply"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/star_conversations_i_post_automatically"/>
         <CheckBox
-            android:id="@+id/chk_2_in_notification"
+            android:id="@+id/chk_star_private"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/star_personal_conversations_i_joined_automatically"/>

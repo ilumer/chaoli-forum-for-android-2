@@ -15,19 +15,16 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.request.target.ImageViewTarget;
 import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.ConversationUtils;
 import com.geno.chaoli.forum.meta.LoginUtils;
 
 import java.io.File;
-import java.net.URI;
 import java.util.List;
 
 import com.bumptech.glide.*;
@@ -39,7 +36,8 @@ import com.bumptech.glide.*;
 public class SettingsActivity extends Activity implements View.OnClickListener, LoginUtils.LoginObserver,
         ConversationUtils.PostConversationObserver, ConversationUtils.SetChannelObserver,
         ConversationUtils.AddMemberObserver, ConversationUtils.GetMembersAllowedObserver,
-        ConversationUtils.IgnoreAndStarConversationObserver{
+        ConversationUtils.IgnoreAndStarConversationObserver,
+        AccountUtils.GetProfileObserver{
     EditText username_txt, password_txt;
     TextView user_id_txt;
 
@@ -47,23 +45,32 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
     File mAvatarFile;
     Toast mToast;
     ImageView avatar_iv;
-    AccountUtils.AccountObserver mAccountObserver;
+    Button change_avatar_btn;
+    Spinner language_spn;
+    CheckBox private_add_chk;
+    CheckBox star_on_reply_chk;
+    CheckBox star_private_chk;
+    CheckBox hide_online_chk;
+    EditText signature_edtTxt;
+    EditText user_status_edtTxt;
+    Button save_btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        mContext = this;
-        avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
         Button change_avatar_btn = (Button)findViewById(R.id.btn_change_avatar);
         Spinner language_spn = (Spinner)findViewById(R.id.spn_language);
-        final CheckBox zero_in_notification_chk = (CheckBox)findViewById(R.id.chk_0_in_notification);
-        final CheckBox one_in_notification_chk = (CheckBox)findViewById(R.id.chk_1_in_notification);
-        final CheckBox two_in_notification_chk = (CheckBox)findViewById(R.id.chk_2_in_notification);
-        final CheckBox hide_online_chk = (CheckBox)findViewById(R.id.chk_hide_online);
-        final EditText signature_edtTxt = (EditText)findViewById(R.id.edtTxt_signature);
-        final EditText user_status_edtTxt = (EditText)findViewById(R.id.edtTxt_user_status);
-        Button save_btn = (Button)findViewById(R.id.btn_save);
+        private_add_chk = (CheckBox)findViewById(R.id.chk_private_add);
+        star_on_reply_chk = (CheckBox)findViewById(R.id.chk_star_on_reply);
+        star_private_chk = (CheckBox)findViewById(R.id.chk_star_private);
+        hide_online_chk = (CheckBox)findViewById(R.id.chk_hide_online);
+        signature_edtTxt = (EditText)findViewById(R.id.edtTxt_signature);
+        user_status_edtTxt = (EditText)findViewById(R.id.edtTxt_user_status);
+        save_btn = (Button)findViewById(R.id.btn_save);
+
+        mContext = this;
+        avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
@@ -80,11 +87,26 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
                         mToast.show();
                         String signature = signature_edtTxt.getText().toString();
                         String user_status = user_status_edtTxt.getText().toString();
-                        Boolean privateAdd = zero_in_notification_chk.isChecked();
-                        Boolean starOnReply = one_in_notification_chk.isChecked();
-                        Boolean starPrivate = two_in_notification_chk.isChecked();
+                        Boolean privateAdd = private_add_chk.isChecked();
+                        Boolean starOnReply = star_on_reply_chk.isChecked();
+                        Boolean starPrivate = star_private_chk.isChecked();
                         Boolean hideOnline = hide_online_chk.isChecked();
-                        AccountUtils.modifySettings(mContext, mAvatarFile, "Chinese", privateAdd, starOnReply, starPrivate, hideOnline, signature, user_status, mAccountObserver);
+                        AccountUtils.modifySettings(mContext, mAvatarFile, "Chinese", privateAdd, starOnReply,
+                                starPrivate, hideOnline, signature, user_status, new AccountUtils.ModifySettingsObserver() {
+                                    @Override
+                                    public void onModifySettingsSuccess() {
+                                        if(mToast != null) mToast.cancel();
+                                        mToast = Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT);
+                                        mToast.show();
+                                    }
+
+                                    @Override
+                                    public void onModifySettingsFailure(int statusCode) {
+                                        if(mToast != null) mToast.cancel();
+                                        mToast = Toast.makeText(mContext, "修改失败，请稍后重试", Toast.LENGTH_SHORT);
+                                        mToast.show();
+                                    }
+                                });
                         break;
                     default:
                         break;
@@ -96,42 +118,6 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_dropdown_item);
         language_spn.setAdapter(adapter);
         save_btn.setOnClickListener(onClickListener);
-
-        mAccountObserver = new AccountUtils.AccountObserver() {
-            @Override
-            public void onGetUpdateSuccess(Boolean hasUpdate) {
-                Log.i("新动态", String.valueOf(hasUpdate));
-            }
-
-            @Override
-            public void onGetUpdateFailure(int statusCode) {
-                Log.i("失败", "error");
-            }
-
-            @Override
-            public void onModifySettingsSuccess() {
-                if(mToast != null) mToast.cancel();
-                mToast = Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT);
-                mToast.show();
-            }
-
-            @Override
-            public void onModifySettingsFailure(int statusCode) {
-                if(mToast != null) mToast.cancel();
-                mToast = Toast.makeText(mContext, "修改失败，请稍后重试", Toast.LENGTH_SHORT);
-                mToast.show();
-            }
-
-            @Override
-            public void onCheckNotificationSuccess(int noti_num) {
-
-            }
-
-            @Override
-            public void onCheckNotificationFailure(int statusCode) {
-
-            }
-        };
 
         LoginUtils.begin_login(this, this);
     }
@@ -188,12 +174,15 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
         //user_id_txt.setText(String.valueOf(userId));
         Log.i("login", String.valueOf(userId));
 
-        Glide.with(this).load("https://dn-chaoli-upload.qbox.me/avatar_" + userId + ".png").into(avatar_iv);
+        AccountUtils.getProfile(this, this);
     }
 
     @Override
     public void onLoginFailure(int statusCode) {
         Log.e("login error", String.valueOf(statusCode));
+        if(statusCode == LoginUtils.COOKIE_EXPIRED){
+            LoginUtils.begin_login(this, this);
+        }
     }
 
     @Override
@@ -269,5 +258,21 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
             Toast.makeText(this, "已取消关注", Toast.LENGTH_SHORT).show();
         }
         Log.i("ignore", String.valueOf(isStarred));
+    }
+
+    @Override
+    public void onGetProfileSuccess() {
+        Glide.with(mContext).load("https://dn-chaoli-upload.qbox.me/avatar_" + LoginUtils.getUserId() + "." + Me.getMyAvatarSuffix()).into(avatar_iv);
+                private_add_chk.setChecked(Me.getMyPrivateAdd());
+        star_on_reply_chk.setChecked(Me.getMyStarOnReply());
+        star_private_chk.setChecked(Me.getMyStarPrivate());
+        hide_online_chk.setChecked(Me.getMyHideOnline());
+        signature_edtTxt.setText(Me.getMySignature());
+        user_status_edtTxt.setText(Me.getMyStatus());
+    }
+
+    @Override
+    public void onGetProfileFailure() {
+
     }
 }
