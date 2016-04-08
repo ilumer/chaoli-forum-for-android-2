@@ -2,15 +2,21 @@ package com.geno.chaoli.forum;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,34 +27,97 @@ import com.geno.chaoli.forum.meta.LoginUtils;
 import java.io.File;
 import java.util.List;
 
+import com.bumptech.glide.*;
+
 
 /**
  * Created by jianhao on 16-3-12.
  */
-public class TestActivity extends Activity implements View.OnClickListener, LoginUtils.LoginObserver,
+public class SettingsActivity extends Activity implements View.OnClickListener, LoginUtils.LoginObserver,
         ConversationUtils.PostConversationObserver, ConversationUtils.SetChannelObserver,
         ConversationUtils.AddMemberObserver, ConversationUtils.GetMembersAllowedObserver,
-        ConversationUtils.IgnoreAndStarConversationObserver{
+        ConversationUtils.IgnoreAndStarConversationObserver,
+        AccountUtils.GetProfileObserver{
     EditText username_txt, password_txt;
     TextView user_id_txt;
 
+    Context mContext;
     File mAvatarFile;
-
+    Toast mToast;
+    ImageView avatar_iv;
+    Button change_avatar_btn;
+    Spinner language_spn;
+    CheckBox private_add_chk;
+    CheckBox star_on_reply_chk;
+    CheckBox star_private_chk;
+    CheckBox hide_online_chk;
+    EditText signature_edtTxt;
+    EditText user_status_edtTxt;
+    Button save_btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_settings);
 
-        Button login_btn = (Button) findViewById(R.id.login_btn);
-        Button number_one_btn = (Button) findViewById(R.id.number_one_btn);
-        Button number_two_btn = (Button) findViewById(R.id.number_two_btn);
-        username_txt = (EditText) findViewById(R.id.username_txt);
-        password_txt = (EditText) findViewById(R.id.password_txt);
-        user_id_txt = (TextView) findViewById(R.id.user_id_txt);
+        Button change_avatar_btn = (Button)findViewById(R.id.btn_change_avatar);
+        Spinner language_spn = (Spinner)findViewById(R.id.spn_language);
+        private_add_chk = (CheckBox)findViewById(R.id.chk_private_add);
+        star_on_reply_chk = (CheckBox)findViewById(R.id.chk_star_on_reply);
+        star_private_chk = (CheckBox)findViewById(R.id.chk_star_private);
+        hide_online_chk = (CheckBox)findViewById(R.id.chk_hide_online);
+        signature_edtTxt = (EditText)findViewById(R.id.edtTxt_signature);
+        user_status_edtTxt = (EditText)findViewById(R.id.edtTxt_user_status);
+        save_btn = (Button)findViewById(R.id.btn_save);
 
-        login_btn.setOnClickListener(this);
-        number_one_btn.setOnClickListener(this);
-        number_two_btn.setOnClickListener(this);
+        mContext = this;
+        avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()){
+                    case R.id.btn_change_avatar:
+                        Intent getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
+                        getAlbum.setType(IMAGE_TYPE);
+                        startActivityForResult(getAlbum, IMAGE_CODE);
+                        break;
+                    case R.id.btn_save:
+                        mToast = Toast.makeText(mContext, "修改中，请稍候。。", Toast.LENGTH_LONG);
+                        mToast.setGravity(Gravity.CENTER, 0, 0);
+                        mToast.show();
+                        String signature = signature_edtTxt.getText().toString();
+                        String user_status = user_status_edtTxt.getText().toString();
+                        Boolean privateAdd = private_add_chk.isChecked();
+                        Boolean starOnReply = star_on_reply_chk.isChecked();
+                        Boolean starPrivate = star_private_chk.isChecked();
+                        Boolean hideOnline = hide_online_chk.isChecked();
+                        AccountUtils.modifySettings(mContext, mAvatarFile, "Chinese", privateAdd, starOnReply,
+                                starPrivate, hideOnline, signature, user_status, new AccountUtils.ModifySettingsObserver() {
+                                    @Override
+                                    public void onModifySettingsSuccess() {
+                                        if(mToast != null) mToast.cancel();
+                                        mToast = Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT);
+                                        mToast.show();
+                                    }
+
+                                    @Override
+                                    public void onModifySettingsFailure(int statusCode) {
+                                        if(mToast != null) mToast.cancel();
+                                        mToast = Toast.makeText(mContext, "修改失败，请稍后重试", Toast.LENGTH_SHORT);
+                                        mToast.show();
+                                    }
+                                });
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        change_avatar_btn.setOnClickListener(onClickListener);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_dropdown_item);
+        language_spn.setAdapter(adapter);
+        save_btn.setOnClickListener(onClickListener);
 
         LoginUtils.begin_login(this, this);
     }
@@ -90,66 +159,30 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
             String path = cursor.getString(column_index);
             Log.i("path", path);
             mAvatarFile = new File(path);
+            Glide.with(this).load(mAvatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
             Log.i("name", mAvatarFile.getName());
         }
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.login_btn:
-                LoginUtils.begin_login(this, username_txt.getText().toString(),
-                        password_txt.getText().toString(), this);
-                break;
-            case R.id.number_one_btn:
-                //AccountUtils.hasUpdate(this, new int[]{2334, 2335, 2332, 2327,1527,2016,2329,2326,2305,2275,2331,2301,2297,2260,2325,2055,2324,2328,1882,310,2319}, mAccountObserver);
-                /*Intent getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
-                getAlbum.setType(IMAGE_TYPE);
-                startActivityForResult(getAlbum, IMAGE_CODE);*/
-                //ArrayList<Question> questions = SignUpUtils.getQuestion();
-                break;
-            case R.id.number_two_btn:
-                /*if(mAvatarFile != null){
-                    AccountUtils.modifySettings(this, mAvatarFile, "Chinese", true, true, true, true, "啊", "啊啊", mAccountObserver);
-                }else{
-                    Log.i("null", "null");
-                }*/
-                AccountUtils.checkNotification(this, new AccountUtils.MessageObserver() {
-                    @Override
-                    public void onGetUpdateSuccess(Boolean hasUpdate) {
-                        Log.i("新动态", String.valueOf(hasUpdate));
-                    }
 
-                    @Override
-                    public void onGetUpdateFailure(int statusCode) {
-                        Log.i("失败", "error");
-                    }
-
-                    @Override
-                    public void onCheckNotificationSuccess(int noti_num) {
-
-                    }
-
-                    @Override
-                    public void onCheckNotificationFailure(int statusCode) {
-
-                    }
-                });
-                break;
-            default:
-                break;
-        }
     }
 
     @Override
     public void onLoginSuccess(int userId, String token) {
-        user_id_txt.setText(String.valueOf(userId));
-        Log.i("login", "success");
+        //user_id_txt.setText(String.valueOf(userId));
+        Log.i("login", String.valueOf(userId));
+
+        AccountUtils.getProfile(this, this);
     }
 
     @Override
     public void onLoginFailure(int statusCode) {
         Log.e("login error", String.valueOf(statusCode));
+        if(statusCode == LoginUtils.COOKIE_EXPIRED){
+            LoginUtils.begin_login(this, this);
+        }
     }
 
     @Override
@@ -164,7 +197,7 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
 
     @Override
     public void onSetChannelSuccess() {
-        ConversationUtils.addMember(this, "我是大缺弦", this);
+
     }
 
     @Override
@@ -225,5 +258,21 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
             Toast.makeText(this, "已取消关注", Toast.LENGTH_SHORT).show();
         }
         Log.i("ignore", String.valueOf(isStarred));
+    }
+
+    @Override
+    public void onGetProfileSuccess() {
+        Glide.with(mContext).load("https://dn-chaoli-upload.qbox.me/avatar_" + LoginUtils.getUserId() + "." + Me.getMyAvatarSuffix()).into(avatar_iv);
+                private_add_chk.setChecked(Me.getMyPrivateAdd());
+        star_on_reply_chk.setChecked(Me.getMyStarOnReply());
+        star_private_chk.setChecked(Me.getMyStarPrivate());
+        hide_online_chk.setChecked(Me.getMyHideOnline());
+        signature_edtTxt.setText(Me.getMySignature());
+        user_status_edtTxt.setText(Me.getMyStatus());
+    }
+
+    @Override
+    public void onGetProfileFailure() {
+
     }
 }
