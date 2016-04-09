@@ -2,7 +2,20 @@
 <resources>
     <string name="app_name">超理論壇</string>
     <string name="username">用戶名</string>
-    <string name="reply"></string>
+    <string name="notification">通知</string>
+    <string name="avatar">頭像</string>
+    <string name="language">語言</string>
+    <string name="privacy">隱私</string>
+    <string name="signature">簽名檔</string>
+    <string name="user_status">簡介</string>
+    <string name="notify_me_when_receiving_personal_conversation">收到私人帖子時，發郵件通知我</string>
+    <string name="star_conversations_i_post_automatically">自動關註我發表的帖子</string>
+    <string name="star_personal_conversations_i_joined_automatically">自動關註我參與的私人帖子</string>
+    <string name="hide_online">隱身</string>
+    <string name="save_settings">保存更改</string>
+    <string name="change_avatar">更換頭像</string>
+    <string name="submit">提交</string>
+    <string name="password">密碼</string>
+    <string name="retype_password">驗證密碼</string>
     <string name="login">登入</string>
-    <string name="password"></string>
 </resources>

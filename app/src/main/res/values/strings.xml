@@ -1,10 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">Chaoli forum</string>
-	<string name="username">Username</string>
+    <string name="app_name">Chaoli forum</string>
+    <string name="username">Username</string>
+    <string name="avatar">Avatar</string>
+    <string name="language">Language</string>
+    <string name="notification">Notification</string>
+    <string name="privacy">Privacy</string>
+    <string name="signature">Signature</string>
+    <string name="user_status">User status</string>
+    <string-array name="languages_array">
+        <item>简体中文</item>
+        <item>English</item>
+    </string-array>
+    <string name="notify_me_when_receiving_personal_conversation">notify me when receiving personal conversation</string>
+    <string name="star_conversations_i_post_automatically">star conversations I post automatically</string>
+    <string name="star_personal_conversations_i_joined_automatically">star personal conversations I joined automatically</string>
+    <string name="hide_online">hide online</string>
+    <string name="save_settings">Save</string>
+    <string name="change_avatar">change avatar</string>
+    <string name="submit">Submit</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="retype_password">Retype password</string>
 	<string name="reply">Reply</string>
 	<string name="login">Login</string>
-	<string name="password">Password</string>
 	<string name="channel.caff">Caff</string>
 	<string name="channel.ad">Ad</string>
 	<string name="channel.maths">Maths</string>
@@ -69,4 +88,5 @@
 	<string name="edit">Edit</string>
 	<string name="delete">Delete</string>
 
+>>>>>>> polygen/master
 </resources>
