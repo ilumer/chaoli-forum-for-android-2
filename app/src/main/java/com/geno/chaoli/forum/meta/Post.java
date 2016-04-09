@@ -1,5 +1,6 @@
 package com.geno.chaoli.forum.meta;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 
 public class Post
 {
+	public Context context;
 	public int postId;
 	public int conversationId;
 	public int memberId;
@@ -22,9 +24,12 @@ public class Post
 	public String avatarFormat;
 	public Map<Integer, String> groups;
 	public String groupNames;
+	public String signature;
 	public List<Attachment> attachments;
 
-	public Post(){};
+	public AvatarView avatarView;
+
+	public Post(){}
 /*
 	public Post(int postId, int conversationId,
 			int memberId, long time,
@@ -57,7 +62,7 @@ public class Post
 				attachments);
 	}
 */
-	public Post(int postId, int conversationId,
+	public Post(Context context, int postId, int conversationId,
 			int memberId, long time,
 			int editMemberId, long editTime,
 			int deleteMemberId, long deleteTime,
@@ -65,8 +70,10 @@ public class Post
 			int floor,
 			String username, String avatarFormat,
 			@Nullable Map<Integer, String> groups, @Nullable String groupNames,
+			@Nullable String signature,
 			@Nullable List<Attachment> attachments)
 	{
+		this.context = context;
 		this.postId = postId;
 		this.conversationId = conversationId;
 		this.memberId = memberId;
@@ -82,7 +89,9 @@ public class Post
 		this.avatarFormat = avatarFormat;
 		this.groups = groups;
 		this.groupNames = groupNames;
+		this.signature = signature;
 		this.attachments = attachments;
+		this.avatarView = new AvatarView(context, avatarFormat, memberId, username);
 	}
 
 	public int getPostId()
@@ -223,6 +232,21 @@ public class Post
 	public void setAttachments(List<Attachment> attachments)
 	{
 		this.attachments = attachments;
+	}
+
+	public void setAvatarView(AvatarView avatarView)
+	{
+		this.avatarView = avatarView;
+	}
+
+	public void setAvatarView()
+	{
+		this.avatarView = new AvatarView(context, avatarFormat, memberId, username);
+	}
+
+	public AvatarView getAvatarView()
+	{
+		return avatarView;
 	}
 
 	public class Attachment

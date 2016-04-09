@@ -1,41 +1,45 @@
 package com.geno.chaoli.forum.meta;
 
+import android.content.Context;
+
+import com.geno.chaoli.forum.R;
+
 public enum Channel
 {
 	// TODO: 2016/2/4 0230 Use R.string to get instead of hardcode.
-	caff("茶馆", "灌水、闲聊、漫游", 1, false, 0xFFA0A0A0),
-	ad("店铺", "为赞助商预留", 3, false, 0xFF999999),
-	maths("数学", "眼前是无穷的数学海洋，准备好启程了吗？", 4, true, 0xFF673AB7),
-	physics("物理", "能量与动量齐飞，时间共空间一色", 5, true, 0xFFFF5722),
-	chem("化学", "化学相关的各种学术、各种各样化学实验！", 6, true, 0xFFF44336),
-	biology("生物", "从生物分子到生态系统的生命科学集锦", 7, true, 0xFF4CAF50),
-	tech("技术", "你为什么不问问神奇海螺呢？", 8, true, 0xFF2196F3),
-	test("公测", "试验功能、报告问题", 9, false, 0xFF607D8B),
-	admin("管理", "超理论坛中央政府", 24, false, 0xFFEAEAEA),
-	court("申诉", "运维人员对用户作出的处罚；对运维人员所作出决定的申诉。", 25, true, 0xFFE040D0),
-	announ("公告", "论坛事务公告", 28, true, 0xFF999999),
-	others("其他", "语言、社科", 30, true, 0xFF3F5185),
-	socsci("社科", "社会科学", 34, true, 0xFFE04000),
-	lang("语言", "语言学习交流", 40, true, 0xFF9030C0);
+	caff(R.string.channel_caff, 1, false, 0xFFA0A0A0),
+	ad(R.string.channel_ad, 3, false, 0xFF999999),
+	maths(R.string.channel_maths, 4, true, 0xFF673AB7),
+	physics(R.string.channel_physics, 5, true, 0xFFFF5722),
+	chem(R.string.channel_chem, 6, true, 0xFFF44336),
+	biology(R.string.channel_biology, 7, true, 0xFF4CAF50),
+	tech(R.string.channel_tech, 8, true, 0xFF2196F3),
+	test(R.string.channel_test, 9, false, 0xFF607D8B),
+	admin(R.string.channel_admin, 24, false, 0xFFEAEAEA),
+	court(R.string.channel_court, 25, true, 0xFFE040D0),
+	announ(R.string.channel_announ, 28, true, 0xFF999999),
+	others(R.string.channel_others, 30, true, 0xFF3F5185),
+	socsci(R.string.channel_socsci, 34, true, 0xFFE04000),
+	lang(R.string.channel_lang, 40, true, 0xFF9030C0);
 
-	private String name;
-	private String detail;
+	private int name;
+	private int detail;
 	private boolean isGuestVisible;
 	private int channelId;
 	private int color;
 
-	Channel(String name, String detail, int channelId, boolean isGuestVisible, int color)
+	Channel(int name, int channelId, boolean isGuestVisible, int color)
 	{
 		this.name = name;
-		this.detail = detail;
+		this.detail = name + 1;
 		this.channelId = channelId;
 		this.isGuestVisible = isGuestVisible;
 		this.color = color;
 	}
 
-	public String getDetail()
+	public String getDetail(Context context)
 	{
-		return this.detail;
+		return context.getString(detail);
 	}
 
 	public int getChannelId()
@@ -53,11 +57,16 @@ public enum Channel
 	{
 		return isGuestVisible;
 	}
-	
+
 	@Override
 	public String toString()
 	{
-		return this.name;
+		return this.name();
+	}
+
+	public String toString(Context context)
+	{
+		return context.getString(this.name);
 	}
 
 

@@ -1,177 +1,114 @@
 package com.geno.chaoli.forum;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerTabStrip;
-import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
+import android.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.VelocityTracker;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Channel;
-import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.ConversationView;
+import com.geno.chaoli.forum.meta.CookieUtils;
+import com.geno.chaoli.forum.meta.LoginUtils;
 
-import net.simonvt.menudrawer.MenuDrawer;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends FragmentActivity
+public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallbacks
 {
 	public static final String TAG = "MainActivity";
 
-	public ConversationView[] c;
+	public NavigationDrawerFragment fragment;
+
+	public CharSequence title;
 
 	public SharedPreferences sp;
 	public SharedPreferences.Editor e;
 
-	public ViewPager mainPager;
-	public PagerTabStrip mainTabStrip;
-	public List<Fragment> mainFragments;
-	public List<String> mainFragmentsTitles;
-
-	public LinearLayout slidingMenu;
-
-	public RelativeLayout.LayoutParams slidingMenuParam;
-
-	private float xDown, xMove, xUp;
-	private VelocityTracker vt;
-	private float vX;
-	private boolean menuIsShown = false;
-
-	public static final int VELOCITY = 400;
+	public boolean loggedIn = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-		sp = getSharedPreferences(Constants.conversationSP, MODE_PRIVATE);
-		e = sp.edit();
 
-		initFragments();
-		initSlidingMenu();
+		fragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.drawer);
+		title = getTitle();
 
-
-	}
-
-	private void initSlidingMenu()
-	{
-		DisplayMetrics dm = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-		slidingMenu = new LinearLayout(this);
-		slidingMenu.setBackgroundColor(0x80000000);
-		slidingMenu.setLayoutParams(new RelativeLayout.LayoutParams((int) (dm.widthPixels / 2.5), ViewGroup.LayoutParams.MATCH_PARENT));
-		slidingMenu.setOrientation(LinearLayout.VERTICAL);
-
-
-		RelativeLayout avatarBox = new RelativeLayout(this);
-		avatarBox.setGravity(RelativeLayout.CENTER_IN_PARENT);
-		ImageView avatar = new ImageView(this);
-		avatarBox.addView(avatar);
-		slidingMenu.addView(avatarBox, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-		TextView userName = new TextView(this);
-		userName.setText(R.string.username);
-		slidingMenu.addView(userName, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-		LinearLayout loginBtn = new LinearLayout(this);
-		loginBtn.setOrientation(LinearLayout.HORIZONTAL);
-		ImageView loginImg = new ImageView(this);
-		loginImg.setImageResource(R.mipmap.ic_menu_login);
-		TextView loginStr = new TextView(this);
-		loginStr.setText("Login");
-		loginBtn.addView(loginImg);
-		loginBtn.addView(loginStr);
-		loginBtn.setOnClickListener(new View.OnClickListener()
+		fragment.setUp(R.id.drawer, (DrawerLayout) findViewById(R.id.drawer_main));
+		LoginUtils.begin_login(this, new LoginUtils.LoginObserver()
 		{
 			@Override
-			public void onClick(View v)
+			public void onLoginSuccess(int userId, String token)
 			{
-				startActivity(new Intent(MainActivity.this, LoginActivity.class));
+				loggedIn = true;
+				((TextView) fragment.getActivity().findViewById(R.id.loginHWndUsername)).setText(getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", ""));
+				//((AvatarView) fragment.getActivity().findViewById(R.id.avatar)).setAvatarView(new AvatarView(MainActivity.this, "png", userId, getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "")));
+				ListView channelSelect = (ListView) fragment.getActivity().findViewById(R.id.channelSelect);
+				channelSelect.setAdapter(new ArrayAdapter<>(
+						MainActivity.this,
+						android.R.layout.simple_list_item_1,
+						android.R.id.text1,
+						new String[]
+								{
+										getString(R.string.channel_all),
+										loggedIn ? getString(R.string.channel_caff) : null,
+										getString(R.string.channel_maths),
+										getString(R.string.channel_physics),
+										getString(R.string.channel_chem),
+										getString(R.string.channel_biology),
+										getString(R.string.channel_tech),
+										getString(R.string.channel_court),
+										getString(R.string.channel_announ),
+										getString(R.string.channel_others),
+										getString(R.string.channel_socsci),
+										getString(R.string.channel_lang),
+								}
+				));
+			}
+
+			@Override
+			public void onLoginFailure(int statusCode)
+			{
+				Log.d(TAG, "onLoginFailure: " + statusCode);
+				if (statusCode == 5)
+				{
+					Toast.makeText(MainActivity.this, "Cookie expired, please login again.", Toast.LENGTH_SHORT).show();
+					startActivity(new Intent(MainActivity.this, LoginActivity.class));
+				}
 			}
 		});
-		slidingMenu.addView(loginBtn);
-
-		slidingMenuParam = (RelativeLayout.LayoutParams) slidingMenu.getLayoutParams();
-		slidingMenuParam.leftMargin = 0;
-
-		slidingMenu.setLayoutParams(slidingMenuParam);
-		MenuDrawer m = MenuDrawer.attach(this);
-		m.setMenuView(slidingMenu);
-		m.setContentView(R.layout.main_activity);
 	}
 
-	private void initFragments()
+	@Override
+	public void onNavigationDrawerItemSelected(int position)
 	{
-		mainPager = (ViewPager) findViewById(R.id.mainPager);
-		mainTabStrip = (PagerTabStrip) findViewById(R.id.mainTabStrip);
-		mainTabStrip.setDrawFullUnderline(false);
-		mainTabStrip.setHorizontalScrollBarEnabled(true);
+		FragmentManager fm = getFragmentManager();
+		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
+		fm.beginTransaction().replace(R.id.main_view, c).commit();
+	}
 
-		mainFragments = new ArrayList<>();
-
-		boolean loggedIn = sp.getBoolean(Constants.loginBool, false);
-
-		mainFragmentsTitles = new ArrayList<>();
-
-		if (loggedIn) mainFragmentsTitles.add(Channel.caff.toString());
-		mainFragmentsTitles.add(Channel.maths.toString());
-		mainFragmentsTitles.add(Channel.physics.toString());
-		mainFragmentsTitles.add(Channel.chem.toString());
-		mainFragmentsTitles.add(Channel.biology.toString());
-		mainFragmentsTitles.add(Channel.tech.toString());
-		mainFragmentsTitles.add(Channel.court.toString());
-		mainFragmentsTitles.add(Channel.announ.toString());
-		mainFragmentsTitles.add(Channel.others.toString());
-		mainFragmentsTitles.add(Channel.socsci.toString());
-		mainFragmentsTitles.add(Channel.lang.toString());
-
-		if (loggedIn) mainFragments.add(new ConversationListFragment().setChannel(Channel.caff.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.maths.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.physics.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.chem.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.biology.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.tech.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.court.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.announ.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.others.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.socsci.name()));
-		mainFragments.add(new ConversationListFragment().setChannel(Channel.lang.name()));
-
-		mainPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager())
-		{
-			@Override
-			public android.support.v4.app.Fragment getItem(int position)
-			{
-				return mainFragments.get(position);
-			}
-
-			@Override
-			public int getCount()
-			{
-				return mainFragments.size();
-			}
-
-			@Override
-			public CharSequence getPageTitle(int position)
-			{
-				return mainFragmentsTitles.get(position);
-			}
-		});
+	public String getChannel(int position, boolean loggedIn)
+	{
+		String[] channel =
+		new String[]
+				{
+						"",
+						loggedIn ? Channel.caff.toString() : null,
+						Channel.maths.toString(),
+						Channel.physics.toString(),
+						Channel.chem.toString(),
+						Channel.biology.toString(),
+						Channel.tech.toString(),
+						Channel.court.toString(),
+						Channel.announ.toString(),
+						Channel.others.toString(),
+						Channel.socsci.toString(),
+						Channel.lang.toString(),
+				};
+		return channel[position];
 	}
 }

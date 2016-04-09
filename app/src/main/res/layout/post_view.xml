@@ -1,28 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-	<TextView
-		android:layout_width="wrap_content"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:layout_margin="@dimen/conversationListMargin">
+	<RelativeLayout
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:id="@+id/username"/>
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/floor"
-		android:layout_alignParentTop="true"
-		android:layout_alignParentRight="true"
-		android:layout_alignParentEnd="true"/>
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/time"
-		android:layout_alignParentTop="true"
-		android:layout_toRightOf="@+id/username"
-		android:layout_toEndOf="@+id/username"/>
+		android:id="@+id/user">
+		<RelativeLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/avatar"/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/username"
+			android:layout_toRightOf="@id/avatar"
+			android:layout_toEndOf="@id/avatar"
+			android:layout_marginLeft="@dimen/avatar_marginLeft"
+			android:layout_marginStart="@dimen/avatar_marginLeft"
+			android:textColor="#000000"/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/signature"
+			android:layout_below="@id/username"
+			android:layout_toRightOf="@id/avatar"
+			android:layout_toEndOf="@id/avatar"/>
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/floor"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"/>
+	</RelativeLayout>
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:id="@+id/content"
-		android:layout_below="@id/username"/>
+		android:layout_below="@id/user"
+		android:id="@+id/content"/>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/content"
+		android:id="@+id/time"/>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/deleteMember"/>
 </RelativeLayout>

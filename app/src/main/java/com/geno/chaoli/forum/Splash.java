@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
+
+import java.util.Locale;
 
 public class Splash extends Activity
 {
@@ -14,6 +17,7 @@ public class Splash extends Activity
 		super.onCreate(savedInstanceState);
 		//TODO Any splash screen here?
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		Toast.makeText(Splash.this, String.format(Locale.getDefault(), "%.2f%%", TODO.getStatus() * 100), Toast.LENGTH_SHORT).show();
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		Thread t = new Thread()
 		{
@@ -24,15 +28,15 @@ public class Splash extends Activity
 				try
 				{
 					sleep(0);
+					startActivity(new Intent(Splash.this, Class.forName("com.geno.chaoli.forum.MainActivity")));
 				}
-				catch (InterruptedException e)
+				catch (Exception e)
 				{
 					e.printStackTrace();
 				}
 				finally
 				{
 					finish();
-					startActivity(new Intent(Splash.this, MainActivity.class));
 				}
 			}
 		};

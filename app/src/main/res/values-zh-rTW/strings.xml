@@ -17,4 +17,5 @@
     <string name="submit">提交</string>
     <string name="password">密碼</string>
     <string name="retype_password">驗證密碼</string>
+    <string name="login">登入</string>
 </resources>
