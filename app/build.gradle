@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '24 rc1'
+    //buildToolsVersion '24 rc1'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "com.geno.chaoli.forum"
