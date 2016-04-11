@@ -5,6 +5,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
         android:focusable="true"
         android:focusableInTouchMode="true" >
@@ -21,7 +22,8 @@
                 android:id="@+id/iv_avatar"
                 android:layout_marginLeft="10dp"
                 android:layout_width="50dp"
-                android:layout_height="50dp"/>
+                android:layout_height="50dp"
+                android:scaleType="fitXY"/>
             <Button
                 android:id="@+id/btn_change_avatar"
                 android:layout_marginLeft="20dp"
@@ -32,9 +34,11 @@
             <ImageView
                 android:id="@+id/iv_new_avatar"
                 android:layout_width="50dp"
-                android:layout_height="50dp" />
+                android:layout_height="50dp"
+                android:scaleType="fitXY"/>
         </LinearLayout>
 
+        <!--
         <View style="@style/Divider"/>
         <TextView style="@style/TitleInSettings"
             android:layout_width="wrap_content"
@@ -45,6 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
         </Spinner>
+        -->
 
         <View style="@style/Divider"/>
         <TextView style="@style/TitleInSettings"

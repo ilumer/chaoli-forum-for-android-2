@@ -38,7 +38,7 @@ public class Me {
     }
 
     public static String getMySignature(){
-        return Me.getInstance().preferences.signature;
+        return Me.getInstance().preferences.signature != null ? Me.getInstance().preferences.signature : "";
     }
 
     public static Boolean getMyPrivateAdd(){
@@ -54,7 +54,7 @@ public class Me {
     }
 
     public static Boolean getMyHideOnline(){
-        return Me.getInstance().preferences.hideOnline;
+        return Me.getInstance().preferences.hideOnline != null ? Me.getInstance().preferences.hideOnline : false;
     }
 
     public Preferences getPreferences() {
