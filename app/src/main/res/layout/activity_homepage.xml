@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/ll_homepage">
+    <RelativeLayout
+        android:id="@+id/rl_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/iv_avatar"
+            android:src="@drawable/avatar_32"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"/>
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_below="@+id/iv_avatar"
+            android:text="test"
+            android:textSize="25sp"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <View style="@style/DividerInHomepage"
+            android:layout_below="@id/tv_username"/>
+    </RelativeLayout>
+    <com.geno.chaoli.forum.PullToRefreshLayout
+        android:id="@+id/ptrl_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/refresh_head" />
+
+        <com.geno.chaoli.forum.pullableview.PullableScrollView
+            android:id="@+id/fssv_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/ll_activities"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="?android:attr/listDivider"
+                android:dividerPadding="10dp"
+                android:showDividers="middle">
+
+            </LinearLayout>
+        </com.geno.chaoli.forum.pullableview.PullableScrollView>
+
+        <include layout="@layout/load_more"/>
+    </com.geno.chaoli.forum.PullToRefreshLayout>
+</LinearLayout>
