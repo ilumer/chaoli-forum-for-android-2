@@ -92,4 +92,7 @@
 	<string name="release_to_load">释放开始加载</string>
 	<string name="refreshing">刷新中……</string>
 	<string name="loading">加载中……</string>
+	<string name="opened_a_conversation">%s 发表了帖子</string>
+	<string name="updated">%s 更新于</string>
+	<string name="modified_his_or_her_information">%s 修改简介为</string>
 </resources>

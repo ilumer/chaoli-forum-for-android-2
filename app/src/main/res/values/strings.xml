@@ -98,6 +98,9 @@
 	<string name="release_to_load">Release to load</string>
 	<string name="refreshing">Refreshing..</string>
 	<string name="loading">Loading..</string>
+	<string name="opened_a_conversation">%s opened a conversation</string>
+	<string name="updated">%s updated </string>
+	<string name="modified_his_or_her_information">%s modified his/her information</string>
 
 	>>>>>>> polygen/master
 </resources>
