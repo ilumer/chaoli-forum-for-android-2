@@ -2,6 +2,7 @@ package com.geno.chaoli.forum;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,7 +13,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.Constants;
+import com.geno.chaoli.forum.meta.LoginUtils;
 import com.geno.chaoli.forum.pullableview.PullableScrollView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -20,6 +23,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.client.cache.Resource;
 
 /**
  * Created by jianhao on 16-4-14.
@@ -27,9 +31,8 @@ import cz.msebera.android.httpclient.Header;
 public class HomepageActivity extends Activity implements PullableScrollView.ScrollListener,
         PullToRefreshLayout.OnRefreshListener{
     Context mContext;
-    String mUsername = "App测试账号";
-    int userId = 5180;
-    String response;
+    String mUsername = "待接收";
+    int userId = -1; // to be received
     int mPage = 1;
     //第一条记录的时间
     String startTime = String.valueOf(Long.MIN_VALUE);
@@ -41,6 +44,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
         mContext = this;
+        ((TextView) findViewById(R.id.tv_username)).setText(mUsername);
         PullableScrollView scrollView = (PullableScrollView) findViewById(R.id.fssv_test);
         scrollView.setScrollListener((PullableScrollView.ScrollListener)mContext);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptrl_history);
@@ -85,13 +89,13 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         client.get(this, Constants.GET_ACTIVITIES_URL + userId, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                response = new String(responseBody);
+                Resources res = getResources();
+                String response = new String(responseBody);
 
                 OuterActivity outerActivity = JSON.parseObject(response, OuterActivity.class);
 
                 int i = 0;
                 for(; i < outerActivity.activity.size(); i++){
-                    Log.d("time", startTime + ", " + outerActivity.activity.get(i).time);
                     if(Long.parseLong(startTime) >= Long.parseLong(outerActivity.activity.get(i).time)){
                         break;
                     }
@@ -118,9 +122,9 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
                         content_tv.setText(thisActivity.content);
                         content_tv.setHint(thisActivity.postId);
                         if("1".equals(thisActivity.start)){
-                            description_tv.setText(mUsername + " 发表了帖子"); // TODO: 16-4-16 remove hardcode
+                            description_tv.setText(res.getString(R.string.opened_a_conversation, mUsername)); // TODO: 16-4-16 remove hardcode
                         }else{
-                            description_tv.setText(mUsername + " 更新于");
+                            description_tv.setText(res.getString(R.string.updated, mUsername));
                         }
                         title_tv.setText(thisActivity.title);
                         title_tv.setHint(thisActivity.postId);
@@ -147,7 +151,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
                         linearLayout.addView(content_tv);
                     }else{
                         if("status".equals(thisActivity.type)){
-                            description_tv.setText(mUsername + " 修改简介为");
+                            description_tv.setText(res.getString(R.string.modified_his_or_her_information, mUsername));
                         }
                         MyActivity.Data data = JSON.parseObject(thisActivity.data, MyActivity.Data.class);
                         linearLayout.addView(description_tv);
@@ -157,7 +161,6 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
                         }
                     }
                     activities_ll.addView(linearLayout, 0);
-                    Log.d("count", String.valueOf(activities_ll.getChildCount()));
                     //activities_ll.addView();
                 }
 
@@ -174,19 +177,15 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
     }
 
     @Override
-    public void onLoadMore(PullToRefreshLayout pullToRefreshLayout) {
-        Log.d("load", "to load");
-        getNewActivities(pullToRefreshLayout);
-    }
-
-    private void getNewActivities(final PullToRefreshLayout pullToRefreshLayout){
+    public void onLoadMore(final PullToRefreshLayout pullToRefreshLayout) {
         final LinearLayout activities_ll = (LinearLayout) findViewById(R.id.ll_activities);
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(this, Constants.GET_ACTIVITIES_URL + userId + "/" + (mPage + 1), new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                response = new String(responseBody);
+                Resources res = getResources();
+                String response = new String(responseBody);
 
                 OuterActivity outerActivity = JSON.parseObject(response, OuterActivity.class);
 
@@ -221,9 +220,9 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
                         content_tv.setText(thisActivity.content);
                         content_tv.setHint(thisActivity.postId);
                         if("1".equals(thisActivity.start)){
-                            description_tv.setText(mUsername + " 发表了帖子"); // TODO: 16-4-16 remove hardcode
+                            description_tv.setText(res.getString(R.string.opened_a_conversation, mUsername)); // TODO: 16-4-16 remove hardcode
                         }else{
-                            description_tv.setText(mUsername + " 更新于");
+                            description_tv.setText(res.getString(R.string.updated, mUsername));
                         }
                         title_tv.setText(thisActivity.title);
                         title_tv.setHint(thisActivity.postId);
@@ -250,7 +249,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
                         linearLayout.addView(content_tv);
                     }else{
                         if("status".equals(thisActivity.type)){
-                            description_tv.setText(mUsername + " 修改简介为");
+                            description_tv.setText(res.getString(R.string.modified_his_or_her_information, mUsername));
                         }
                         MyActivity.Data data = JSON.parseObject(thisActivity.data, MyActivity.Data.class);
                         content_tv.setText(data.newStatus);
