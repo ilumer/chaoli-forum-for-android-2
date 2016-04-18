@@ -67,7 +67,7 @@ public class Me {
 
 
     public static int getUserId() {
-        return Me.getInstance().userId;
+        return getMyUserId();
     }
 
     public static void setUserId(int userId) {

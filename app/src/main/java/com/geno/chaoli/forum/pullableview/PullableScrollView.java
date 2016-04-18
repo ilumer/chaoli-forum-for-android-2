@@ -3,6 +3,7 @@ package com.geno.chaoli.forum.pullableview;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 public class PullableScrollView extends ScrollView implements Pullable
@@ -61,7 +62,7 @@ public class PullableScrollView extends ScrollView implements Pullable
 	@Override
 	public boolean canPullUp()
 	{
-		if (getScrollY() >= (getChildAt(0).getHeight() - ((View)getParent().getParent().getParent()).getHeight()) && getChildCount() >= 10)
+		if (getScrollY() >= (getChildAt(0).getHeight() - ((View)getParent().getParent().getParent()).getHeight()) && ((LinearLayout)getChildAt(0)).getChildCount() >= 10)
 		//if (getScrollY() >= (getChildAt(0).getHeight() - getMeasuredHeight()))
 			return true;
 		else

@@ -30,6 +30,7 @@ public class LoginUtils {
     public static final int FAILED_AT_OPEN_HOMEPAGE = 4;
     public static final int COOKIE_EXPIRED = 5;
     public static final int EMPTY_UN_OR_PW = 6;
+    public static final int ERROR_LOGIN_STATUS = 7;
 
     private static void setToken(String token) {
         LoginUtils.token = token;
@@ -56,7 +57,7 @@ public class LoginUtils {
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
 
-    public static void begin_login(final Context context, String username, String password, LoginObserver loginObserver){
+    public static void begin_login(final Context context, final String username, final String password, final LoginObserver loginObserver){
         CookieUtils.clearCookie(context); //正常情况下这句应该不会用到，但以防万一
         CookieUtils.saveCookie(client, context);
 
@@ -65,8 +66,22 @@ public class LoginUtils {
         if( !sharedPreferences.getBoolean(IS_LOGGED_IN, false)){
             LoginUtils.username = username;
             LoginUtils.password = password;
-            //Log.i("cookie", "doesn't exists");
             pre_login(context, loginObserver);
+        }else{
+            //如果已经登录，先注销
+            logout(context, new LogoutObserver() {
+                @Override
+                public void onLogoutSuccess() {
+                    LoginUtils.username = username;
+                    LoginUtils.password = password;
+                    pre_login(context, loginObserver);
+                }
+
+                @Override
+                public void onLogoutFailure(int statusCode) {
+                    loginObserver.onLoginFailure(ERROR_LOGIN_STATUS);
+                }
+            });
         }
     }
 
