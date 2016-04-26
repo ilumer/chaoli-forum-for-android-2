@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum.meta;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.geno.chaoli.forum.Me;
 import com.loopj.android.http.*;
@@ -11,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.cookie.Cookie;
 
 public class LoginUtils {
     public static final String LOGIN_URL = "https://chaoli.club/index.php/user/login?return=%2F";
@@ -18,6 +20,7 @@ public class LoginUtils {
     public static final String LOGOUT_PRE_URL = "https://chaoli.club/index.php/user/logout?token=";
     public static final String COOKIE_UN_AND_PW = "im^#@cookie^$&";
     public static final String LOGIN_SP_NAME = "username_and_password";
+    public static final String IS_LOGGED_IN = "is_logged_in";
     public static final String SP_USERNAME_KEY = "username";
     public static final String SP_PASSWORD_KEY = "password";
     public static final int FAILED_AT_OPEN_LOGIN_PAGE = 0;
@@ -27,6 +30,7 @@ public class LoginUtils {
     public static final int FAILED_AT_OPEN_HOMEPAGE = 4;
     public static final int COOKIE_EXPIRED = 5;
     public static final int EMPTY_UN_OR_PW = 6;
+    public static final int ERROR_LOGIN_STATUS = 7;
 
     private static void setToken(String token) {
         LoginUtils.token = token;
@@ -51,35 +55,57 @@ public class LoginUtils {
     private static AsyncHttpClient client = new AsyncHttpClient();
 
     private static SharedPreferences sharedPreferences;
+    private static SharedPreferences.Editor editor;
 
-    public static void begin_login(final Context context, String username, String password, LoginObserver loginObserver){
+    public static void begin_login(final Context context, final String username, final String password, final LoginObserver loginObserver){
         CookieUtils.clearCookie(context); //正常情况下这句应该不会用到，但以防万一
         CookieUtils.saveCookie(client, context);
-        if(CookieUtils.getCookie(context).size() == 0){
+
+        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
+
+        if( !sharedPreferences.getBoolean(IS_LOGGED_IN, false)){
             LoginUtils.username = username;
             LoginUtils.password = password;
-            //Log.i("cookie", "doesn't exists");
             pre_login(context, loginObserver);
+        }else{
+            //如果已经登录，先注销
+            logout(context, new LogoutObserver() {
+                @Override
+                public void onLogoutSuccess() {
+                    LoginUtils.username = username;
+                    LoginUtils.password = password;
+                    pre_login(context, loginObserver);
+                }
+
+                @Override
+                public void onLogoutFailure(int statusCode) {
+                    loginObserver.onLoginFailure(ERROR_LOGIN_STATUS);
+                }
+            });
         }
     }
 
     public static void begin_login(final Context context, LoginObserver loginObserver){
         CookieUtils.saveCookie(client, context);
 
-        if(CookieUtils.getCookie(context).size() != 0){
-            //Log.i("cookie", "exists");
+        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
+        Boolean is_logged_in = sharedPreferences.getBoolean(IS_LOGGED_IN, false);
+
+        //if(CookieUtils.getCookie(context).size() != 0){
+
+        if(is_logged_in){
             getNewToken(context, loginObserver);
             username = password = COOKIE_UN_AND_PW;
             return;
         }
 
         //Log.i("login_2", "username = " + username + ", password = " + password);
-        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
         username = sharedPreferences.getString(SP_USERNAME_KEY, "");
         password = sharedPreferences.getString(SP_PASSWORD_KEY, "");
 
         if("".equals(username) || "".equals(password)){
             loginObserver.onLoginFailure(EMPTY_UN_OR_PW);
+            CookieUtils.clearCookie(context);
             return;
         }
 
@@ -99,6 +125,7 @@ public class LoginUtils {
                     login(context, loginObserver);
                 } else {
                     //Log.e("regex_error", "regex_error");
+                    CookieUtils.clearCookie(context);
                     loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
                 }
                 //Log.i("login_page", response);
@@ -107,6 +134,7 @@ public class LoginUtils {
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 //Log.e("login_error", "");
+                CookieUtils.clearCookie(context);
                 loginObserver.onLoginFailure(FAILED_AT_OPEN_LOGIN_PAGE);
             }
         });
@@ -123,7 +151,7 @@ public class LoginUtils {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 //Log.i("after_login", new String(responseBody));
-                CookieUtils.clearCookie(context);
+                clear(context);
                 loginObserver.onLoginFailure(WRONG_USERNAME_OR_PASSWORD);
             }
 
@@ -135,6 +163,8 @@ public class LoginUtils {
                 if ("Moved Temporarily".equals(error.getMessage())) { //表示登陆成功，若在浏览器中将会跳转到首页
                     getNewToken(context, loginObserver);
                 } else {
+                    CookieUtils.clearCookie(context);
+
                     loginObserver.onLoginFailure(FAILED_AT_LOGIN);
                 }
             }
@@ -168,16 +198,20 @@ public class LoginUtils {
                         editor.apply();
                     }
                     //CookieUtils.setCookies(CookieUtils.getCookie(context));
+                    setSPIsLoggedIn(true);
                     loginObserver.onLoginSuccess(getUserId(), getToken());
                 } else {
                     CookieUtils.clearCookie(context);
+                    setSPIsLoggedIn(false);
                     loginObserver.onLoginFailure(COOKIE_EXPIRED);
+                    begin_login(context, loginObserver);
                     //Log.e("regex_error", "regex_error");
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                CookieUtils.clearCookie(context);
                 loginObserver.onLoginFailure(FAILED_AT_OPEN_HOMEPAGE);
             }
         });
@@ -202,14 +236,20 @@ public class LoginUtils {
     }
 
     public static void clear(Context context){
-        //CookieUtils.clearLoginCookie();
         CookieUtils.clearCookie(context);
         if(sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove(IS_LOGGED_IN);
             editor.remove(SP_USERNAME_KEY);
             editor.remove(SP_PASSWORD_KEY);
             editor.apply();
         }
+    }
+
+    private static void setSPIsLoggedIn(Boolean isLoggedIn){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(IS_LOGGED_IN, isLoggedIn);
+        editor.apply();
     }
 
     public interface LoginObserver

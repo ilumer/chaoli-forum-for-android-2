@@ -18,4 +18,17 @@
     <string name="password">密碼</string>
     <string name="retype_password">驗證密碼</string>
     <string name="login">登入</string>
+    <string name="refresh_succeed">刷新成功</string>
+    <string name="refresh_failed">刷新失敗</string>
+    <string name="refresh_fail">刷新失敗</string>
+    <string name="load_succeed">加載成功</string>
+    <string name="load_fail">加載失敗</string>
+    <string name="pull_to_refresh">下拉刷新</string>
+    <string name="pullup_to_load">上拉加載</string>
+    <string name="release_to_refresh">釋放開始刷新</string>
+    <string name="release_to_load">釋放開始加載</string>
+    <string name="loading">加載中……</string>
+    <string name="opened_a_conversation">%s 發表了帖子</string>
+    <string name="updated">%s 更新於</string>
+    <string name="modified_his_or_her_information">%s 修改簡介為</string>
 </resources>

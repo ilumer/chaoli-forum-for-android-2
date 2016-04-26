@@ -7,6 +7,8 @@ public class Constants
 	public static final int paddingRight = 16;
 	public static final int paddingBottom = 16;
 
+	// activity.json/32/2
+	public static final String GET_ACTIVITIES_URL = "https://chaoli.club/member/activity.json/";
 	// index.json/channelName?searchDetail
 	// index.json/all?search=%23%E4%B8%8A%E9%99%90%EF%BC%9A0%20~%20100
 	// index.json/chem?search=%23%E7%B2%BE%E5%93%81

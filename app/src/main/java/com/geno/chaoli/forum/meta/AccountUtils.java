@@ -3,6 +3,8 @@ package com.geno.chaoli.forum.meta;
 import android.content.Context;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.geno.chaoli.forum.Me;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -10,6 +12,7 @@ import com.loopj.android.http.RequestParams;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,12 +65,14 @@ public class AccountUtils {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 Log.i("success", new String(responseBody));
                 String response = new String(responseBody);
-                String messageFormat = "\"count\":(\\d+)";
-                Pattern pattern = Pattern.compile(messageFormat);
-                Matcher matcher = pattern.matcher(response);
-                if(matcher.find()){
-                    observer.onCheckNotificationSuccess(Integer.valueOf(matcher.group(1)));
-                }else{
+                try {
+                    NotificationList notificationList = JSON.parseObject(response, NotificationList.class);
+                    if (notificationList != null) {
+                        observer.onCheckNotificationSuccess(notificationList);
+                    } else {
+                        observer.onCheckNotificationFailure(RETURN_ERROR);
+                    }
+                } catch (Exception e){
                     observer.onCheckNotificationFailure(RETURN_ERROR);
                 }
             }
@@ -78,6 +83,26 @@ public class AccountUtils {
                 observer.onCheckNotificationFailure(statusCode);
             }
         });
+    }
+
+    public static class NotificationList{
+        public int count;
+        public List<Notification> results;
+    }
+
+    public static class Notification{
+        public String fromMemberId;
+        public String fromMemberName;
+        @JSONField(name="avatarFormat")
+        public String avatarSuffix;
+        public Data data;
+        public String type;
+
+        public static class Data{
+            public String conversationId;
+            public String postId;
+            public String title;
+        }
     }
 
     public static void hasUpdate(Context context, int[] conversationIdArr, final MessageObserver observer){
@@ -179,7 +204,7 @@ public class AccountUtils {
     public interface MessageObserver {
         void onGetUpdateSuccess(Boolean hasUpdate);
         void onGetUpdateFailure(int statusCode);
-        void onCheckNotificationSuccess(int noti_num);
+        void onCheckNotificationSuccess(NotificationList notificationList);
         void onCheckNotificationFailure(int statusCode);
     }
 

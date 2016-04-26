@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '24 rc1'
+    //buildToolsVersion '24 rc1'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "com.geno.chaoli.forum"
@@ -27,6 +28,7 @@ dependencies {
     compile 'com.alibaba:fastjson:1.1.46.android'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.android.support:design:23.2.1'
+    compile 'com.canyinghao:canrefresh:1.0.0'
     compile 'me.imid.swipebacklayout.lib:library:1.0.0'
 	compile 'com.github.bumptech.glide:glide:3.5.2'
 }

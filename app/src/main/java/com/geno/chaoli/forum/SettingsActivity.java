@@ -33,11 +33,7 @@ import com.bumptech.glide.*;
 /**
  * Created by jianhao on 16-3-12.
  */
-public class SettingsActivity extends Activity implements View.OnClickListener, LoginUtils.LoginObserver,
-        ConversationUtils.PostConversationObserver, ConversationUtils.SetChannelObserver,
-        ConversationUtils.AddMemberObserver, ConversationUtils.GetMembersAllowedObserver,
-        ConversationUtils.IgnoreAndStarConversationObserver,
-        AccountUtils.GetProfileObserver{
+public class SettingsActivity extends Activity implements AccountUtils.GetProfileObserver{
     EditText username_txt, password_txt;
     TextView user_id_txt;
 
@@ -46,7 +42,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
     Toast mToast;
     ImageView avatar_iv;
     Button change_avatar_btn;
-    Spinner language_spn;
+    //Spinner language_spn;
     CheckBox private_add_chk;
     CheckBox star_on_reply_chk;
     CheckBox star_private_chk;
@@ -60,7 +56,7 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
         setContentView(R.layout.activity_settings);
 
         Button change_avatar_btn = (Button)findViewById(R.id.btn_change_avatar);
-        Spinner language_spn = (Spinner)findViewById(R.id.spn_language);
+        //Spinner language_spn = (Spinner)findViewById(R.id.spn_language);
         private_add_chk = (CheckBox)findViewById(R.id.chk_private_add);
         star_on_reply_chk = (CheckBox)findViewById(R.id.chk_star_on_reply);
         star_private_chk = (CheckBox)findViewById(R.id.chk_star_private);
@@ -116,10 +112,8 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
         change_avatar_btn.setOnClickListener(onClickListener);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_dropdown_item);
-        language_spn.setAdapter(adapter);
+        //language_spn.setAdapter(adapter);
         save_btn.setOnClickListener(onClickListener);
-
-        LoginUtils.begin_login(this, this);
     }
 
     private final String IMAGE_TYPE = "image/*";
@@ -143,127 +137,47 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
 
         //此处的用于判断接收的Activity是不是你想要的那个
         if (requestCode == IMAGE_CODE) {
-            Uri originalUri = data.getData();        //获得图片的uri
+            /*Uri originalUri = data.getData();        //获得图片的uri
             Log.i("uri", originalUri.toString());
             //bm = MediaStore.Images.Media.getBitmap(resolver, originalUri);        //显得到bitmap图片
 
             String[] proj = {MediaStore.Images.Media.DATA};
 
             //好像是android多媒体数据库的封装接口，具体的看Android文档
-            Cursor cursor = managedQuery(originalUri, proj, null, null, null);
+            Cursor cursor = resolver.query(originalUri, proj, null, null, null);
             //按我个人理解 这个是获得用户选择的图片的索引值
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             //将光标移至开头 ，这个很重要，不小心很容易引起越界
             cursor.moveToFirst();
             //最后根据索引值获取图片路径
-            String path = cursor.getString(column_index);
-            Log.i("path", path);
-            mAvatarFile = new File(path);
+            String path = cursor.getString(column_index);*/
+            //Log.i("path", path);
+
+            Uri selectedImageUri = data.getData();
+            String selectedImagePath = getPath(selectedImageUri);
+            mAvatarFile = new File(selectedImagePath);
             Glide.with(this).load(mAvatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
             Log.i("name", mAvatarFile.getName());
         }
     }
 
     @Override
-    public void onClick(View v) {
-
-    }
-
-    @Override
-    public void onLoginSuccess(int userId, String token) {
-        //user_id_txt.setText(String.valueOf(userId));
-        Log.i("login", String.valueOf(userId));
-
-        AccountUtils.getProfile(this, this);
-    }
-
-    @Override
-    public void onLoginFailure(int statusCode) {
-        Log.e("login error", String.valueOf(statusCode));
-        if(statusCode == LoginUtils.COOKIE_EXPIRED){
-            LoginUtils.begin_login(this, this);
-        }
-    }
-
-    @Override
-    public void onPostConversationSuccess(int conversationId) {
-        Log.i("post", String.valueOf(conversationId));
-    }
-
-    @Override
-    public void onPostConversationFailure(int statusCode) {
-        Log.i("post", "success");
-    }
-
-    @Override
-    public void onSetChannelSuccess() {
-
-    }
-
-    @Override
-    public void onSetChannelFailure(int statusCode) {
-
-    }
-
-    @Override
-    public void onAddMemberFailure(int statusCode) {
-
-    }
-
-    @Override
-    public void onAddMemberSuccess() {
-        ConversationUtils.postConversation(this, "发帖测试", "发帖测试", this);
-    }
-
-    @Override
-    public void onGetMembersAllowedFailure(int statusCode) {
-        Log.e("member", String.valueOf(statusCode));
-    }
-
-    @Override
-    public void onGetMembersAllowedSuccess(List<Integer> memberList) {
-        Log.i("size", String.valueOf(memberList.size()));
-        Log.i("member1", String.valueOf(memberList.get(0)));
-        for (Integer i:
-             memberList) {
-            Log.i("member", i.toString());
-        }
-    }
-
-    @Override
-    public void onIgnoreConversationFailure(int statusCode) {
-        Log.e("ignore", String.valueOf(statusCode));
-    }
-
-    @Override
-    public void onIgnoreConversationSuccess(Boolean isIgnored) {
-        if(isIgnored){
-            Toast.makeText(this, "已被隐藏", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(this, "已取消隐藏", Toast.LENGTH_SHORT).show();
-        }
-        Log.i("ignore", String.valueOf(isIgnored));
-    }
-
-    @Override
-    public void onStarConversationFailure(int statusCode) {
-        Log.e("star", String.valueOf(statusCode));
-    }
-
-    @Override
-    public void onStarConversationSuccess(Boolean isStarred) {
-        if(isStarred){
-            Toast.makeText(this, "已关注", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(this, "已取消关注", Toast.LENGTH_SHORT).show();
-        }
-        Log.i("ignore", String.valueOf(isStarred));
-    }
-
-    @Override
     public void onGetProfileSuccess() {
-        Glide.with(mContext).load("https://dn-chaoli-upload.qbox.me/avatar_" + LoginUtils.getUserId() + "." + Me.getMyAvatarSuffix()).into(avatar_iv);
-                private_add_chk.setChecked(Me.getMyPrivateAdd());
+        updateViews();
+    }
+
+    @Override
+    public void onGetProfileFailure() {
+
+    }
+
+    public void updateViews(){
+        if(Me.getMyAvatarSuffix() != null) {
+            Glide.with(mContext).load("https://dn-chaoli-upload.qbox.me/avatar_" + LoginUtils.getUserId() + "." + Me.getMyAvatarSuffix()).into(avatar_iv);
+        }else {
+
+        }
+        private_add_chk.setChecked(Me.getMyPrivateAdd());
         star_on_reply_chk.setChecked(Me.getMyStarOnReply());
         star_private_chk.setChecked(Me.getMyStarPrivate());
         hide_online_chk.setChecked(Me.getMyHideOnline());
@@ -271,8 +185,25 @@ public class SettingsActivity extends Activity implements View.OnClickListener, 
         user_status_edtTxt.setText(Me.getMyStatus());
     }
 
-    @Override
-    public void onGetProfileFailure() {
-
+    /**
+     * helper to retrieve the path of an image URI
+     */
+    public String getPath(Uri uri) {
+        // just some safety built in
+        if( uri == null ) {
+            return null;
+        }
+        // try to retrieve the image from the media store first
+        // this will only work for images selected from gallery
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        if( cursor != null ){
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        // this is our fallback here
+        return uri.getPath();
     }
 }

@@ -37,6 +37,8 @@
 		<activity
 			android:name=".ReplyAction"
 			android:theme="@style/Theme.AppCompat.Light"/>
+		<activity android:name=".HomepageActivity">
+		</activity>
 	</application>
 
 </manifest>
