@@ -2,6 +2,7 @@ package com.geno.chaoli.forum;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.IntegerCodec;
 import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.LoginUtils;
@@ -21,6 +23,8 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.client.cache.Resource;
@@ -31,8 +35,8 @@ import cz.msebera.android.httpclient.client.cache.Resource;
 public class HomepageActivity extends Activity implements PullableScrollView.ScrollListener,
         PullToRefreshLayout.OnRefreshListener{
     Context mContext;
-    String mUsername = "待接收";
-    int userId = -1; // to be received
+    String mUsername = "我是大缺弦";
+    int userId = 32; // to be received
     int mPage = 1;
     //第一条记录的时间
     String startTime = String.valueOf(Long.MIN_VALUE);
@@ -81,6 +85,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         rootLayout.scrollTo(0, scrollY);
     }
 
+
     @Override
     public void onRefresh(final PullToRefreshLayout pullToRefreshLayout) {
         final LinearLayout activities_ll = (LinearLayout) findViewById(R.id.ll_activities);
@@ -89,7 +94,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         client.get(this, Constants.GET_ACTIVITIES_URL + userId, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Resources res = getResources();
+
                 String response = new String(responseBody);
 
                 OuterActivity outerActivity = JSON.parseObject(response, OuterActivity.class);
@@ -105,61 +110,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
 
                 for (; i >= 0; i--) {
                     MyActivity thisActivity = outerActivity.activity.get(i);
-                    LinearLayout linearLayout = new LinearLayout(mContext);
-                    linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    linearLayout.setOrientation(LinearLayout.VERTICAL);
-                    TextView description_tv = new TextView(mContext);
-                    description_tv.setSingleLine(true);
-                    TextView content_tv = new TextView(mContext);
-                    content_tv.setMaxLines(4);
-                    content_tv.setMinLines(3);
-                    content_tv.setEllipsize(TextUtils.TruncateAt.END);
-                    TextView title_tv = new TextView(mContext);
-                    title_tv.setEllipsize(TextUtils.TruncateAt.END);
-                    title_tv.setTextSize(20);
-                    title_tv.setSingleLine(true);
-                    if("postActivity".equals(thisActivity.type)) {
-                        content_tv.setText(thisActivity.content);
-                        content_tv.setHint(thisActivity.postId);
-                        if("1".equals(thisActivity.start)){
-                            description_tv.setText(res.getString(R.string.opened_a_conversation, mUsername)); // TODO: 16-4-16 remove hardcode
-                        }else{
-                            description_tv.setText(res.getString(R.string.updated, mUsername));
-                        }
-                        title_tv.setText(thisActivity.title);
-                        title_tv.setHint(thisActivity.postId);
-                        View.OnClickListener onClickListener = new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                AsyncHttpClient client = new AsyncHttpClient();
-                                client.get(mContext, "https://chaoli.club/index.php/conversation/post/" + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
-                                    @Override
-                                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                                        Log.d("body", new String(responseBody));
-                                    }
-
-                                    @Override
-                                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                                        Log.d("body", "e");
-                                    }
-                                });
-                            }
-                        };
-                        title_tv.setOnClickListener(onClickListener);
-                        linearLayout.addView(description_tv);
-                        linearLayout.addView(title_tv);
-                        linearLayout.addView(content_tv);
-                    }else{
-                        if("status".equals(thisActivity.type)){
-                            description_tv.setText(res.getString(R.string.modified_his_or_her_information, mUsername));
-                        }
-                        MyActivity.Data data = JSON.parseObject(thisActivity.data, MyActivity.Data.class);
-                        linearLayout.addView(description_tv);
-                        if(data != null && data.newStatus != null){
-                            content_tv.setText(data.newStatus);
-                            linearLayout.addView(content_tv);
-                        }
-                    }
+                    LinearLayout linearLayout = inflateItem(thisActivity);
                     activities_ll.addView(linearLayout, 0);
                     //activities_ll.addView();
                 }
@@ -203,59 +154,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
 
                 for (; i < outerActivity.activity.size(); i++) {
                     MyActivity thisActivity = outerActivity.activity.get(i);
-                    LinearLayout linearLayout = new LinearLayout(mContext);
-                    linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    linearLayout.setOrientation(LinearLayout.VERTICAL);
-                    TextView description_tv = new TextView(mContext);
-                    description_tv.setSingleLine(true);
-                    TextView content_tv = new TextView(mContext);
-                    content_tv.setMaxLines(4);
-                    content_tv.setMinLines(3);
-                    content_tv.setEllipsize(TextUtils.TruncateAt.END);
-                    TextView title_tv = new TextView(mContext);
-                    title_tv.setEllipsize(TextUtils.TruncateAt.END);
-                    title_tv.setTextSize(20);
-                    title_tv.setSingleLine(true);
-                    if("postActivity".equals(thisActivity.type)) {
-                        content_tv.setText(thisActivity.content);
-                        content_tv.setHint(thisActivity.postId);
-                        if("1".equals(thisActivity.start)){
-                            description_tv.setText(res.getString(R.string.opened_a_conversation, mUsername)); // TODO: 16-4-16 remove hardcode
-                        }else{
-                            description_tv.setText(res.getString(R.string.updated, mUsername));
-                        }
-                        title_tv.setText(thisActivity.title);
-                        title_tv.setHint(thisActivity.postId);
-                        View.OnClickListener onClickListener = new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                AsyncHttpClient client = new AsyncHttpClient();
-                                client.get(mContext, "https://chaoli.club/index.php/conversation/post/" + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
-                                    @Override
-                                    public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                                        Log.d("body", new String(responseBody));
-                                    }
-
-                                    @Override
-                                    public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                                        Log.d("body", "e");
-                                    }
-                                });
-                            }
-                        };
-                        title_tv.setOnClickListener(onClickListener);
-                        linearLayout.addView(description_tv);
-                        linearLayout.addView(title_tv);
-                        linearLayout.addView(content_tv);
-                    }else{
-                        if("status".equals(thisActivity.type)){
-                            description_tv.setText(res.getString(R.string.modified_his_or_her_information, mUsername));
-                        }
-                        MyActivity.Data data = JSON.parseObject(thisActivity.data, MyActivity.Data.class);
-                        content_tv.setText(data.newStatus);
-                        linearLayout.addView(description_tv);
-                        linearLayout.addView(content_tv);
-                    }
+                    LinearLayout linearLayout = inflateItem(thisActivity);
                     activities_ll.addView(linearLayout);
                     //activities_ll.addView();
                 }
@@ -271,5 +170,94 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
                 pullToRefreshLayout.loadmoreFinish(PullToRefreshLayout.FAIL);
             }
         });
+    }
+
+    private LinearLayout inflateItem(MyActivity thisActivity){
+        Resources res = getResources();
+        LinearLayout linearLayout = new LinearLayout(mContext);
+        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        TextView description_tv = new TextView(mContext);
+        description_tv.setSingleLine(true);
+        final TextView content_tv = new TextView(mContext);
+        content_tv.setMaxLines(4);
+        content_tv.setMinLines(3);
+        content_tv.setEllipsize(TextUtils.TruncateAt.END);
+        final TextView title_tv = new TextView(mContext);
+        title_tv.setEllipsize(TextUtils.TruncateAt.END);
+        title_tv.setTextSize(20);
+        title_tv.setSingleLine(true);
+        if("postActivity".equals(thisActivity.type)) {
+            content_tv.setText(thisActivity.content);
+            content_tv.setHint(thisActivity.postId);
+            if("1".equals(thisActivity.start)){
+                description_tv.setText(res.getString(R.string.opened_a_conversation, mUsername));
+            }else{
+                description_tv.setText(res.getString(R.string.updated, mUsername));
+            }
+            title_tv.setText(thisActivity.title);
+            title_tv.setHint(thisActivity.postId);
+            View.OnClickListener onClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    AsyncHttpClient client = new AsyncHttpClient();
+                    client.get(mContext, "https://chaoli.club/index.php/conversation/post/" + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                            Log.d("body", new String(responseBody));
+                            String response = new String(responseBody);
+                            Intent intent = new Intent(HomepageActivity.this, PostActivity.class);
+
+                            Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");
+                            Matcher matcher = pattern.matcher(response);
+                            if(matcher.find()){
+                                int conversationId = Integer.parseInt(matcher.group(1));
+                                intent.putExtra("conversationId", conversationId);
+                            }
+
+                            pattern = Pattern.compile("<h1 id='conversationTitle'>(.*?)</h1>");
+                            matcher = pattern.matcher(response);
+                            if(matcher.find()){
+                                String title = matcher.group(1);
+                                intent.putExtra("title", title);
+                            }
+
+                            if(v.equals(content_tv)) {
+                                pattern = Pattern.compile("\"startFrom\":(\\d+)");
+                                matcher = pattern.matcher(response);
+                                if (matcher.find()) {
+                                    String intentToPage = "/p" + String.valueOf(Integer.parseInt(matcher.group(1)) / 20 + 1);
+                                    Log.d("page", intentToPage);
+                                    intent.putExtra("intentToPage", intentToPage);
+                                }
+                            }
+
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                            Log.d("body", "e");
+                        }
+                    });
+                }
+            };
+            title_tv.setOnClickListener(onClickListener);
+            content_tv.setOnClickListener(onClickListener);
+            linearLayout.addView(description_tv);
+            linearLayout.addView(title_tv);
+            linearLayout.addView(content_tv);
+        }else{
+            if("status".equals(thisActivity.type)){
+                description_tv.setText(res.getString(R.string.modified_his_or_her_information, mUsername));
+            }
+            MyActivity.Data data = JSON.parseObject(thisActivity.data, MyActivity.Data.class);
+            linearLayout.addView(description_tv);
+            if(data != null && data.newStatus != null){
+                content_tv.setText(data.newStatus);
+                linearLayout.addView(content_tv);
+            }
+        }
+        return linearLayout;
     }
 }

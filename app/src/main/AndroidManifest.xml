@@ -13,10 +13,6 @@
 		android:supportsRtl="true"
 		android:theme="@android:style/Theme.DeviceDefault.Light">
 		<activity android:name=".Splash">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
 		</activity>
 		<activity
 			android:name=".MainActivity"
@@ -38,6 +34,10 @@
 			android:name=".ReplyAction"
 			android:theme="@style/Theme.AppCompat.Light"/>
 		<activity android:name=".HomepageActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"/>
+				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
 		</activity>
 	</application>
 

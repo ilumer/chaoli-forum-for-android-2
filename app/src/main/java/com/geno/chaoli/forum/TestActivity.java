@@ -126,7 +126,7 @@ public class TestActivity extends Activity implements View.OnClickListener, Logi
                     }
 
                     @Override
-                    public void onCheckNotificationSuccess(int noti_num) {
+                    public void onCheckNotificationSuccess(AccountUtils.NotificationList notificationList) {
 
                     }
 
