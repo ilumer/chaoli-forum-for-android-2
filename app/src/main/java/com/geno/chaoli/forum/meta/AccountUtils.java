@@ -54,7 +54,6 @@ public class AccountUtils {
         });
     }
 
-    // TODO: 16-4-8  modify the callback function according to the new API which can show the content of notifications
     public static void checkNotification(Context context, final MessageObserver observer){
         CookieUtils.saveCookie(client, context);
         RequestParams params = new RequestParams();
