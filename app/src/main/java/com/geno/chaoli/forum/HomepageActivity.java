@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -84,7 +85,6 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         int scrollY = Math.min(top_rl.getHeight(), (int)(t / 1.1));
         rootLayout.scrollTo(0, scrollY);
     }
-
 
     @Override
     public void onRefresh(final PullToRefreshLayout pullToRefreshLayout) {
@@ -200,6 +200,7 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
             View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
+                    final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.just_a_sec));
                     AsyncHttpClient client = new AsyncHttpClient();
                     client.get(mContext, "https://chaoli.club/index.php/conversation/post/" + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
                         @Override
@@ -231,12 +232,13 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
                                     intent.putExtra("intentToPage", intentToPage);
                                 }
                             }
-
+                            progressDialog.dismiss();
                             startActivity(intent);
                         }
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                            progressDialog.dismiss();
                             Log.d("body", "e");
                         }
                     });

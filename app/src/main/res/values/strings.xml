@@ -101,6 +101,8 @@
 	<string name="opened_a_conversation">%s opened a conversation</string>
 	<string name="updated">%s updated </string>
 	<string name="modified_his_or_her_information">%s modified his/her information</string>
+	<string name="loading_posts">Loading posts...</string>
+	<string name="just_a_sec">Just a sec...</string>
 
 	>>>>>>> polygen/master
 </resources>

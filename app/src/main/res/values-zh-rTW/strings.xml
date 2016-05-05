@@ -31,4 +31,6 @@
     <string name="opened_a_conversation">%s 發表了帖子</string>
     <string name="updated">%s 更新於</string>
     <string name="modified_his_or_her_information">%s 修改簡介為</string>
+    <string name="loading_posts">帖子正在加載中...</string>
+    <string name="just_a_sec">請稍候...</string>
 </resources>
