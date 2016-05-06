@@ -7,6 +7,8 @@ public class Constants
 	public static final int paddingRight = 16;
 	public static final int paddingBottom = 16;
 
+	public static final String GET_CAPTCHA_URL = "https://chaoli.club/index.php/mscaptcha";
+	public static final String SIGN_UP_URL = "https://chaoli.club/index.php/user/join?invite=";
 	// activity.json/32/2
 	public static final String GET_ACTIVITIES_URL = "https://chaoli.club/member/activity.json/";
 	// index.json/channelName?searchDetail
