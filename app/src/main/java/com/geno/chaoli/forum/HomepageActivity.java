@@ -10,12 +10,15 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.IntegerCodec;
+import com.bumptech.glide.Glide;
 import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.LoginUtils;
@@ -36,9 +39,10 @@ import cz.msebera.android.httpclient.client.cache.Resource;
 public class HomepageActivity extends Activity implements PullableScrollView.ScrollListener,
         PullToRefreshLayout.OnRefreshListener{
     Context mContext;
-    String mUsername = "我是大缺弦";
-    int userId = 32; // to be received
+    String mUsername; // to be received
+    int userId; // to be received
     int mPage = 1;
+    String avatarSuffix; // to be received
     //第一条记录的时间
     String startTime = String.valueOf(Long.MIN_VALUE);
     //最后一条记录的时间
@@ -49,7 +53,22 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
         mContext = this;
+        Bundle bundle = getIntent().getExtras();
+        if(bundle == null){
+            this.finish();
+            return;
+        }
+        mUsername = bundle.getString("username", "");
+        userId = bundle.getInt("userId", -1);
+        avatarSuffix = bundle.getString("avatarSuffix", "");
+        if("".equals(mUsername) || userId == -1 || "".equals(avatarSuffix)){
+            this.finish();
+            return;
+        }
+
         ((TextView) findViewById(R.id.tv_username)).setText(mUsername);
+        ImageView avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
+        Glide.with(this).load(Constants.avatarURL + avatarSuffix).into(avatar_iv);
         PullableScrollView scrollView = (PullableScrollView) findViewById(R.id.fssv_test);
         scrollView.setScrollListener((PullableScrollView.ScrollListener)mContext);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptrl_history);

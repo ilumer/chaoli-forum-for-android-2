@@ -9,7 +9,6 @@
         android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/iv_avatar"
-            android:src="@drawable/avatar_32"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"/>
