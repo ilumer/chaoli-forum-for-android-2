@@ -97,4 +97,17 @@
 	<string name="modified_his_or_her_information">%s 修改简介为</string>
 	<string name="loading_posts">帖子正在加载中...</string>
 	<string name="just_a_sec">请稍候...</string>
+	<string name="username_has_been_used">用户名已被注册</string>
+	<string name="email_has_been_used">邮箱已被注册</string>
+	<string name="wrong_captcha">验证码错误</string>
+	<string name="sign_up_error">注册失败,请重试</string>
+	<string name="sign_up_successfully">注册成功</string>
+	<string name="at_least_six_character">密码至少6字符</string>
+	<string name="should_be_same_with_password">验证密码与密码不符</string>
+	<string name="error_when_retrieving_captcha">获取验证码错误,请重试</string>
+	<string name="refresh">刷新</string>
+	<string name="invaild_email">无效的邮箱地址</string>
+	<string name="you_dont_answer_enough_quesitions_correctly">很遗憾,您没能通过测试,您想再试一次吗?</string>
+	<string name="try_again">再试一次</string>
+	<string name="dont_try_again">不了</string>
 </resources>

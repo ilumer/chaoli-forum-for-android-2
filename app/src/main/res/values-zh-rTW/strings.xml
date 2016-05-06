@@ -33,4 +33,17 @@
     <string name="modified_his_or_her_information">%s 修改簡介為</string>
     <string name="loading_posts">帖子正在加載中...</string>
     <string name="just_a_sec">請稍候...</string>
+    <string name="wrong_captcha">驗證碼錯誤</string>
+    <string name="username_has_been_used">用戶名已被註冊</string>
+    <string name="email_has_been_used">郵箱已被註冊</string>
+    <string name="sign_up_error">註冊失敗,請重試</string>
+    <string name="sign_up_successfully">註冊成功</string>
+    <string name="at_least_six_character">密碼至少6字符</string>
+    <string name="should_be_same_with_password">驗證密碼與密碼不符</string>
+    <string name="error_when_retrieving_captcha">獲取驗證碼錯誤,請重試</string>
+    <string name="refresh">刷新</string>
+    <string name="invaild_email">無效的郵箱地址</string>
+    <string name="you_dont_answer_enough_quesitions_correctly">很遺憾,您沒能通過測試,您想再試壹次嗎?</string>
+    <string name="try_again">再試壹次</string>
+    <string name="dont_try_again">不了</string>
 </resources>

@@ -93,15 +93,16 @@ public class LoginUtils {
 
         //if(CookieUtils.getCookie(context).size() != 0){
 
+        username = sharedPreferences.getString(SP_USERNAME_KEY, "");
+        password = sharedPreferences.getString(SP_PASSWORD_KEY, "");
+
         if(is_logged_in){
             getNewToken(context, loginObserver);
-            username = password = COOKIE_UN_AND_PW;
+            //username = password = COOKIE_UN_AND_PW;
             return;
         }
 
         //Log.i("login_2", "username = " + username + ", password = " + password);
-        username = sharedPreferences.getString(SP_USERNAME_KEY, "");
-        password = sharedPreferences.getString(SP_PASSWORD_KEY, "");
 
         if("".equals(username) || "".equals(password)){
             loginObserver.onLoginFailure(EMPTY_UN_OR_PW);
@@ -188,15 +189,7 @@ public class LoginUtils {
 
                     setToken(matcher.group(2));
 
-                    sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    //不是用cookie登录
-                    if (!COOKIE_UN_AND_PW.equals(username)) {
-                        editor.putString(SP_USERNAME_KEY, username);
-	                    // TODO: 16-3-11 1915 Encrypt saved password
-	                    editor.putString(SP_PASSWORD_KEY, password);
-                        editor.apply();
-                    }
+                    saveUsernameAndPassword(context, username, password);
                     //CookieUtils.setCookies(CookieUtils.getCookie(context));
                     setSPIsLoggedIn(true);
                     loginObserver.onLoginSuccess(getUserId(), getToken());
@@ -249,6 +242,15 @@ public class LoginUtils {
     private static void setSPIsLoggedIn(Boolean isLoggedIn){
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(IS_LOGGED_IN, isLoggedIn);
+        editor.apply();
+    }
+
+    public static void saveUsernameAndPassword(Context context, String username, String password){
+        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(SP_USERNAME_KEY, username);
+        // TODO: 16-3-11 1915 Encrypt saved password
+        editor.putString(SP_PASSWORD_KEY, password);
         editor.apply();
     }
 

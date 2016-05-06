@@ -103,6 +103,17 @@
 	<string name="modified_his_or_her_information">%s modified his/her information</string>
 	<string name="loading_posts">Loading posts...</string>
 	<string name="just_a_sec">Just a sec...</string>
-
-	>>>>>>> polygen/master
+	<string name="username_has_been_used">Username has been used</string>
+	<string name="email_has_been_used">Email has been used</string>
+	<string name="wrong_captcha">Wrong captcha</string>
+	<string name="sign_up_error">Sign up error, please try again</string>
+	<string name="sign_up_successfully">Sign up successfully</string>
+	<string name="at_least_six_character">At least six character</string>
+	<string name="should_be_same_with_password">Should be same with password</string>
+	<string name="error_when_retrieving_captcha">Error when retrieving captcha, please refresh</string>
+	<string name="refresh">Refresh</string>
+	<string name="invaild_email">Invaild email</string>
+	<string name="you_dont_answer_enough_quesitions_correctly">Sorry, you don\'t answer enough questions correctly. Would you like to try again?</string>
+	<string name="try_again">Try again</string>
+	<string name="dont_try_again">No, thanks.</string>
 </resources>
