@@ -114,9 +114,12 @@ public class SignUpActivity extends Activity {
                         params.put("submit", "注册");
 
                         CookieUtils.saveCookie(client, mContext);
+                        final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.just_a_sec));
+                        progressDialog.show();
                         client.post(signUpUrl, params, new AsyncHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                                progressDialog.dismiss();
                                 String response = new String(responseBody);
                                 if(response.contains(USERNAME_HAS_BEEN_USED)){
                                     ((TextView)((Activity)mContext).findViewById(R.id.tv_username_msg)).setText(R.string.username_has_been_used);
@@ -131,6 +134,7 @@ public class SignUpActivity extends Activity {
 
                             @Override
                             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                                progressDialog.dismiss();
                                 if(statusCode == 302){  //登录成功
                                     LoginUtils.saveUsernameAndPassword(mContext, username, password);
                                     Toast.makeText(getApplicationContext(), R.string.sign_up_successfully, Toast.LENGTH_LONG).show();
