@@ -3,6 +3,7 @@ package com.geno.chaoli.forum;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -66,6 +67,9 @@ public class LoginActivity extends Activity
 							e.putBoolean(Constants.loginBool, true);
 							e.apply();
 							Toast.makeText(LoginActivity.this, userId + ", " + token, Toast.LENGTH_SHORT).show();
+							Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							startActivity(intent);
 						}
 
 						@Override
