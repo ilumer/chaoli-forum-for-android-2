@@ -14,14 +14,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.IntegerCodec;
 import com.bumptech.glide.Glide;
-import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.LoginUtils;
 import com.geno.chaoli.forum.pullableview.PullableScrollView;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -31,7 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.client.cache.Resource;
 
 /**
  * Created by jianhao on 16-4-14.
@@ -42,7 +37,8 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
     String mUsername; // to be received
     int userId; // to be received
     int mPage = 1;
-    String avatarSuffix; // to be received
+    String avatarURL; // to be received
+    String avatarSuffix; // use this if avatarURL is null
     //第一条记录的时间
     String startTime = String.valueOf(Long.MIN_VALUE);
     //最后一条记录的时间
@@ -60,15 +56,20 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         }
         mUsername = bundle.getString("username", "");
         userId = bundle.getInt("userId", -1);
+        avatarURL = bundle.getString("avatarURL", "");
         avatarSuffix = bundle.getString("avatarSuffix", "");
-        if("".equals(mUsername) || userId == -1 || "".equals(avatarSuffix)){
+        if("".equals(avatarURL) && !"".equals(avatarSuffix)){
+            avatarURL = Constants.avatarURL + "avatar_" + userId + "." + avatarSuffix;
+        }
+
+        if("".equals(mUsername) || userId == -1 || "".equals(avatarURL)){
             this.finish();
             return;
         }
 
         ((TextView) findViewById(R.id.tv_username)).setText(mUsername);
         ImageView avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
-        Glide.with(this).load(Constants.avatarURL + avatarSuffix).into(avatar_iv);
+        Glide.with(this).load(avatarURL).into(avatar_iv);
         PullableScrollView scrollView = (PullableScrollView) findViewById(R.id.fssv_test);
         scrollView.setScrollListener((PullableScrollView.ScrollListener)mContext);
         final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptrl_history);
