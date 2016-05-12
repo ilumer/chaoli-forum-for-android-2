@@ -110,4 +110,5 @@
 	<string name="you_dont_answer_enough_quesitions_correctly">很遗憾,您没能通过测试,您想再试一次吗?</string>
 	<string name="try_again">再试一次</string>
 	<string name="dont_try_again">不了</string>
+	<string name="logging_in">登录中...</string>
 </resources>
