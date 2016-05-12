@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -29,22 +30,32 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 
 	public boolean loggedIn = false;
 
+	private Boolean delayShowConversations;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
 
+		Bundle bundle = getIntent().getExtras();
+		if(bundle != null){
+			delayShowConversations = bundle.getBoolean("delayShowConversations", false);
+		}
+
 		fragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.drawer);
 		title = getTitle();
 
 		fragment.setUp(R.id.drawer, (DrawerLayout) findViewById(R.id.drawer_main));
+		final ProgressDialog progressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.login));
 		LoginUtils.begin_login(this, new LoginUtils.LoginObserver()
 		{
 			@Override
 			public void onLoginSuccess(int userId, String token)
 			{
+				progressDialog.dismiss();
 				loggedIn = true;
+				onNavigationDrawerItemSelected(0);
 				((TextView) fragment.getActivity().findViewById(R.id.loginHWndUsername)).setText(getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", ""));
 				//((AvatarView) fragment.getActivity().findViewById(R.id.avatar)).setAvatarView(new AvatarView(MainActivity.this, "png", userId, getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "")));
 				ListView channelSelect = (ListView) fragment.getActivity().findViewById(R.id.channelSelect);
@@ -73,12 +84,14 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 			@Override
 			public void onLoginFailure(int statusCode)
 			{
+				progressDialog.dismiss();
+				onNavigationDrawerItemSelected(0);
 				Log.d(TAG, "onLoginFailure: " + statusCode);
-				if (statusCode == 5)
+				/*if (statusCode == 5)
 				{
 					Toast.makeText(MainActivity.this, "Cookie expired, please login again.", Toast.LENGTH_SHORT).show();
 					startActivity(new Intent(MainActivity.this, LoginActivity.class));
-				}
+				}*/
 			}
 		});
 	}
@@ -86,9 +99,13 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 	@Override
 	public void onNavigationDrawerItemSelected(int position)
 	{
-		FragmentManager fm = getFragmentManager();
-		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
-		fm.beginTransaction().replace(R.id.main_view, c).commit();
+		if(delayShowConversations == null || delayShowConversations){
+			delayShowConversations = false;
+		}else {
+			FragmentManager fm = getFragmentManager();
+			ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
+			fm.beginTransaction().replace(R.id.main_view, c).commit();
+		}
 	}
 
 	public String getChannel(int position, boolean loggedIn)
