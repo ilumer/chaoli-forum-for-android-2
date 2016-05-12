@@ -110,6 +110,8 @@ public class LoginUtils {
             return;
         }
 
+        Log.d("login", username + ", " + password);
+
         begin_login(context, username, password, loginObserver);
     }
 
@@ -174,6 +176,7 @@ public class LoginUtils {
 
     private static void getNewToken(final Context context, final LoginObserver loginObserver){ //得到新的token
         CookieUtils.saveCookie(client, context);
+        Log.d("login", "hi");
         client.get(context, HOMEPAGE_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -192,11 +195,12 @@ public class LoginUtils {
                     saveUsernameAndPassword(context, username, password);
                     //CookieUtils.setCookies(CookieUtils.getCookie(context));
                     setSPIsLoggedIn(true);
+                    Me.setUsername(username);
                     loginObserver.onLoginSuccess(getUserId(), getToken());
                 } else {
                     CookieUtils.clearCookie(context);
                     setSPIsLoggedIn(false);
-                    loginObserver.onLoginFailure(COOKIE_EXPIRED);
+                    //loginObserver.onLoginFailure(COOKIE_EXPIRED);
                     begin_login(context, loginObserver);
                     //Log.e("regex_error", "regex_error");
                 }
@@ -216,6 +220,7 @@ public class LoginUtils {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 clear(context);
+                Me.clear();
                 //Log.i("logout", new String(responseBody));
                 //Log.i("cookie", String.valueOf(CookieUtils.getCookie(context).size()));
                 logoutObserver.onLogoutSuccess();
@@ -230,6 +235,7 @@ public class LoginUtils {
 
     public static void clear(Context context){
         CookieUtils.clearCookie(context);
+        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
         if(sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove(IS_LOGGED_IN);
@@ -243,6 +249,10 @@ public class LoginUtils {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(IS_LOGGED_IN, isLoggedIn);
         editor.apply();
+    }
+
+    public static Boolean isLoggedIn(){
+        return sharedPreferences.getBoolean(IS_LOGGED_IN, false);
     }
 
     public static void saveUsernameAndPassword(Context context, String username, String password){
