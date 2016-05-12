@@ -42,6 +42,8 @@ public class PullToRefreshLayout extends RelativeLayout
 	public static final int LOADING = 4;
 	// 操作完毕
 	public static final int DONE = 5;
+	//自动刷新/加载时的下拉/上拉速度,代替速度极慢的MOVE_SPEED
+	private static final int AUTO_MOVE_SPEED = 20;
 	// 当前状态
 	private int state = INIT;
 	// 刷新回调接口
@@ -515,7 +517,7 @@ public class PullToRefreshLayout extends RelativeLayout
 		{
 			while (pullDownY < 4 / 3 * refreshDist)
 			{
-				pullDownY += MOVE_SPEED;
+				pullDownY += AUTO_MOVE_SPEED;//MOVE_SPEED;
 				publishProgress(pullDownY);
 				try
 				{
