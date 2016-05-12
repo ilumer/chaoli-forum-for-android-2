@@ -54,7 +54,13 @@ public class ConversationListFragment extends Fragment
 		sp = getActivity().getSharedPreferences(Constants.conversationSP, Context.MODE_PRIVATE);
 		Log.v(TAG, channel + ".");
 		swipeRefreshLayout = (SwipeRefreshLayout) conversationListView.findViewById(R.id.conversationListRefreshLayout);
-		swipeRefreshLayout.setRefreshing(true);
+		//trigger the circle to animate
+		swipeRefreshLayout.post(new Runnable() {
+			@Override
+			public void run() {
+				swipeRefreshLayout.setRefreshing(true);
+			}
+		});
 		swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
 		{
 			@Override
