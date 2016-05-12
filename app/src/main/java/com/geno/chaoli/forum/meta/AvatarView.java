@@ -2,11 +2,13 @@ package com.geno.chaoli.forum.meta;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -17,9 +19,18 @@ import com.geno.chaoli.forum.R;
 
 public class AvatarView extends RelativeLayout
 {
+	String mImagePath, mUsername;
+	int mUserId;
 	public AvatarView(final Context context, final String imagePath, int userId, String username)
 	{
 		this(context, null);
+		update(context, imagePath, userId, username);
+	}
+
+	public void update(Context context, String imagePath, int userId, String username) {
+		mImagePath = imagePath;
+		mUserId = userId;
+		mUsername = username;
 		RelativeLayout v = (RelativeLayout) inflate(context, R.layout.avatar_view, this);
 		final TextView t = (TextView) v.findViewById(R.id.avatarTxt);
 		final ImageView i = (ImageView) v.findViewById(R.id.avatarImg);
