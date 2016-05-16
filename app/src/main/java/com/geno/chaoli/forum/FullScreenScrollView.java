@@ -10,6 +10,8 @@ import android.widget.TextView;
 /**
  * Created by jianhao on 16-4-16.
  */
+
+@Deprecated
 public class FullScreenScrollView extends ScrollView {
     public FullScreenScrollView(Context context){
         super(context);

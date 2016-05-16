@@ -27,6 +27,8 @@ import com.geno.chaoli.forum.pullableview.Pullable;
  * 
  * @author 陈靖
  */
+
+@Deprecated
 public class PullToRefreshLayout extends RelativeLayout
 {
 	public static final String TAG = "PullToRefreshLayout";

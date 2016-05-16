@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+@Deprecated
 public class PullableScrollView extends ScrollView implements Pullable
 {
 
