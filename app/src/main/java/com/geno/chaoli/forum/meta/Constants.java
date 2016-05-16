@@ -39,4 +39,6 @@ public class Constants
 	public static final String loginSP = "loginReturn";
 	public static final String loginSPKey = "listJSON";
 	public static final String loginBool = "logged";
+
+	public static final String NONE = "none";
 }

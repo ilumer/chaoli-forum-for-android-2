@@ -171,5 +171,8 @@ public class Me {
         me2.username = me.username;
         me = me2;
         me.isEmpty = false;
+        if(getMyAvatarSuffix() == null){
+            me.setAvatarSuffix(Constants.NONE);
+        }
     }
 }

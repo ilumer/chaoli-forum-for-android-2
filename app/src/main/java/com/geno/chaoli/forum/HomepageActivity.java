@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.bumptech.glide.Glide;
+import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.FullScreenObservableScrollView;
 import com.geno.chaoli.forum.meta.ScrollViewListener;
@@ -41,7 +42,7 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
     String mUsername; // to be received
     int userId; // to be received
     int mPage = 1;
-    String avatarURL; // to be received
+    //String avatarURL; // to be received
     String avatarSuffix; // use this if avatarURL is null
     //第一条记录的时间
     String startTime = String.valueOf(Long.MIN_VALUE);
@@ -57,18 +58,21 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
         mContext = this;
         Bundle bundle = getIntent().getExtras();
         if(bundle == null){
+            Log.e(TAG, "bundle mustn't be null");
             this.finish();
             return;
         }
         mUsername = bundle.getString("username", "");
         userId = bundle.getInt("userId", -1);
-        avatarURL = bundle.getString("avatarURL", "");
+        //avatarURL = bundle.getString("avatarURL", "");
         avatarSuffix = bundle.getString("avatarSuffix", "");
-        if("".equals(avatarURL) && !"".equals(avatarSuffix)){
-            avatarURL = Constants.avatarURL + "avatar_" + userId + "." + avatarSuffix;
-        }
 
-        if("".equals(mUsername) || userId == -1 || "".equals(avatarURL)){
+        /*Log.d(TAG, "id=" + userId + "un=" + mUsername + "url=" + avatarURL + "suffix=" + avatarSuffix);
+        if("".equals(avatarURL) && avatarSuffix != null && !"".equals(avatarSuffix)){
+            avatarURL = Constants.avatarURL + "avatar_" + userId + "." + avatarSuffix;
+        }*/
+
+        if("".equals(mUsername) || userId == -1 || "".equals(avatarSuffix)){
             this.finish();
             return;
         }
@@ -77,8 +81,8 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
         osv_activities.setScrollViewListener(this);
 
         ((TextView) findViewById(R.id.tv_username)).setText(mUsername);
-        ImageView avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
-        Glide.with(this).load(avatarURL).into(avatar_iv);
+        AvatarView avatar_iv = (AvatarView) findViewById(R.id.iv_avatar);
+        avatar_iv.update(mContext, avatarSuffix, userId, mUsername);
         srl_activities = (SwipyRefreshLayout) findViewById(R.id.srl_activities);
         srl_activities.setDirection(SwipyRefreshLayoutDirection.BOTH);
         srl_activities.setOnRefreshListener(this);

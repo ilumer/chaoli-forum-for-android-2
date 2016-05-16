@@ -125,7 +125,7 @@ public class NavigationDrawerFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString("username", Me.getMyUsername());
                     bundle.putInt("userId", Me.getUserId());
-                    bundle.putString("avatarURL", Me.getMyAvatarURL());
+                    bundle.putString("avatarSuffix", Me.getMyAvatarSuffix() == null ? "none" : Me.getMyAvatarSuffix());
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }else {
