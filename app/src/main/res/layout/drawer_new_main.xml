@@ -11,6 +11,7 @@
 			android:layout_height="@dimen/avatar_diameter"
 			android:layout_marginLeft="@dimen/avatar_marginLeft"
 			android:layout_marginStart="@dimen/avatar_marginLeft"
+			android:clickable="true"
 			android:id="@+id/avatarView"/>
 		<TextView
 			android:layout_width="wrap_content"

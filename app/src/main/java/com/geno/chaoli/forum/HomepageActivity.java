@@ -17,10 +17,14 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.bumptech.glide.Glide;
+import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.pullableview.PullableScrollView;
+import com.geno.chaoli.forum.meta.FullScreenObservableScrollView;
+import com.geno.chaoli.forum.meta.ScrollViewListener;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -29,20 +33,23 @@ import java.util.regex.Pattern;
 import cz.msebera.android.httpclient.Header;
 
 /**
- * Created by jianhao on 16-4-14.
+ * Created by daquexian on 16-4-14.
  */
-public class HomepageActivity extends Activity implements PullableScrollView.ScrollListener,
-        PullToRefreshLayout.OnRefreshListener{
+public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnRefreshListener, ScrollViewListener{
+    final String TAG = "HomepageActivity";
+
     Context mContext;
     String mUsername; // to be received
     int userId; // to be received
     int mPage = 1;
-    String avatarURL; // to be received
+    //String avatarURL; // to be received
     String avatarSuffix; // use this if avatarURL is null
     //第一条记录的时间
     String startTime = String.valueOf(Long.MIN_VALUE);
     //最后一条记录的时间
     String endTime = String.valueOf(Long.MAX_VALUE);
+
+    SwipyRefreshLayout srl_activities;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,31 +58,42 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
         mContext = this;
         Bundle bundle = getIntent().getExtras();
         if(bundle == null){
+            Log.e(TAG, "bundle mustn't be null");
             this.finish();
             return;
         }
         mUsername = bundle.getString("username", "");
         userId = bundle.getInt("userId", -1);
-        avatarURL = bundle.getString("avatarURL", "");
+        //avatarURL = bundle.getString("avatarURL", "");
         avatarSuffix = bundle.getString("avatarSuffix", "");
-        if("".equals(avatarURL) && !"".equals(avatarSuffix)){
-            avatarURL = Constants.avatarURL + "avatar_" + userId + "." + avatarSuffix;
-        }
 
-        if("".equals(mUsername) || userId == -1 || "".equals(avatarURL)){
+        /*Log.d(TAG, "id=" + userId + "un=" + mUsername + "url=" + avatarURL + "suffix=" + avatarSuffix);
+        if("".equals(avatarURL) && avatarSuffix != null && !"".equals(avatarSuffix)){
+            avatarURL = Constants.avatarURL + "avatar_" + userId + "." + avatarSuffix;
+        }*/
+
+        if("".equals(mUsername) || userId == -1 || "".equals(avatarSuffix)){
             this.finish();
             return;
         }
 
+        FullScreenObservableScrollView osv_activities = (FullScreenObservableScrollView)findViewById(R.id.osv_activities);
+        osv_activities.setScrollViewListener(this);
+
         ((TextView) findViewById(R.id.tv_username)).setText(mUsername);
-        ImageView avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
-        Glide.with(this).load(avatarURL).into(avatar_iv);
-        PullableScrollView scrollView = (PullableScrollView) findViewById(R.id.fssv_test);
-        scrollView.setScrollListener((PullableScrollView.ScrollListener)mContext);
-        final PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) findViewById(R.id.ptrl_history);
-        pullToRefreshLayout.setOnRefreshListener((PullToRefreshLayout.OnRefreshListener)mContext);
-        pullToRefreshLayout.autoRefresh();
-        //getNewActivities(1, pullToRefreshLayout);
+        AvatarView avatar_iv = (AvatarView) findViewById(R.id.iv_avatar);
+        avatar_iv.update(mContext, avatarSuffix, userId, mUsername);
+        srl_activities = (SwipyRefreshLayout) findViewById(R.id.srl_activities);
+        srl_activities.setDirection(SwipyRefreshLayoutDirection.BOTH);
+        srl_activities.setOnRefreshListener(this);
+
+        srl_activities.post(new Runnable() {
+            @Override
+            public void run() {
+                srl_activities.setRefreshing(true);
+                onRefresh(SwipyRefreshLayoutDirection.TOP); // why is it also needed?
+            }
+        });
     }
 
     private static class OuterActivity{
@@ -99,97 +117,98 @@ public class HomepageActivity extends Activity implements PullableScrollView.Scr
     }
 
     @Override
-    public void onScroll(int l, int t, int oldl, int oldt) {
-        LinearLayout rootLayout = ((LinearLayout) findViewById(R.id.ll_homepage));
-        final RelativeLayout top_rl = (RelativeLayout) findViewById(R.id.rl_top);
-        int scrollY = Math.min(top_rl.getHeight(), (int)(t / 1.1));
-        rootLayout.scrollTo(0, scrollY);
+    public void onScrollChanged(FullScreenObservableScrollView scrollView, int x, int y, int oldx, int oldy) {
+        if(scrollView.getId() == R.id.osv_activities){
+            LinearLayout rootLayout = ((LinearLayout) findViewById(R.id.ll_homepage));
+            final RelativeLayout top_rl = (RelativeLayout) findViewById(R.id.rl_top);
+            int scrollY = Math.min(top_rl.getHeight(), (int)(y / 1.1));
+            rootLayout.scrollTo(0, scrollY);
+        }
     }
 
     @Override
-    public void onRefresh(final PullToRefreshLayout pullToRefreshLayout) {
-        final LinearLayout activities_ll = (LinearLayout) findViewById(R.id.ll_activities);
+    public void onRefresh(SwipyRefreshLayoutDirection direction) {
+        if(direction == SwipyRefreshLayoutDirection.TOP){
+            final LinearLayout activities_ll = (LinearLayout) findViewById(R.id.ll_activities);
 
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(this, Constants.GET_ACTIVITIES_URL + userId, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.get(this, Constants.GET_ACTIVITIES_URL + userId, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
 
-                String response = new String(responseBody);
+                    String response = new String(responseBody);
 
-                OuterActivity outerActivity = JSON.parseObject(response, OuterActivity.class);
+                    OuterActivity outerActivity = JSON.parseObject(response, OuterActivity.class);
 
-                int i = 0;
-                for(; i < outerActivity.activity.size(); i++){
-                    if(Long.parseLong(startTime) >= Long.parseLong(outerActivity.activity.get(i).time)){
-                        break;
+                    int i = 0;
+                    for(; i < outerActivity.activity.size(); i++){
+                        if(Long.parseLong(startTime) >= Long.parseLong(outerActivity.activity.get(i).time)){
+                            break;
+                        }
                     }
-                }
 
-                i--;
+                    i--;
 
-                for (; i >= 0; i--) {
-                    MyActivity thisActivity = outerActivity.activity.get(i);
-                    LinearLayout linearLayout = inflateItem(thisActivity);
-                    activities_ll.addView(linearLayout, 0);
-                    //activities_ll.addView();
-                }
-
-                startTime = outerActivity.activity.get(0).time;
-
-                pullToRefreshLayout.refreshFinish(PullToRefreshLayout.SUCCEED);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                pullToRefreshLayout.refreshFinish(PullToRefreshLayout.FAIL);
-            }
-        });
-    }
-
-    @Override
-    public void onLoadMore(final PullToRefreshLayout pullToRefreshLayout) {
-        final LinearLayout activities_ll = (LinearLayout) findViewById(R.id.ll_activities);
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(this, Constants.GET_ACTIVITIES_URL + userId + "/" + (mPage + 1), new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Resources res = getResources();
-                String response = new String(responseBody);
-
-                OuterActivity outerActivity = JSON.parseObject(response, OuterActivity.class);
-
-                if(outerActivity.activity.size() == 0){
-                    pullToRefreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
-                    return;
-                }
-
-                int i = 0;
-                for(; i < outerActivity.activity.size(); i++){
-                    if(Long.parseLong(endTime) >= Long.parseLong(outerActivity.activity.get(i).time)){
-                        break;
+                    for (; i >= 0; i--) {
+                        MyActivity thisActivity = outerActivity.activity.get(i);
+                        LinearLayout linearLayout = inflateItem(thisActivity);
+                        activities_ll.addView(linearLayout, 0);
+                        //activities_ll.addView();
                     }
+
+                    startTime = outerActivity.activity.get(0).time;
+
+                    srl_activities.setRefreshing(false);
                 }
 
-                for (; i < outerActivity.activity.size(); i++) {
-                    MyActivity thisActivity = outerActivity.activity.get(i);
-                    LinearLayout linearLayout = inflateItem(thisActivity);
-                    activities_ll.addView(linearLayout);
-                    //activities_ll.addView();
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    srl_activities.setRefreshing(false);
+                }
+            });
+        }else{
+            final LinearLayout activities_ll = (LinearLayout) findViewById(R.id.ll_activities);
+
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.get(this, Constants.GET_ACTIVITIES_URL + userId + "/" + (mPage + 1), new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Resources res = getResources();
+                    String response = new String(responseBody);
+
+                    OuterActivity outerActivity = JSON.parseObject(response, OuterActivity.class);
+
+                    if(outerActivity.activity.size() == 0){
+                        srl_activities.setRefreshing(false);
+                        return;
+                    }
+
+                    int i = 0;
+                    for(; i < outerActivity.activity.size(); i++){
+                        if(Long.parseLong(endTime) >= Long.parseLong(outerActivity.activity.get(i).time)){
+                            break;
+                        }
+                    }
+
+                    for (; i < outerActivity.activity.size(); i++) {
+                        MyActivity thisActivity = outerActivity.activity.get(i);
+                        LinearLayout linearLayout = inflateItem(thisActivity);
+                        activities_ll.addView(linearLayout);
+                        //activities_ll.addView();
+                    }
+
+                    endTime = outerActivity.activity.get(i - 1).time;
+                    mPage++;
+
+                    srl_activities.setRefreshing(false);
                 }
 
-                endTime = outerActivity.activity.get(i - 1).time;
-                mPage++;
-
-                pullToRefreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                pullToRefreshLayout.loadmoreFinish(PullToRefreshLayout.FAIL);
-            }
-        });
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    srl_activities.setRefreshing(false);
+                }
+            });
+        }
     }
 
     private LinearLayout inflateItem(MyActivity thisActivity){

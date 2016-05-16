@@ -8,10 +8,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp">
-        <ImageView
+        <com.geno.chaoli.forum.meta.AvatarView
             android:id="@+id/iv_avatar"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/avatar_diameter"
+            android:layout_height="@dimen/avatar_diameter"
             android:layout_centerHorizontal="true"/>
         <TextView
             android:id="@+id/tv_username"
@@ -23,17 +23,17 @@
         <View style="@style/DividerInHomepage"
             android:layout_below="@id/tv_username"/>
     </RelativeLayout>
-    <com.geno.chaoli.forum.PullToRefreshLayout
-        android:id="@+id/ptrl_history"
+    <com.geno.chaoli.forum.meta.FullScreenSwipyRefreshLayout
+        android:id="@+id/srl_activities"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <include layout="@layout/refresh_head" />
-
-        <com.geno.chaoli.forum.pullableview.PullableScrollView
-            android:id="@+id/fssv_test"
+        <com.geno.chaoli.forum.meta.FullScreenObservableScrollView
+            android:id="@+id/osv_activities"
+            android:clickable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <LinearLayout
                 android:id="@+id/ll_activities"
                 android:orientation="vertical"
@@ -42,10 +42,7 @@
                 android:divider="?android:attr/listDivider"
                 android:dividerPadding="10dp"
                 android:showDividers="middle">
-
             </LinearLayout>
-        </com.geno.chaoli.forum.pullableview.PullableScrollView>
-
-        <include layout="@layout/load_more"/>
-    </com.geno.chaoli.forum.PullToRefreshLayout>
+        </com.geno.chaoli.forum.meta.FullScreenObservableScrollView>
+    </com.geno.chaoli.forum.meta.FullScreenSwipyRefreshLayout>
 </LinearLayout>

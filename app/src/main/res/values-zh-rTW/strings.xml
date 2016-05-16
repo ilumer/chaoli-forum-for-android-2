@@ -46,4 +46,5 @@
     <string name="you_dont_answer_enough_quesitions_correctly">很遺憾,您沒能通過測試,您想再試壹次嗎?</string>
     <string name="try_again">再試壹次</string>
     <string name="dont_try_again">不了</string>
+    <string name="logging_in">登入中...</string>
 </resources>

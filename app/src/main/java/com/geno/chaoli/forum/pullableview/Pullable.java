@@ -1,5 +1,6 @@
 package com.geno.chaoli.forum.pullableview;
 
+@Deprecated
 public interface Pullable
 {
 	/**

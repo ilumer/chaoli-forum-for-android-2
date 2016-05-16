@@ -47,7 +47,7 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
 		title = getTitle();
 
 		fragment.setUp(R.id.drawer, (DrawerLayout) findViewById(R.id.drawer_main));
-		final ProgressDialog progressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.login));
+		final ProgressDialog progressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.logging_in));
 		LoginUtils.begin_login(this, new LoginUtils.LoginObserver()
 		{
 			@Override
