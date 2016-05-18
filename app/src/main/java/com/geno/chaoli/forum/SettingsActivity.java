@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -87,10 +88,13 @@ public class SettingsActivity extends Activity implements AccountUtils.GetProfil
                         Boolean starOnReply = star_on_reply_chk.isChecked();
                         Boolean starPrivate = star_private_chk.isChecked();
                         Boolean hideOnline = hide_online_chk.isChecked();
+                        final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.just_a_sec));
+                        progressDialog.show();
                         AccountUtils.modifySettings(mContext, mAvatarFile, "Chinese", privateAdd, starOnReply,
                                 starPrivate, hideOnline, signature, user_status, new AccountUtils.ModifySettingsObserver() {
                                     @Override
                                     public void onModifySettingsSuccess() {
+                                        progressDialog.dismiss();
                                         if(mToast != null) mToast.cancel();
                                         mToast = Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT);
                                         mToast.show();
@@ -98,6 +102,7 @@ public class SettingsActivity extends Activity implements AccountUtils.GetProfil
 
                                     @Override
                                     public void onModifySettingsFailure(int statusCode) {
+                                        progressDialog.dismiss();
                                         if(mToast != null) mToast.cancel();
                                         mToast = Toast.makeText(mContext, "修改失败，请稍后重试", Toast.LENGTH_SHORT);
                                         mToast.show();

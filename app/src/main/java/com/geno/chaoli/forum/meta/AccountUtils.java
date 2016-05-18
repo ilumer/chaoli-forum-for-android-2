@@ -41,6 +41,7 @@ public class AccountUtils {
                 String response = new String(responseBody);
                 Log.i("response", response);
                 Me.setInstanceFromJSONStr(response);
+                Log.d("AccountUtils", "suffix: " + Me.getMyAvatarSuffix() + ", " + String.valueOf(Me.getMyAvatarSuffix() == null));
                 Log.i("profile", Me.getMyStatus());
                 Log.i("profile", String.valueOf(Me.getMyHideOnline()));
                 //Log.i("profile", me.getPreferences().getSignature());

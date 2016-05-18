@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import java.util.List;

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.HomepageActivity;
+import com.geno.chaoli.forum.Me;
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.ReplyAction;
 import com.loopj.android.http.AsyncHttpClient;
@@ -65,6 +68,18 @@ public class PostView extends RelativeLayout
 			content.setVisibility(GONE);
 		}
 		avatar.addView(post.avatarView);
+		avatar.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(post.context, HomepageActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putString("username", post.avatarView.mUsername);
+				bundle.putInt("userId", post.avatarView.mUserId);
+				bundle.putString("avatarSuffix", post.avatarView.mImagePath);
+				intent.putExtras(bundle);
+				post.context.startActivity(intent);
+			}
+		});
 		signature.setText(post.signature);
 		content.setText(post.getContent());
 		time.setText(SimpleDateFormat.getDateTimeInstance().format(post.getTime() * 1000));

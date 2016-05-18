@@ -4,13 +4,16 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.geno.chaoli.forum.meta.Constants;
 
 /**
  * Created by daquexian on 16-4-8.
  * 保存用户自己的账户信息的类
  */
 public class Me {
+    private boolean isEmpty = true;
     private int userId;
+    private String username;
 
     @JSONField(name="avatarFormat")
     private String avatarSuffix;
@@ -21,16 +24,33 @@ public class Me {
     private Me(){}
 
     private static Me getInstance(){
-        if(me == null) me = new Me();
+        if(me == null)
+            me = new Me();
         return me;
+    }
+
+    public static void clear(){
+        me = new Me();
+    }
+
+    public static boolean isEmpty(){
+        return Me.getInstance().isEmpty;
     }
 
     public static int getMyUserId(){
         return Me.getInstance().userId;
     }
 
+    public static String getMyUsername(){
+        return Me.getInstance().username;
+    }
+
     public static String getMyAvatarSuffix(){
         return Me.getInstance().avatarSuffix;
+    }
+
+    public static String getMyAvatarURL(){
+        return Constants.avatarURL + "avatar_" + getMyUserId() + "." + getMyAvatarSuffix();
     }
 
     public static String getMyStatus(){
@@ -61,6 +81,10 @@ public class Me {
         return preferences;
     }
 
+    public static void setUsername(String username){
+        Me.getInstance().username = username;
+    }
+
     public void setPreferences(Preferences preferences) {
         this.preferences = preferences;
     }
@@ -71,7 +95,9 @@ public class Me {
     }
 
     public static void setUserId(int userId) {
+        Log.d("me", "id = " + Me.getInstance().userId);
         Me.getInstance().userId = userId;
+        Log.d("me", "id = " + Me.getInstance().userId);
     }
 
     public String getStatus() {
@@ -140,6 +166,13 @@ public class Me {
     }
 
     public static void setInstanceFromJSONStr(String jsonStr){
-        me = JSON.parseObject(jsonStr, Me.class);
+        Me me2 = JSON.parseObject(jsonStr, Me.class);
+        me2.userId = me.userId;
+        me2.username = me.username;
+        me = me2;
+        me.isEmpty = false;
+        if(getMyAvatarSuffix() == null){
+            me.setAvatarSuffix(Constants.NONE);
+        }
     }
 }

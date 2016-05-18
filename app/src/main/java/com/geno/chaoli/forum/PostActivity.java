@@ -1,6 +1,8 @@
 package com.geno.chaoli.forum;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +40,8 @@ import cz.msebera.android.httpclient.Header;
 public class PostActivity extends AppCompatActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
 	public static final String TAG = "PostActivity";
+
+	private final Context mContext = this;
 
 	public static final int menu_settings = 0;
 	public static final int menu_share = 1;
@@ -88,6 +92,7 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 			}
 		});
 		CookieUtils.saveCookie(client, this);
+		final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.loading_posts));
 		client.get(this, Constants.postListURL + conversationId + intentToPage, new AsyncHttpResponseHandler()
 		{
 			@Override
@@ -143,6 +148,7 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 						return v[position];
 					}
 				});
+				progressDialog.dismiss();
 			}
 
 			@Override

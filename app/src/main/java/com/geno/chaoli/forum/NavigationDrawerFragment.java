@@ -4,6 +4,7 @@ package com.geno.chaoli.forum;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -13,6 +14,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,8 +32,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
+import com.geno.chaoli.forum.meta.LoginUtils;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -65,13 +70,17 @@ public class NavigationDrawerFragment extends Fragment {
     private RelativeLayout slideViewLayout;
 	private RelativeLayout loginHWnd;
 	private ListView channelSelect;
+    private AvatarView avatar;
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
 
+    private Fragment mFragment;
+
     public NavigationDrawerFragment() {
+        mFragment = this;
     }
 
     @Override
@@ -100,18 +109,28 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 		slideViewLayout = (RelativeLayout) inflater.inflate(R.layout.drawer_new_main, container, false);
 		loginHWnd = (RelativeLayout) slideViewLayout.findViewById(R.id.loginHWnd);
-		AvatarView avatar = (AvatarView) slideViewLayout.findViewById(R.id.avatarView);
-		TextView username = (TextView) slideViewLayout.findViewById(R.id.loginHWndUsername);
+		avatar = (AvatarView) slideViewLayout.findViewById(R.id.avatarView);
+		final TextView username = (TextView) slideViewLayout.findViewById(R.id.loginHWndUsername);
 		avatar.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
-				startActivity(new Intent(getActivity(), LoginActivity.class));
+                if(((MainActivity)mCallbacks).loggedIn){
+                    Intent intent = new Intent(getActivity(), HomepageActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("username", Me.getMyUsername());
+                    bundle.putInt("userId", Me.getUserId());
+                    bundle.putString("avatarSuffix", Me.getMyAvatarSuffix() == null ? "none" : Me.getMyAvatarSuffix());
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }else {
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                }
 			}
 		});
 		channelSelect = (ListView) slideViewLayout.findViewById(R.id.channelSelect);
@@ -191,6 +210,29 @@ public class NavigationDrawerFragment extends Fragment {
                 if (!isAdded()) {
                     return;
                 }
+
+                if(LoginUtils.isLoggedIn()) {
+                    if (Me.isEmpty()) {
+                        AccountUtils.getProfile((Context) mCallbacks, new AccountUtils.GetProfileObserver() {
+                            @Override
+                            public void onGetProfileSuccess() {
+                                Log.d("account", "id = " + Me.getMyUserId());
+                                avatar.update((Context) mCallbacks, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
+                            }
+
+                            @Override
+                            public void onGetProfileFailure() {
+
+                            }
+                        });
+                    } else {
+                        avatar.update((Context) mCallbacks, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
+                        //Glide.with(mFragment).load(Me.getMyAvatarURL()).into(avatar.i);
+                        //Glide.with(mFragment).load(R.drawable.avatar_32).into(avatar.i);
+                    }
+                }
+
+                Log.d("hei", "hei");
 
                 if (!mUserLearnedDrawer) {
                     // The user manually opened the drawer; store this flag to prevent auto-showing
