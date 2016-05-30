@@ -17,6 +17,7 @@ public enum Channel
 	test(R.string.channel_test, 9, false, 0xFF607D8B),
 	admin(R.string.channel_admin, 24, false, 0xFFEAEAEA),
 	court(R.string.channel_court, 25, true, 0xFFE040D0),
+	recycled(R.string.channel_recycled, 27, false, 0xFFA6B3E0),
 	announ(R.string.channel_announ, 28, true, 0xFF999999),
 	others(R.string.channel_others, 30, true, 0xFF3F5185),
 	socsci(R.string.channel_socsci, 34, true, 0xFFE04000),

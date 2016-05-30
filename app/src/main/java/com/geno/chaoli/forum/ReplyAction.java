@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -53,7 +55,18 @@ public class ReplyAction extends AppCompatActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.reply_action);
-		setTitle(R.string.reply);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
+		toolbar.setTitle(R.string.reply);
+		toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+			}
+		});
 		client = new AsyncHttpClient();
 		sp = getSharedPreferences("draftList", MODE_PRIVATE);
 		e = sp.edit();

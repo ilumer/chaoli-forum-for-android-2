@@ -6,13 +6,14 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -25,6 +26,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -37,6 +39,10 @@ import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.LoginUtils;
+
+import org.jsoup.Connection;
+
+import java.util.zip.Inflater;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -71,6 +77,7 @@ public class NavigationDrawerFragment extends Fragment {
 	private RelativeLayout loginHWnd;
 	private ListView channelSelect;
     private AvatarView avatar;
+    private TextView signature;
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
@@ -115,6 +122,8 @@ public class NavigationDrawerFragment extends Fragment {
 		loginHWnd = (RelativeLayout) slideViewLayout.findViewById(R.id.loginHWnd);
 		avatar = (AvatarView) slideViewLayout.findViewById(R.id.avatarView);
 		final TextView username = (TextView) slideViewLayout.findViewById(R.id.loginHWndUsername);
+        signature = (TextView) slideViewLayout.findViewById(R.id.signature);
+
 		avatar.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -125,6 +134,7 @@ public class NavigationDrawerFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString("username", Me.getMyUsername());
                     bundle.putInt("userId", Me.getUserId());
+                    bundle.putString("signature", Me.getMySignature());
                     bundle.putString("avatarSuffix", Me.getMyAvatarSuffix() == null ? "none" : Me.getMyAvatarSuffix());
                     intent.putExtras(bundle);
                     startActivity(intent);
@@ -142,8 +152,10 @@ public class NavigationDrawerFragment extends Fragment {
 				selectItem(position);
 			}
 		});
-		channelSelect.setAdapter(new ArrayAdapter<String>(
-				getActionBar().getThemedContext(),
+        channelSelect.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        //channelSelect.setAdapter(mAdapter);
+		/*channelSelect.setAdapter(new ArrayAdapter<String>(
+ 				(Context)mCallbacks,
 				android.R.layout.simple_list_item_1,
 				android.R.id.text1,
 				new String[]
@@ -159,7 +171,8 @@ public class NavigationDrawerFragment extends Fragment {
 								getString(R.string.channel_socsci),
 								getString(R.string.channel_lang),
 						}
-		));
+		));*/
+
 		return slideViewLayout;
     }
 
@@ -173,7 +186,7 @@ public class NavigationDrawerFragment extends Fragment {
      * @param fragmentId   The android:id of this fragment in its activity's layout.
      * @param drawerLayout The DrawerLayout containing this fragment's UI.
      */
-    public void setUp(int fragmentId, DrawerLayout drawerLayout) {
+    public void setUp(int fragmentId, DrawerLayout drawerLayout, Toolbar toolbar) {
         mFragmentContainerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
 
@@ -181,16 +194,16 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
 
-        ActionBar actionBar = getActionBar();
+        /*ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        actionBar.setHomeButtonEnabled(true);*/
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the navigation drawer and the action bar app icon.
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),                    /* host Activity */
                 mDrawerLayout,                    /* DrawerLayout object */
-                R.drawable.ic_drawer,             /* nav drawer image to replace 'Up' caret */
+                toolbar,
                 R.string.navigation_drawer_open,  /* "open drawer" description for accessibility */
                 R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
         ) {
@@ -216,8 +229,8 @@ public class NavigationDrawerFragment extends Fragment {
                         AccountUtils.getProfile((Context) mCallbacks, new AccountUtils.GetProfileObserver() {
                             @Override
                             public void onGetProfileSuccess() {
-                                Log.d("account", "id = " + Me.getMyUserId());
                                 avatar.update((Context) mCallbacks, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
+                                signature.setText(Me.getMySignature());
                             }
 
                             @Override
@@ -227,12 +240,11 @@ public class NavigationDrawerFragment extends Fragment {
                         });
                     } else {
                         avatar.update((Context) mCallbacks, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
+                        signature.setText(Me.getMySignature());
                         //Glide.with(mFragment).load(Me.getMyAvatarURL()).into(avatar.i);
                         //Glide.with(mFragment).load(R.drawable.avatar_32).into(avatar.i);
                     }
                 }
-
-                Log.d("hei", "hei");
 
                 if (!mUserLearnedDrawer) {
                     // The user manually opened the drawer; store this flag to prevent auto-showing
@@ -249,9 +261,9 @@ public class NavigationDrawerFragment extends Fragment {
 
         // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer,
         // per the navigation drawer design guidelines.
-        if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
-            mDrawerLayout.openDrawer(mFragmentContainerView);
-        }
+        //if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
+        //    mDrawerLayout.openDrawer(mFragmentContainerView);
+        //}
 
         // Defer code dependent on restoration of previous instance state.
         mDrawerLayout.post(new Runnable() {
@@ -264,7 +276,7 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-    private void selectItem(int position) {
+    public void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (channelSelect != null) {
             channelSelect.setItemChecked(position, true);
@@ -342,6 +354,10 @@ public class NavigationDrawerFragment extends Fragment {
         actionBar.setTitle(R.string.app_name);
     }
 
+    public DrawerLayout getDrawerLayout(){
+        return mDrawerLayout;
+    }
+
     private ActionBar getActionBar() {
         return getActivity().getActionBar();
     }
@@ -355,4 +371,6 @@ public class NavigationDrawerFragment extends Fragment {
          */
         void onNavigationDrawerItemSelected(int position);
     }
+
+
 }

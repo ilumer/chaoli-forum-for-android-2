@@ -93,6 +93,12 @@ public class ConversationListFragment extends Fragment
 					c.title = sub.getString("title");
 					c.excerpt = sub.getString("firstPost");
 					c.replies = sub.getInteger("replies");
+					c.startMember = sub.getString("startMember");
+					c.startMemberAvatarSuffix = sub.getString("startMemberAvatarFormat");
+					c.startMemberId = sub.getString("startMemberId");
+					c.lastPostMember = sub.getString("lastPostMember");
+					c.lastPostMemberAvatarSuffix = sub.getString("lastPostMemberAvatarFormat");
+					c.lastPostMemberId = sub.getString("lastPostMemberId");
 					c.channel = Channel.getChannel(sub.getInteger("channelId"));
 					v[i] = new ConversationView(getActivity(), c);
 				}

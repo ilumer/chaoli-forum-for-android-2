@@ -4,13 +4,22 @@
 	<dimen name="activity_vertical_margin">16dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
 
+	<dimen name="left_margin_in_post_view">5dp</dimen>
+	<dimen name="right_margin_in_post_view">15dp</dimen>
+	<dimen name="conversation_view_horizontal_margin">16dp</dimen>
+	<dimen name="conversation_view_vertical_margin">12dp</dimen>
+	<dimen name="middle_margin">10dp</dimen>
 	<!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
          https://developer.android.com/design/patterns/navigation-drawer.html -->
 	<dimen name="navigation_drawer_width">240dp</dimen>
 
 	<dimen name="avatar_marginLeft">16dp</dimen>
+	<dimen name="avatar_marginTop">10dp</dimen>
 	<dimen name="avatar_diameter">72dp</dimen>
 	<dimen name="conversationListMargin">8dp</dimen>
+	<dimen name="marginForBackground">8dp</dimen>
 	<dimen name="title_size">20sp</dimen>
+	<dimen name="text_greater_size">25sp</dimen>
 	<dimen name="normal_size">16sp</dimen>
+	<dimen name="common_margin">15dp</dimen>
 </resources>

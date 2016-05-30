@@ -40,6 +40,7 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
 
     Context mContext;
     String mUsername; // to be received
+    String mSignature; // to be received
     int userId; // to be received
     int mPage = 1;
     //String avatarURL; // to be received
@@ -63,16 +64,17 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
             return;
         }
         mUsername = bundle.getString("username", "");
+        mSignature = bundle.getString("signature", "");
         userId = bundle.getInt("userId", -1);
         //avatarURL = bundle.getString("avatarURL", "");
-        avatarSuffix = bundle.getString("avatarSuffix", "");
+        avatarSuffix = bundle.getString("avatarSuffix", Constants.NONE);
 
         /*Log.d(TAG, "id=" + userId + "un=" + mUsername + "url=" + avatarURL + "suffix=" + avatarSuffix);
         if("".equals(avatarURL) && avatarSuffix != null && !"".equals(avatarSuffix)){
             avatarURL = Constants.avatarURL + "avatar_" + userId + "." + avatarSuffix;
         }*/
 
-        if("".equals(mUsername) || userId == -1 || "".equals(avatarSuffix)){
+        if("".equals(mUsername) || userId == -1){
             this.finish();
             return;
         }
@@ -81,6 +83,7 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
         osv_activities.setScrollViewListener(this);
 
         ((TextView) findViewById(R.id.tv_username)).setText(mUsername);
+        ((TextView) findViewById(R.id.tv_signature)).setText(mSignature);
         AvatarView avatar_iv = (AvatarView) findViewById(R.id.iv_avatar);
         avatar_iv.update(mContext, avatarSuffix, userId, mUsername);
         srl_activities = (SwipyRefreshLayout) findViewById(R.id.srl_activities);
@@ -213,7 +216,12 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
 
     private LinearLayout inflateItem(MyActivity thisActivity){
         Resources res = getResources();
-        LinearLayout linearLayout = new LinearLayout(mContext);
+        Log.i(TAG, "inflateItem");
+        LinearLayout ll = (LinearLayout)getLayoutInflater().inflate(R.layout.history_item, null);
+        final TextView content_tv = (TextView) ll.findViewById(R.id.tv_post_content);
+        TextView description_tv = (TextView) ll.findViewById(R.id.tv_description);
+        TextView title_tv = (TextView) ll.findViewById(R.id.tv_conversation_title);
+        /*LinearLayout linearLayout = new LinearLayout(mContext);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         TextView description_tv = new TextView(mContext);
@@ -225,7 +233,7 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
         final TextView title_tv = new TextView(mContext);
         title_tv.setEllipsize(TextUtils.TruncateAt.END);
         title_tv.setTextSize(20);
-        title_tv.setSingleLine(true);
+        title_tv.setSingleLine(true);*/
         if("postActivity".equals(thisActivity.type)) {
             content_tv.setText(thisActivity.content);
             content_tv.setHint(thisActivity.postId);
@@ -278,27 +286,22 @@ public class HomepageActivity extends Activity implements SwipyRefreshLayout.OnR
                         @Override
                         public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                             progressDialog.dismiss();
-                            Log.d("body", "e");
                         }
                     });
                 }
             };
             title_tv.setOnClickListener(onClickListener);
             content_tv.setOnClickListener(onClickListener);
-            linearLayout.addView(description_tv);
-            linearLayout.addView(title_tv);
-            linearLayout.addView(content_tv);
         }else{
             if("status".equals(thisActivity.type)){
                 description_tv.setText(res.getString(R.string.modified_his_or_her_information, mUsername));
             }
             MyActivity.Data data = JSON.parseObject(thisActivity.data, MyActivity.Data.class);
-            linearLayout.addView(description_tv);
+            ll.removeView(title_tv);
             if(data != null && data.newStatus != null){
                 content_tv.setText(data.newStatus);
-                linearLayout.addView(content_tv);
             }
         }
-        return linearLayout;
+        return ll;
     }
 }

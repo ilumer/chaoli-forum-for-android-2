@@ -1,27 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
 				android:orientation="vertical">
 	<TextView
-		android:layout_width="match_parent"
+		android:id="@+id/tv_login"
+		android:layout_marginTop="@dimen/common_margin"
+		android:textSize="@dimen/text_greater_size"
+		android:layout_centerHorizontal="true"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/login"/>
 	<EditText
+		android:layout_marginTop="@dimen/common_margin"
+		android:layout_marginLeft="@dimen/common_margin"
+		android:layout_marginRight="@dimen/common_margin"
+		android:layout_below="@id/tv_login"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:inputType="textPersonName"
 		android:hint="@string/username"
 		android:id="@+id/loginName"/>
 	<EditText
+		android:layout_marginTop="@dimen/common_margin"
+		android:layout_marginLeft="@dimen/common_margin"
+		android:layout_marginRight="@dimen/common_margin"
+		android:layout_below="@id/loginName"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:inputType="textPassword"
 		android:hint="@string/password"
 		android:id="@+id/loginPwd"/>
 	<Button
+		android:layout_below="@id/loginPwd"
+		android:layout_centerHorizontal="true"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/login"
 		android:id="@+id/loginBtn"/>
-</LinearLayout>
+
+	<View style="@style/DividerInHomepage"
+		android:layout_below="@id/loginBtn"/>
+</RelativeLayout>

@@ -18,6 +18,7 @@ public class Constants
 	// index.json/1430/p2
 	public static final String postListURL = "https://chaoli.club/conversation/index.json/";
 	public static final String loginURL = "https://chaoli.club/index.php/user/login";
+	public static final String postURL = "https://chaoli.club/";// TODO: 16-5-25  to be updated
 	public static final String replyURL = "https://chaoli.club/index.php/?p=conversation/reply.ajax/";
 	public static final String editURL = "https://chaoli.club/index.php/?p=conversation/editPost.ajax/";
 	public static final String cancelEditURL = "https://chaoli.club/index.php/?p=attachment/removeSession/";

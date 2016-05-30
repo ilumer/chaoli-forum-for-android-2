@@ -70,6 +70,8 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_activity);
+
+
 //		setSupportActionBar((Toolbar) findViewById(R.id.titleBar));
 		postList = (ListView) findViewById(R.id.postList);
 		Bundle data = getIntent().getExtras();
@@ -79,6 +81,20 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 		intentToPage = data.getString("intentToPage", "");
 		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
 		sp = getSharedPreferences(Constants.postSP + conversationId, MODE_PRIVATE);
+
+		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
+		toolbar.setTitle(title);
+		toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+			}
+		});
+
 //		e = sp.edit();
 		reply = (FloatingActionButton) findViewById(R.id.reply);
 		reply.setOnClickListener(new View.OnClickListener()
