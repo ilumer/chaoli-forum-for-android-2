@@ -118,4 +118,5 @@
 	<string name="dont_try_again">No, thanks.</string>
 	<string name="logging_in">Logging in...</string>
 	<string name="channel_recycled">Recycled</string>
+	<string name="post">Post</string>
 </resources>

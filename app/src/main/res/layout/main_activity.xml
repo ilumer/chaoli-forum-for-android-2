@@ -1,30 +1,46 @@
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical"
 	tools:context="com.geno.chaoli.forum.MainActivity">
 	<include layout="@layout/custom_toolbar" />
-	<android.support.v4.widget.DrawerLayout
-		android:id="@+id/drawer_main"
+	<RelativeLayout
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:background="@color/light_gray">
-		<FrameLayout
-			android:id="@+id/main_view"
-			android:background="@color/white"
-			android:layout_margin="@dimen/marginForBackground"
+		android:layout_height="match_parent">
+		<android.support.v4.widget.DrawerLayout
+			android:id="@+id/drawer_main"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"/>
-
-		<fragment
-			android:id="@+id/drawer"
-			android:name="com.geno.chaoli.forum.NavigationDrawerFragment"
-			android:layout_width="@dimen/navigation_drawer_width"
 			android:layout_height="match_parent"
-			android:layout_gravity="start"
-			tools:layout="@layout/drawer_new_main"/>
-	</android.support.v4.widget.DrawerLayout>
+			android:background="@color/light_gray">
+			<FrameLayout
+				android:id="@+id/main_view"
+				android:background="@color/white"
+				android:layout_margin="@dimen/marginForBackground"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"/>
+
+			<fragment
+				android:id="@+id/drawer"
+				android:name="com.geno.chaoli.forum.NavigationDrawerFragment"
+				android:layout_width="@dimen/navigation_drawer_width"
+				android:layout_height="match_parent"
+				android:layout_gravity="start"
+				tools:layout="@layout/drawer_new_main"/>
+		</android.support.v4.widget.DrawerLayout>
+
+		<android.support.design.widget.FloatingActionButton
+			android:id="@+id/postBtn"
+			android:src="@drawable/ic_menu_notifications"
+			android:layout_alignParentRight="true"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentBottom="true"
+			app:borderWidth="0dp"
+			android:layout_margin="16dp"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</RelativeLayout>
 
 </LinearLayout>

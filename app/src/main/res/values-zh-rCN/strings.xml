@@ -112,4 +112,5 @@
 	<string name="dont_try_again">不了</string>
 	<string name="logging_in">登录中...</string>
 	<string name="channel_recycled">回收站</string>
+	<string name="post">发帖</string>
 </resources>

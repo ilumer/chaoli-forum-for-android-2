@@ -78,10 +78,10 @@ public enum Channel
 		return null;
 	}
 
-	public static final Channel getChannel(String channelName)
+	public static final Channel getChannel(Context context, String channelName)
 	{
 		for (Channel c : Channel.values())
-			if (c.toString().equals(channelName)) return c;
+			if (c.toString(context).equals(channelName)) return c;
 		return null;
 	}
 }

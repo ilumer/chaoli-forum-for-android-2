@@ -37,6 +37,7 @@
 			android:name=".ReplyAction"/>
 		<activity android:name=".HomepageActivity">
 		</activity>
+		<activity android:name=".PostAction"/>
 	</application>
 
 </manifest>
