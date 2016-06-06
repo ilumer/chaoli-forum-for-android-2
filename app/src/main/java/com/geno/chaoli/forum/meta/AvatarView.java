@@ -43,6 +43,7 @@ public class AvatarView extends RelativeLayout
 		update(context, imagePath, userId, username);
 	}
 
+	// adjust the size
 	public void scale(int length){
 		int lengthdp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, length, getResources().getDisplayMetrics());
 		ViewGroup.LayoutParams layoutParams = getLayoutParams();
@@ -55,11 +56,7 @@ public class AvatarView extends RelativeLayout
 		mUserId = userId;
 		mUsername = username;
 		if(firstLoad) {
-			v = (RelativeLayout) inflate(context, R.layout.avatar_view, this);
-			t = (TextView) v.findViewById(R.id.avatarTxt);
-			i = (ImageView) v.findViewById(R.id.avatarImg);
-			t.setTextSize(20);
-			firstLoad = false;
+			init(context);
 		}
 
 		if (Constants.NONE.equals(imagePath) || imagePath == null)
@@ -72,6 +69,21 @@ public class AvatarView extends RelativeLayout
 			Glide.with(context).load(Constants.avatarURL + "avatar_" + userId + "." + imagePath).into(i);
 			t.setVisibility(INVISIBLE);
 		}
+	}
+
+	public void init(Context context){
+		v = (RelativeLayout) inflate(context, R.layout.avatar_view, this);
+		t = (TextView) v.findViewById(R.id.avatarTxt);
+		i = (ImageView) v.findViewById(R.id.avatarImg);
+		t.setTextSize(20);
+		firstLoad = false;
+	}
+
+	public void setLoginImage(Context context){
+		if(firstLoad)
+			init(context);
+		Glide.with(context).load(R.drawable.ic_account_plus_white_48dp).into(i);
+		t.setVisibility(INVISIBLE);
 	}
 
 	public AvatarView(Context context, AttributeSet attrs)
