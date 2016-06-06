@@ -51,6 +51,7 @@ import java.util.zip.Inflater;
  */
 public class NavigationDrawerFragment extends Fragment {
 
+    private static final String TAG = "NavigationDrawerFragment";
     /**
      * Remember the position of the selected item.
      */
@@ -135,7 +136,8 @@ public class NavigationDrawerFragment extends Fragment {
                     bundle.putString("username", Me.getMyUsername());
                     bundle.putInt("userId", Me.getUserId());
                     bundle.putString("signature", Me.getMySignature());
-                    bundle.putString("avatarSuffix", Me.getMyAvatarSuffix() == null ? "none" : Me.getMyAvatarSuffix());
+                    bundle.putString("mAvatarSuffix", Me.getMyAvatarSuffix() == null ? "none" : Me.getMyAvatarSuffix());
+                    bundle.putBoolean("isSelf", true);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }else {
@@ -225,35 +227,36 @@ public class NavigationDrawerFragment extends Fragment {
                 }
 
                 if(LoginUtils.isLoggedIn()) {
-                    if (Me.isEmpty()) {
-                        AccountUtils.getProfile((Context) mCallbacks, new AccountUtils.GetProfileObserver() {
-                            @Override
-                            public void onGetProfileSuccess() {
-                                avatar.update((Context) mCallbacks, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
-                                signature.setText(Me.getMySignature());
-                            }
-
-                            @Override
-                            public void onGetProfileFailure() {
-
-                            }
-                        });
-                    } else {
+                    if (!Me.isEmpty()) {
+                        //Log.d(TAG, "AvatarSuffix: " + Me.getMyAvatarSuffix());
                         avatar.update((Context) mCallbacks, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
                         signature.setText(Me.getMySignature());
+                    }
+                    AccountUtils.getProfile((Context) mCallbacks, new AccountUtils.GetProfileObserver() {
+                        @Override
+                        public void onGetProfileSuccess() {
+                            //Log.d(TAG, "AvatarSuffix: " + Me.getMyAvatarSuffix());
+                            avatar.update((Context) mCallbacks, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
+                            signature.setText(Me.getMySignature());
+                        }
+
+                        @Override
+                        public void onGetProfileFailure() {
+
+                        }
+                    });
                         //Glide.with(mFragment).load(Me.getMyAvatarURL()).into(avatar.i);
                         //Glide.with(mFragment).load(R.drawable.avatar_32).into(avatar.i);
-                    }
                 }
 
-                if (!mUserLearnedDrawer) {
+                /*if (!mUserLearnedDrawer) {
                     // The user manually opened the drawer; store this flag to prevent auto-showing
                     // the navigation drawer automatically in the future.
                     mUserLearnedDrawer = true;
                     SharedPreferences sp = PreferenceManager
                             .getDefaultSharedPreferences(getActivity());
                     sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).apply();
-                }
+                }*/
 
                 getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
             }
