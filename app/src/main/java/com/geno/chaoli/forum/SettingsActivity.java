@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.AccountUtils;
+import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.ConversationUtils;
 import com.geno.chaoli.forum.meta.LoginUtils;
 
@@ -34,14 +35,14 @@ import com.bumptech.glide.*;
 /**
  * Created by jianhao on 16-3-12.
  */
-public class SettingsActivity extends Activity implements AccountUtils.GetProfileObserver{
+public class SettingsActivity extends BaseActivity implements AccountUtils.GetProfileObserver{
     EditText username_txt, password_txt;
     TextView user_id_txt;
 
     Context mContext;
     File mAvatarFile;
     Toast mToast;
-    ImageView avatar_iv;
+    AvatarView avatar;
     Button change_avatar_btn;
     //Spinner language_spn;
     CheckBox private_add_chk;
@@ -55,6 +56,7 @@ public class SettingsActivity extends Activity implements AccountUtils.GetProfil
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        configToolbar(R.string.settings);
 
         Button change_avatar_btn = (Button)findViewById(R.id.btn_change_avatar);
         //Spinner language_spn = (Spinner)findViewById(R.id.spn_language);
@@ -67,7 +69,9 @@ public class SettingsActivity extends Activity implements AccountUtils.GetProfil
         save_btn = (Button)findViewById(R.id.btn_save);
 
         mContext = this;
-        avatar_iv = (ImageView)findViewById(R.id.iv_avatar);
+        avatar = (AvatarView)findViewById(R.id.iv_avatar);
+
+        updateViews();
 
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
@@ -79,9 +83,6 @@ public class SettingsActivity extends Activity implements AccountUtils.GetProfil
                         startActivityForResult(getAlbum, IMAGE_CODE);
                         break;
                     case R.id.btn_save:
-                        mToast = Toast.makeText(mContext, "修改中，请稍候。。", Toast.LENGTH_LONG);
-                        mToast.setGravity(Gravity.CENTER, 0, 0);
-                        mToast.show();
                         String signature = signature_edtTxt.getText().toString();
                         String user_status = user_status_edtTxt.getText().toString();
                         Boolean privateAdd = private_add_chk.isChecked();
@@ -94,16 +95,24 @@ public class SettingsActivity extends Activity implements AccountUtils.GetProfil
                                 starPrivate, hideOnline, signature, user_status, new AccountUtils.ModifySettingsObserver() {
                                     @Override
                                     public void onModifySettingsSuccess() {
-                                        progressDialog.dismiss();
-                                        if(mToast != null) mToast.cancel();
-                                        mToast = Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT);
-                                        mToast.show();
+                                        AccountUtils.getProfile(mContext, new AccountUtils.GetProfileObserver() {
+                                            @Override
+                                            public void onGetProfileSuccess() {
+                                                progressDialog.dismiss();
+                                                Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            @Override
+                                            public void onGetProfileFailure() {
+                                                progressDialog.dismiss();
+                                                Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                     }
 
                                     @Override
                                     public void onModifySettingsFailure(int statusCode) {
                                         progressDialog.dismiss();
-                                        if(mToast != null) mToast.cancel();
                                         mToast = Toast.makeText(mContext, "修改失败，请稍后重试", Toast.LENGTH_SHORT);
                                         mToast.show();
                                     }
@@ -177,11 +186,7 @@ public class SettingsActivity extends Activity implements AccountUtils.GetProfil
     }
 
     public void updateViews(){
-        if(Me.getMyAvatarSuffix() != null) {
-            Glide.with(mContext).load("https://dn-chaoli-upload.qbox.me/avatar_" + LoginUtils.getUserId() + "." + Me.getMyAvatarSuffix()).into(avatar_iv);
-        }else {
-
-        }
+        avatar.update(this, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
         private_add_chk.setChecked(Me.getMyPrivateAdd());
         star_on_reply_chk.setChecked(Me.getMyStarOnReply());
         star_private_chk.setChecked(Me.getMyStarPrivate());

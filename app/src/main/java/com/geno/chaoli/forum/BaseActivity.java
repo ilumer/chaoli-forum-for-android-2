@@ -10,9 +10,9 @@ import android.view.View;
  * Created by jianhao on 16-5-31.
  */
 public class BaseActivity extends AppCompatActivity {
-    public void configToolbar(){
+    public void configToolbar(String title){
         Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
-        toolbar.setTitle(R.string.reply);
+        toolbar.setTitle(title);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -23,5 +23,8 @@ public class BaseActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+    }
+    public void configToolbar(int resId){
+        configToolbar(getString(resId));
     }
 }

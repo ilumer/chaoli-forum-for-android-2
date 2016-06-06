@@ -37,7 +37,7 @@ import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
 
-public class PostActivity extends AppCompatActivity implements ConversationUtils.IgnoreAndStarConversationObserver
+public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
 	public static final String TAG = "PostActivity";
 
@@ -82,18 +82,7 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
 		sp = getSharedPreferences(Constants.postSP + conversationId, MODE_PRIVATE);
 
-		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
-		toolbar.setTitle(title);
-		toolbar.setTitleTextColor(getResources().getColor(R.color.white));
-		setSupportActionBar(toolbar);
-		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressed();
-			}
-		});
+		configToolbar(title);
 
 //		e = sp.edit();
 		reply = (FloatingActionButton) findViewById(R.id.reply);

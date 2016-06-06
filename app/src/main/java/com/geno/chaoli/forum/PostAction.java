@@ -3,11 +3,13 @@ package com.geno.chaoli.forum;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.ChannelTextView;
 import com.geno.chaoli.forum.meta.ConversationUtils;
+import com.geno.chaoli.forum.meta.Post;
 import com.geno.chaoli.forum.meta.PostUtils;
 
 import java.util.List;
@@ -44,6 +47,8 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
 
     private EditText title_et, content_et;
 
+    private final Context mContext = this;
+
     SharedPreferences sharedPreferences;
 
     @Override
@@ -52,9 +57,7 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
 
         setContentView(R.layout.post_action);
 
-        configToolbar();
-
-        final Context mContext = this;
+        configToolbar(R.string.post);
 
         sharedPreferences = getSharedPreferences(TAG, MODE_PRIVATE);
 
@@ -69,10 +72,11 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
         String title = sharedPreferences.getString(DRAFT_TITLE, "");
         String content = sharedPreferences.getString(DRAFT_CONTENT, "");
         String channelText = sharedPreferences.getString(DRAFT_CHANNEL, getString(R.string.channel_caff));
+        curChannel = Channel.getChannel(mContext, channelText);
 
         title_et.setText(title);
         content_et.setText(content);
-        channel.addView(new ChannelTextView(this, Channel.getChannel(mContext, getString(R.string.channel_caff))));
+        channel.addView(new ChannelTextView(this, Channel.getChannel(mContext, channelText)));
         channel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,7 +117,7 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
             case MENU_DRAFT:
                 editor.putString(DRAFT_TITLE, title);
                 editor.putString(DRAFT_CONTENT, content);
-                editor.putString(DRAFT_CHANNEL, curChannel.toString());
+                editor.putString(DRAFT_CHANNEL, curChannel.toString(mContext));
                 editor.apply();
                 Toast.makeText(this, R.string.save_as_draft, Toast.LENGTH_SHORT).show();
                 finish();
@@ -132,7 +136,9 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
     public void onPostConversationSuccess(int conversationId) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear().apply();
-        finish();
+        Intent intent = new Intent(PostAction.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     @Override
