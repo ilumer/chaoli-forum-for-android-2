@@ -8,28 +8,9 @@
 	tools:context="com.geno.chaoli.forum.MainActivity"
 	android:layout_height="match_parent"
 	android:layout_width="match_parent">
-	<android.support.design.widget.CoordinatorLayout
+	<FrameLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
-		<android.support.design.widget.AppBarLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
-
-			<android.support.v7.widget.Toolbar
-				android:id="@+id/tl_custom"
-				android:layout_width="match_parent"
-				android:layout_height="?attr/actionBarSize"
-				android:background="?attr/colorPrimary"
-				app:layout_scrollFlags="scroll|enterAlways" />
-		</android.support.design.widget.AppBarLayout>
-		<FrameLayout
-			android:id="@+id/main_view"
-			app:layout_behavior="@string/appbar_scrolling_view_behavior"
-			android:background="@color/white"
-			android:elevation="10dp"
-			android:layout_margin="@dimen/marginForBackground"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"/>
 		<android.support.design.widget.FloatingActionButton
 			android:id="@+id/postBtn"
 			android:layout_width="wrap_content"
@@ -38,7 +19,30 @@
 			android:layout_margin="@dimen/fab_margin"
 			android:src="@drawable/ic_menu_notifications"
 			app:borderWidth="0dp" />
-	</android.support.design.widget.CoordinatorLayout>
+		<android.support.design.widget.CoordinatorLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+			<android.support.design.widget.AppBarLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content">
+
+				<android.support.v7.widget.Toolbar
+					android:id="@+id/tl_custom"
+					android:layout_width="match_parent"
+					android:layout_height="?attr/actionBarSize"
+					android:background="?attr/colorPrimary"
+					app:layout_scrollFlags="scroll|enterAlways" />
+			</android.support.design.widget.AppBarLayout>
+			<FrameLayout
+				android:id="@+id/main_view"
+				app:layout_behavior="@string/appbar_scrolling_view_behavior"
+				android:background="@color/white"
+				android:elevation="10dp"
+				android:layout_margin="@dimen/marginForBackground"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"/>
+		</android.support.design.widget.CoordinatorLayout>
+	</FrameLayout>
 
 	<android.support.design.widget.NavigationView
 		android:id="@+id/navigation_view"
