@@ -15,6 +15,7 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.cookie.Cookie;
 
 public class LoginUtils {
+    private static final String TAG = "LoginUtils";
     public static final String LOGIN_URL = "https://chaoli.club/index.php/user/login?return=%2F";
     public static final String HOMEPAGE_URL = "https://chaoli.club/index.php";
     public static final String LOGOUT_PRE_URL = "https://chaoli.club/index.php/user/logout?token=";
@@ -216,18 +217,17 @@ public class LoginUtils {
 
     public static void logout(final Context context, final LogoutObserver logoutObserver){
         String logoutURL = LOGOUT_PRE_URL + getToken();
-        client.get(context, logoutURL, new AsyncHttpResponseHandler() {
+        clear(context);
+        Me.clear();
+        client.get(context, logoutURL, new AsyncHttpResponseHandler() { //与服务器通信的作用似乎只是告诉服务器我下线了而已
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                clear(context);
-                Me.clear();
-                //Log.i("logout", new String(responseBody));
-                //Log.i("cookie", String.valueOf(CookieUtils.getCookie(context).size()));
                 logoutObserver.onLogoutSuccess();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.d(TAG, String.valueOf(statusCode));
                 logoutObserver.onLogoutFailure(statusCode);
             }
         });
