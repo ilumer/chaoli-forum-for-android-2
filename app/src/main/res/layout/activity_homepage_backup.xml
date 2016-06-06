@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/ll_homepage">
+    <RelativeLayout
+        android:id="@+id/rl_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp">
+        <com.geno.chaoli.forum.meta.AvatarView
+            android:id="@+id/iv_avatar"
+            android:layout_width="@dimen/avatar_diameter"
+            android:layout_height="@dimen/avatar_diameter"
+            android:layout_margin="@dimen/middle_margin"/>
+        <TextView
+            android:id="@+id/tv_username"
+            android:layout_toRightOf="@+id/iv_avatar"
+            android:layout_toEndOf="@+id/iv_avatar"
+            android:layout_marginTop="3dp"
+            android:layout_alignTop="@id/iv_avatar"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_signature"
+            android:layout_marginBottom="3dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textSize="16sp"
+            android:textColor="@color/contentColor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <View style="@style/DividerInHomepage"
+            android:layout_below="@id/iv_avatar"/>
+    </RelativeLayout>
+    <com.geno.chaoli.forum.meta.FullScreenSwipyRefreshLayout
+        android:id="@+id/srl_activities"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.geno.chaoli.forum.meta.FullScreenObservableScrollView
+            android:id="@+id/osv_activities"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/ll_activities"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="?android:attr/listDivider"
+                android:dividerPadding="10dp"
+                android:showDividers="middle">
+            </LinearLayout>
+        </com.geno.chaoli.forum.meta.FullScreenObservableScrollView>
+    </com.geno.chaoli.forum.meta.FullScreenSwipyRefreshLayout>
+</LinearLayout>

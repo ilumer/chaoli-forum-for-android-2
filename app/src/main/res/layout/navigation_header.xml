@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/avatar_marginLeft"
+    android:paddingStart="@dimen/avatar_marginLeft"
+    android:paddingTop="@dimen/avatar_marginTop"
+    android:background="#444"
+    android:id="@+id/loginHWnd">
+    <com.geno.chaoli.forum.meta.AvatarView
+        android:layout_width="@dimen/avatar_diameter"
+        android:layout_height="@dimen/avatar_diameter"
+        android:clickable="true"
+        android:id="@+id/avatar"/>
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+        <TextView
+            android:layout_marginTop="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/loginHWndUsername"
+            android:text="@string/click_login"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"/>
+        <TextView
+            android:id="@+id/signature_txt"
+            android:ellipsize="end"
+            android:layout_marginBottom="7dp"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"/>
+    </RelativeLayout>
+</LinearLayout>

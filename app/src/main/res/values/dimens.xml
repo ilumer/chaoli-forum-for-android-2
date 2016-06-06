@@ -14,7 +14,7 @@
 	<dimen name="navigation_drawer_width">240dp</dimen>
 
 	<dimen name="avatar_marginLeft">16dp</dimen>
-	<dimen name="avatar_marginTop">10dp</dimen>
+	<dimen name="avatar_marginTop">40dp</dimen>
 	<dimen name="avatar_diameter">72dp</dimen>
 	<dimen name="conversationListMargin">8dp</dimen>
 	<dimen name="marginForBackground">8dp</dimen>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/channelAll"
+            android:orderInCategory="0"
+            android:title="@string/channel.all"
+            android:checked="true"/>
+        <item android:id="@+id/channelMath"
+            android:orderInCategory="2"
+            android:title="@string/channel.maths"/>
+        <item android:id="@+id/channelPhys"
+            android:orderInCategory="3"
+            android:title="@string/channel.physics"/>
+        <item android:id="@+id/channelChem"
+            android:orderInCategory="4"
+            android:title="@string/channel.chem"/>
+        <item android:id="@+id/channelBio"
+            android:orderInCategory="5"
+            android:title="@string/channel.biology"/>
+        <item android:id="@+id/channelTech"
+            android:orderInCategory="6"
+            android:title="@string/channel.tech"/>
+        <item android:id="@+id/channelCourt"
+            android:orderInCategory="7"
+            android:title="@string/channel.court"/>
+        <item android:id="@+id/channelAnn"
+            android:orderInCategory="8"
+            android:title="@string/channel.announ"/>
+        <item android:id="@+id/channelOthers"
+            android:orderInCategory="9"
+            android:title="@string/channel.others"/>
+        <item android:id="@+id/channelSoc"
+            android:orderInCategory="10"
+            android:title="@string/channel.socsci"/>
+        <item android:id="@+id/channelLang"
+            android:orderInCategory="11"
+            android:title="@string/channel.lang"/>
+    </group>
+</menu>

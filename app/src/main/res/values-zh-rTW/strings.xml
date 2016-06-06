@@ -28,9 +28,9 @@
     <string name="release_to_refresh">釋放開始刷新</string>
     <string name="release_to_load">釋放開始加載</string>
     <string name="loading">加載中……</string>
-    <string name="opened_a_conversation">%s 發表了帖子</string>
-    <string name="updated">%s 更新於</string>
-    <string name="modified_his_or_her_information">%s 修改簡介為</string>
+    <string name="opened_a_conversation">發表了帖子</string>
+    <string name="updated">更新於 %s</string>
+    <string name="modified_his_or_her_information">修改簡介為</string>
     <string name="loading_posts">帖子正在加載中...</string>
     <string name="just_a_sec">請稍候...</string>
     <string name="wrong_captcha">驗證碼錯誤</string>
@@ -47,4 +47,22 @@
     <string name="try_again">再試壹次</string>
     <string name="dont_try_again">不了</string>
     <string name="logging_in">登入中...</string>
+    <string name="logout">登出</string>
+    <string name="config">設置</string>
+    <string name="logout_success">登出成功</string>
+    <string name="activity">動態</string>
+    <string name="statistics">統計</string>
+    <string name="dont_have_an_account">還沒有賬戶?</string>
+    <string name="answer_quesiton">答題註冊</string>
+    <string name="sign_up_directly">直接註冊</string>
+    <string name="if_you_have_an_invite_code">若您有邀請碼,您可以</string>
+    <string name="you_can_only_sign_up_with_an_invite_code">必須有邀請碼才可以註冊</string>
+    <string name="please_enter_your_invite_code">請輸入邀請碼</string>
+    <string name="sign_up">註冊</string>
+    <string name="captcha">驗證碼</string>
+    <string name="join_the_forum">加入了論壇</string>
+    <string name="days_ago">%d 天前</string>
+    <string name="weeks_ago">%d 星期前</string>
+    <string name="months_ago">%d 月前</string>
+    <string name="today">今天</string>
 </resources>

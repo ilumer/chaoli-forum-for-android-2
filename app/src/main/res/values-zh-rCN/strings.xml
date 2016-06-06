@@ -92,9 +92,9 @@
 	<string name="release_to_load">释放开始加载</string>
 	<string name="refreshing">刷新中……</string>
 	<string name="loading">加载中……</string>
-	<string name="opened_a_conversation">%s 发表了帖子</string>
-	<string name="updated">%s 更新于</string>
-	<string name="modified_his_or_her_information">%s 修改简介为</string>
+	<string name="opened_a_conversation">发表了帖子</string>
+	<string name="updated">更新于 %s</string>
+	<string name="modified_his_or_her_information">修改简介为</string>
 	<string name="loading_posts">帖子正在加载中...</string>
 	<string name="just_a_sec">请稍候...</string>
 	<string name="username_has_been_used">用户名已被注册</string>
@@ -113,4 +113,22 @@
 	<string name="logging_in">登录中...</string>
 	<string name="channel_recycled">回收站</string>
 	<string name="post">发帖</string>
+	<string name="logout">注销</string>
+	<string name="config">设置</string>
+	<string name="logout_success">注销成功</string>
+	<string name="activity">动态</string>
+	<string name="statistics">统计</string>
+	<string name="dont_have_an_account">还没有账号?</string>
+	<string name="answer_quesiton">答题注册</string>
+	<string name="if_you_have_an_invite_code">若您有邀请码,您可以</string>
+	<string name="sign_up_directly">直接注册</string>
+	<string name="you_can_only_sign_up_with_an_invite_code">必须有邀请码才可以注册</string>
+	<string name="please_enter_your_invite_code">请输入邀请码</string>
+	<string name="sign_up">注册</string>
+	<string name="captcha">验证码</string>
+	<string name="join_the_forum">加入了论坛</string>
+	<string name="days_ago">%d 天前</string>
+	<string name="weeks_ago">%d 星期前</string>
+	<string name="months_ago">%d 月前</string>
+	<string name="today">今天</string>
 </resources>
