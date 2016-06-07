@@ -51,6 +51,9 @@ public class HistoryFragment extends Fragment implements SwipyRefreshLayout.OnRe
 
     final static String TAG = "HistoryFragment";
 
+    final String DIVIDER    = "divider";
+    final String SPACE      = "space";
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -226,20 +229,23 @@ public class HistoryFragment extends Fragment implements SwipyRefreshLayout.OnRe
         MyActivity(){
 
         }
-        MyActivity(String type, int date){
+        MyActivity(String type, int date){      // only used to create divider
             this.type = type;
             this.time = String.valueOf(date);
+        }
+        MyActivity(String type){                // only used to create space
+            this.type = type;
         }
     }
 
     private void addTimeDivider(List<MyActivity> myActivities){
-        final String DIVIDER = "divider";
         int dateNow;
         if(myActivities.size() > 0 && !DIVIDER.equals(myActivities.get(0).type)){
             int firstDate = (int) ((Long.parseLong(myActivities.get(0).time) + 8 * 60 * 60) / 24 / 60 / 60);
             dateNow = (int) (Calendar.getInstance().getTimeInMillis() / 1000 / 24 / 60 / 60);
             myActivities.add(0, new MyActivity(DIVIDER, dateNow - firstDate));
         }
+        myActivities.add(0, new MyActivity(SPACE));
         for(int i = 0; i < myActivities.size() - 1; i++){
             MyActivity thisActivity = myActivities.get(i), nextActivity = myActivities.get(i + 1);
             if(!DIVIDER.equals(thisActivity.type) && !DIVIDER.equals(nextActivity.type)){
@@ -259,6 +265,7 @@ public class HistoryFragment extends Fragment implements SwipyRefreshLayout.OnRe
 
         final int ITEM_TYPE     = 0;
         final int DIVIDER_TYPE  = 1;
+        final int SPACE_TYPE    = 2;
 
         final String POSTACTIVITY   = "postActivity";
         final String STATUS         = "status";
@@ -271,8 +278,9 @@ public class HistoryFragment extends Fragment implements SwipyRefreshLayout.OnRe
 
         @Override
         public MyAdpter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            int layoutId = viewType == ITEM_TYPE ? R.layout.history_item : viewType == DIVIDER_TYPE ? R.layout.history_divider : R.layout.history_space;
             return new MyViewHolder(LayoutInflater.from(mCallback).
-                    inflate(viewType == ITEM_TYPE ? R.layout.history_item : R.layout.history_divider, parent, false));
+                    inflate(layoutId, parent, false));
         }
 
         @Override
@@ -355,21 +363,14 @@ public class HistoryFragment extends Fragment implements SwipyRefreshLayout.OnRe
                 TextPaint tp = holder.description_tv.getPaint();
                 tp.setFakeBoldText(true);
             }else if(getItemViewType(position) == DIVIDER_TYPE){
+                if(position == 1)
+                    holder.divider.setVisibility(View.INVISIBLE);
                 int timeDiff = Integer.parseInt(thisActivity.time);
                 if(timeDiff == 0){
                     holder.time_tv.setText(R.string.today);
                 } else {
                     holder.time_tv.setText(getString(R.string.days_ago, timeDiff));
                 }
-                /*if(timeDiff == 0){
-                    holder.time_tv.setText(R.string.today);
-                } else if(timeDiff < 7) {
-                    holder.time_tv.setText(getString(R.string.days_ago, timeDiff));
-                }else if(timeDiff <= 28){
-                    holder.time_tv.setText(getString(R.string.weeks_ago, timeDiff / 7));
-                }else if(timeDiff <= 45){
-                    holder.time_tv.setText(getString(R.string.months_ago, timeDiff / 30));
-                }*/
             }
         }
 
@@ -386,6 +387,7 @@ public class HistoryFragment extends Fragment implements SwipyRefreshLayout.OnRe
         class MyViewHolder extends RecyclerView.ViewHolder{
             TextView content_tv, description_tv, time_tv;
             AvatarView avatarView;
+            View divider;
             MyViewHolder(View view){
                 super(view);
                 // For item
@@ -394,12 +396,20 @@ public class HistoryFragment extends Fragment implements SwipyRefreshLayout.OnRe
                 avatarView = (AvatarView) view.findViewById(R.id.avatar);
                 // For divider
                 time_tv = (TextView) view.findViewById(R.id.tvTime);
+                divider = view.findViewById(R.id.divider);
             }
         }
 
         @Override
         public int getItemViewType(int position) {
-            return "divider".equals(myActivities.get(position).type) ? DIVIDER_TYPE : ITEM_TYPE;
+            switch (myActivities.get(position).type){
+                case DIVIDER:
+                    return DIVIDER_TYPE;
+                case SPACE:
+                    return SPACE_TYPE;
+                default:
+                    return ITEM_TYPE;
+            }
         }
     }
 

@@ -93,7 +93,7 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
         AvatarView avatarView = (AvatarView) findViewById(R.id.ivAvatar);
         avatarView.update(this, mAvatarSuffix, mUserId, mUsername);
         TextView tvSignature = (TextView) findViewById(R.id.tvSignature);
-        tvSignature.setText(mSignature);
+        tvSignature.setText("".equals(mSignature) ? getString(R.string.this_user_has_not_set_signature) : mSignature);
 
         mViewPager.setAdapter(new MyViewPagerAdapter(getSupportFragmentManager()));
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.activity));
@@ -137,7 +137,6 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
                     args0.putString("username", mUsername);
                     args0.putString("avatarSuffix", mAvatarSuffix);
                     mHistoryFragment.setArguments(args0);
-                    Log.d(TAG, "Hi!!!");
                     return mHistoryFragment;
                 case 1:
                     mStastisticFragment = new StatisticFragment();

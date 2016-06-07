@@ -35,13 +35,16 @@
                     android:layout_width="75dp"
                     android:layout_height="75dp"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="50dp"/>
+                    android:layout_marginTop="58dp"/>
                 <TextView
                     android:id="@+id/tvSignature"
-                    android:text="This is signature"
                     android:layout_centerHorizontal="true"
                     android:layout_below="@id/ivAvatar"
                     android:layout_marginTop="10dp"
+                    android:maxLines="2"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:ellipsize="end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </RelativeLayout>
@@ -59,7 +62,7 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabGravity="center"
+            app:tabGravity="fill"
             app:tabMode="scrollable"
             android:gravity="bottom"/>
     </android.support.design.widget.AppBarLayout>
