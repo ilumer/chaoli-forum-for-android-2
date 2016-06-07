@@ -3,12 +3,12 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="180dp"
     android:orientation="vertical"
     android:paddingLeft="@dimen/avatar_marginLeft"
     android:paddingStart="@dimen/avatar_marginLeft"
     android:paddingTop="@dimen/avatar_marginTop"
-    android:background="#444"
+    android:background="@drawable/header"
     android:id="@+id/loginHWnd">
     <com.geno.chaoli.forum.meta.AvatarView
         android:layout_width="@dimen/avatar_diameter"
