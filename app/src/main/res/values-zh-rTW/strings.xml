@@ -65,4 +65,5 @@
     <string name="weeks_ago">%d 星期前</string>
     <string name="months_ago">%d 月前</string>
     <string name="today">今天</string>
+    <string name="this_user_has_not_set_signature">這個用戶還沒有簽名哦~</string>
 </resources>
