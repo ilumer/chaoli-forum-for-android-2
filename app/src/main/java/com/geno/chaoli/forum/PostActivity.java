@@ -37,7 +37,7 @@ import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
 
-public class PostActivity extends AppCompatActivity implements ConversationUtils.IgnoreAndStarConversationObserver
+public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
 	public static final String TAG = "PostActivity";
 
@@ -70,6 +70,8 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_activity);
+
+
 //		setSupportActionBar((Toolbar) findViewById(R.id.titleBar));
 		postList = (ListView) findViewById(R.id.postList);
 		Bundle data = getIntent().getExtras();
@@ -79,6 +81,9 @@ public class PostActivity extends AppCompatActivity implements ConversationUtils
 		intentToPage = data.getString("intentToPage", "");
 		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
 		sp = getSharedPreferences(Constants.postSP + conversationId, MODE_PRIVATE);
+
+		configToolbar(title);
+
 //		e = sp.edit();
 		reply = (FloatingActionButton) findViewById(R.id.reply);
 		reply.setOnClickListener(new View.OnClickListener()

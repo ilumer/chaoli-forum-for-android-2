@@ -1,7 +1,7 @@
 package com.geno.chaoli.forum;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Created by jianhao on 16-3-28.
  */
-public class AnswerQuestionsActivity extends Activity implements SignUpUtils.SubmitObserver {
+public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils.SubmitObserver {
     Context mContext;
     Boolean isFirst = true;
     @Override
@@ -43,6 +43,7 @@ public class AnswerQuestionsActivity extends Activity implements SignUpUtils.Sub
         super.onCreate(savedInstanceState);
         mContext = this;
         setContentView(R.layout.activity_answer_questions);
+        configToolbar(R.string.answer_quesiton);
 
         init();
     }

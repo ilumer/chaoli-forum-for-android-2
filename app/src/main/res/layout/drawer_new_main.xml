@@ -1,26 +1,42 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:background="#444">
+				android:layout_height="match_parent">
 	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:paddingLeft="@dimen/avatar_marginLeft"
+		android:paddingStart="@dimen/avatar_marginLeft"
+		android:paddingTop="@dimen/avatar_marginTop"
+		android:background="#444"
 		android:id="@+id/loginHWnd">
 		<com.geno.chaoli.forum.meta.AvatarView
 			android:layout_width="@dimen/avatar_diameter"
 			android:layout_height="@dimen/avatar_diameter"
-			android:layout_marginLeft="@dimen/avatar_marginLeft"
-			android:layout_marginStart="@dimen/avatar_marginLeft"
 			android:clickable="true"
 			android:id="@+id/avatarView"/>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/loginHWndUsername"
-			android:text="@string/click_login"
+		<RelativeLayout
+			android:orientation="vertical"
 			android:layout_below="@id/avatarView"
-			android:textSize="14sp"
-			android:textColor="#FFFFFF"/>
+			android:layout_width="match_parent"
+			android:layout_height="56dp">
+			<TextView
+				android:layout_marginTop="7dp"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/loginHWndUsername"
+				android:text="@string/click_login"
+				android:textSize="14sp"
+				android:textColor="#FFFFFF"/>
+			<TextView
+				android:id="@+id/signature"
+				android:ellipsize="end"
+				android:layout_marginBottom="7dp"
+				android:layout_alignParentBottom="true"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:textSize="14sp"
+				android:textColor="#FFFFFF"/>
+		</RelativeLayout>
 	</RelativeLayout>
 	<ListView
 		android:layout_width="match_parent"

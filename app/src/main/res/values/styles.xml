@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="AppBaseTheme" parent="Theme.AppCompat">
-	</style>
 
     <style name="Widget" />
 
@@ -47,7 +45,19 @@
         <item name="android:layout_marginBottom">10dp</item>
         <item name="android:background">@drawable/et</item>
     </style>
-	<style name="AppTheme" parent="AppBaseTheme">
-		<item name="android:windowIsTranslucent">true</item>
-	</style>
+
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="Widget.MyApp.ActionBar" parent="AppBaseTheme">
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>
+    </style>
 </resources>

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.CookieUtils;
 import com.geno.chaoli.forum.meta.LoginUtils;
@@ -33,13 +35,14 @@ import cz.msebera.android.httpclient.Header;
  * SignUpActivity
  */
 
-public class SignUpActivity extends Activity {
+public class SignUpActivity extends BaseActivity {
     Context mContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         mContext = this;
+        configToolbar(R.string.sign_up);
 
         final EditText username_edtTxt = (EditText)findViewById(R.id.edtTxt_username);
         final EditText password_edtTxt = (EditText)findViewById(R.id.edtTxt_password);
@@ -56,6 +59,13 @@ public class SignUpActivity extends Activity {
 
         Bundle bundle = getIntent().getExtras();
         String inviteCode = bundle == null ? "" :bundle.getString("inviteCode", "");
+
+        if("".equals(inviteCode)){
+            Toast.makeText(getApplicationContext(), R.string.you_can_only_sign_up_with_an_invite_code, Toast.LENGTH_SHORT).show();
+            finish();
+        }else{
+            Toast.makeText(mContext, inviteCode, Toast.LENGTH_LONG).show();
+        }
 
         final String signUpUrl = Constants.SIGN_UP_URL + inviteCode;
         client.get(this, signUpUrl, new AsyncHttpResponseHandler() {
@@ -94,16 +104,28 @@ public class SignUpActivity extends Activity {
                         String confirm = retype_password_edtTxt.getText().toString();
                         String email = email_edtTxt.getText().toString();
 
-                        if (password.length() <= 6) {
-                            ((TextView)((Activity)mContext).findViewById(R.id.tv_password_msg)).setText(R.string.at_least_six_character);
+                        TextInputLayout passwordTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.passwordTIL);
+                        TextInputLayout retypePasswordTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.retypePasswordTIL);
+                        final TextInputLayout usernameTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.usernameTIL);
+                        final TextInputLayout emailTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.emailTIL);
+                        final TextInputLayout captchaTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.captchaTIL);
+
+                        passwordTIL.setError("");
+                        retypePasswordTIL.setError("");
+                        usernameTIL.setError("");
+                        emailTIL.setError("");
+                        captchaTIL.setError("");
+
+                        if (password.length() < 6) {
+                            passwordTIL.setError(getString(R.string.at_least_six_character));
                             return;
                         }
                         if (!password.equals(confirm)) {
-                            ((TextView)((Activity)mContext).findViewById(R.id.tv_retype_msg)).setText(R.string.should_be_same_with_password);
+                            retypePasswordTIL.setError(getString(R.string.should_be_same_with_password));
                             return;
                         }
                         if (!email.contains("@") || !email.contains(".")) {
-                            ((TextView)((Activity)mContext).findViewById(R.id.tv_email_msg)).setText(R.string.invaild_email);
+                            emailTIL.setError(getString(R.string.invaild_email));
                             return;
                         }
                         params.put("username", username);
@@ -122,14 +144,15 @@ public class SignUpActivity extends Activity {
                                 progressDialog.dismiss();
                                 String response = new String(responseBody);
                                 if(response.contains(USERNAME_HAS_BEEN_USED)){
-                                    ((TextView)((Activity)mContext).findViewById(R.id.tv_username_msg)).setText(R.string.username_has_been_used);
+                                    usernameTIL.setError(getString(R.string.username_has_been_used));
                                 }else if(response.contains(EMAIL_HAS_BEEN_USED)){
-                                    ((TextView)((Activity)mContext).findViewById(R.id.tv_email_msg)).setText(R.string.email_has_been_used);
+                                    emailTIL.setError(getString(R.string.email_has_been_used));
                                 } else if (response.contains(WRONG_CAPTCHA)) {
-                                    ((TextView) ((Activity) mContext).findViewById(R.id.tv_captcha_msg)).setText(R.string.wrong_captcha);
+                                    captchaTIL.setError(getString(R.string.wrong_captcha));
                                 } else {
                                     Toast.makeText(mContext, R.string.sign_up_error, Toast.LENGTH_LONG).show();
                                 }
+                                getAndShowCaptchaImage(client, captcha_iv);
                             }
 
                             @Override
@@ -157,6 +180,7 @@ public class SignUpActivity extends Activity {
     }
 
     private void getAndShowCaptchaImage(AsyncHttpClient client, final ImageView captcha_iv){
+        captcha_iv.setImageDrawable(getResources().getDrawable(R.drawable.refreshing));
         CookieUtils.saveCookie(client, mContext);
         client.get(Constants.GET_CAPTCHA_URL, new AsyncHttpResponseHandler() {
             @Override

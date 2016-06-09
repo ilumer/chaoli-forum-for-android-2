@@ -2,50 +2,51 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
-				android:layout_margin="@dimen/conversationListMargin">
-	<RelativeLayout
+				android:layout_margin="@dimen/middle_margin">
+	<TextView
+		android:id="@+id/floor"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentRight="true"
+		android:textSize="18sp"
+		android:textColor="@color/contentColor"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+	<LinearLayout
+		android:id="@+id/firstLineInPost"
 		android:layout_width="match_parent"
+		android:layout_marginRight="@dimen/right_margin_in_post_view"
+		android:layout_marginEnd="@dimen/right_margin_in_post_view"
 		android:layout_height="wrap_content"
-		android:id="@+id/user">
+		android:gravity="center_vertical">
 		<RelativeLayout
+			android:id="@+id/avatar"
+			android:clickable="true"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/avatar"/>
+			android:layout_height="wrap_content">
+		</RelativeLayout>
 		<TextView
+			android:id="@+id/usernameAndSignature"
+			android:ellipsize="end"
+			android:textSize="16sp"
+			android:layout_marginLeft="15dp"
+			android:layout_marginStart="15dp"
+			android:textColor="@color/black"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/username"
-			android:layout_toRightOf="@id/avatar"
-			android:layout_toEndOf="@id/avatar"
-			android:layout_marginLeft="@dimen/avatar_marginLeft"
-			android:layout_marginStart="@dimen/avatar_marginLeft"
-			android:textColor="#000000"/>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/signature"
-			android:layout_below="@id/username"
-			android:layout_toRightOf="@id/avatar"
-			android:layout_toEndOf="@id/avatar"/>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/floor"
-			android:layout_alignParentRight="true"
-			android:layout_alignParentEnd="true"/>
-	</RelativeLayout>
+			android:maxLines="1"/>
+	</LinearLayout>
+
 	<TextView
+		android:id="@+id/content"
+		android:textColor="@color/black"
+		android:lineSpacingMultiplier="1.5"
+		android:layout_below="@id/firstLineInPost"
+		android:layout_marginTop="5dp"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/user"
-		android:id="@+id/content"/>
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_below="@id/content"
-		android:id="@+id/time"/>
-	<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/deleteMember"/>
+		android:layout_marginLeft="@dimen/left_margin_in_post_view"
+		android:layout_marginStart="@dimen/left_margin_in_post_view"
+		android:layout_marginRight="@dimen/right_margin_in_post_view"
+		android:layout_marginEnd="@dimen/right_margin_in_post_view" />
+
 </RelativeLayout>

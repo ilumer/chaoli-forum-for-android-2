@@ -2,26 +2,73 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-				android:orientation="vertical">
+				android:orientation="vertical"
+	android:gravity="center_horizontal">
 	<TextView
-		android:layout_width="match_parent"
+		android:id="@+id/tv_login"
+		android:layout_marginTop="60dp"
+		android:textSize="@dimen/text_greater_size"
+		android:layout_centerHorizontal="true"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/login"/>
-	<EditText
+	<android.support.design.widget.TextInputLayout
+		android:id="@+id/loginNameLayout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:inputType="textPersonName"
-		android:hint="@string/username"
-		android:id="@+id/loginName"/>
-	<EditText
+		android:layout_marginTop="80dp"
+		android:layout_marginLeft="@dimen/common_margin"
+		android:layout_marginRight="@dimen/common_margin"
+		android:layout_below="@id/tv_login">
+		<android.support.design.widget.TextInputEditText
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:inputType="textPersonName"
+			android:hint="@string/username"
+			android:id="@+id/loginName"/>
+	</android.support.design.widget.TextInputLayout>
+	<android.support.design.widget.TextInputLayout
+		android:id="@+id/loginPwdLayout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:inputType="textPassword"
-		android:hint="@string/password"
-		android:id="@+id/loginPwd"/>
+		android:layout_marginTop="@dimen/common_margin"
+		android:layout_marginLeft="@dimen/common_margin"
+		android:layout_marginRight="@dimen/common_margin"
+		android:layout_below="@id/loginNameLayout">
+		<EditText
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:inputType="textPassword"
+			android:hint="@string/password"
+			android:id="@+id/loginPwd"/>
+	</android.support.design.widget.TextInputLayout>
 	<Button
+		android:layout_below="@id/loginPwdLayout"
+		android:layout_centerHorizontal="true"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:text="@string/login"
 		android:id="@+id/loginBtn"/>
+
+	<View style="@style/DividerInHomepage"
+		android:layout_below="@id/loginBtn"/>
+
+	<TextView
+		android:text="@string/dont_have_an_account"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+	<Button
+		android:id="@+id/answerQuestionBtn"
+		android:text="@string/answer_quesiton"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+	<TextView
+		android:text="@string/if_you_have_an_invite_code"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+	<Button
+		android:id="@+id/signUpBtn"
+		android:text="@string/sign_up_directly"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
 </LinearLayout>

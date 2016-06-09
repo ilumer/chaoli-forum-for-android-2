@@ -1,48 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/ll_homepage">
-    <RelativeLayout
-        android:id="@+id/rl_top"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp">
-        <com.geno.chaoli.forum.meta.AvatarView
-            android:id="@+id/iv_avatar"
-            android:layout_width="@dimen/avatar_diameter"
-            android:layout_height="@dimen/avatar_diameter"
-            android:layout_centerHorizontal="true"/>
-        <TextView
-            android:id="@+id/tv_username"
-            android:layout_below="@+id/iv_avatar"
-            android:textSize="25sp"
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <View style="@style/DividerInHomepage"
-            android:layout_below="@id/tv_username"/>
-    </RelativeLayout>
-    <com.geno.chaoli.forum.meta.FullScreenSwipyRefreshLayout
-        android:id="@+id/srl_activities"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:fitsSystemWindows="true">
 
-        <com.geno.chaoli.forum.meta.FullScreenObservableScrollView
-            android:id="@+id/osv_activities"
-            android:clickable="true"
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="256dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginStart="48dp"
+            app:expandedTitleMarginEnd="64dp">
 
-            <LinearLayout
-                android:id="@+id/ll_activities"
-                android:orientation="vertical"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="?android:attr/listDivider"
-                android:dividerPadding="10dp"
-                android:showDividers="middle">
-            </LinearLayout>
-        </com.geno.chaoli.forum.meta.FullScreenObservableScrollView>
-    </com.geno.chaoli.forum.meta.FullScreenSwipyRefreshLayout>
-</LinearLayout>
+                android:layout_height="match_parent">
+                <com.geno.chaoli.forum.meta.AvatarView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="58dp"/>
+                <TextView
+                    android:id="@+id/tvSignature"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@id/ivAvatar"
+                    android:layout_marginTop="10dp"
+                    android:maxLines="2"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="40dp"
+                    android:ellipsize="end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tl_custom"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:layout_collapseMode="pin" />
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="scrollable"
+            android:gravity="bottom"/>
+    </android.support.design.widget.AppBarLayout>
+
+</android.support.design.widget.CoordinatorLayout>

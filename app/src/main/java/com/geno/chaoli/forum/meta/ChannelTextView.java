@@ -13,7 +13,7 @@ public class ChannelTextView extends TextView
 
 	public static final String TAG = "ChannelTextView";
 
-	ChannelTextView(Context context, Channel channel)
+	public ChannelTextView(Context context, Channel channel)
 	{
 		this(context);
 		this.channel = channel;

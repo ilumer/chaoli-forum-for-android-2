@@ -40,7 +40,7 @@ public class PostView extends RelativeLayout
 
 	public Post post;
 	public RelativeLayout avatar;
-	public TextView username, signature, floor, content, time;
+	public TextView usernameAndSignature, floor, content, time;
 
 	public PostView(final Context context, final Post post)
 	{
@@ -50,13 +50,14 @@ public class PostView extends RelativeLayout
 		CookieUtils.saveCookie(client, context);
 		this.post = post;
 		avatar = (RelativeLayout) findViewById(R.id.avatar);
-		username = (TextView) findViewById(R.id.username);
-		signature = (TextView) findViewById(R.id.signature);
+		usernameAndSignature = (TextView) findViewById(R.id.usernameAndSignature);
+		//username = (TextView) findViewById(R.id.username);
+		//signature = (TextView) findViewById(R.id.signature);
 		floor = (TextView) findViewById(R.id.floor);
 		content = (TextView) findViewById(R.id.content);
 		time = (TextView) findViewById(R.id.time);
 
-		username.setText(post.username);
+		usernameAndSignature.setText(post.username + (post.signature == null ? "" : (", " + post.signature)));
 		floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
 
 
@@ -64,27 +65,31 @@ public class PostView extends RelativeLayout
 		{
 			this.setBackgroundColor(0xFF808080);
 			avatar.setVisibility(GONE);
-			signature.setVisibility(GONE);
+			//signature.setVisibility(GONE);
 			content.setVisibility(GONE);
 		}
+
 		avatar.addView(post.avatarView);
-		avatar.setOnClickListener(new OnClickListener() {
+		post.avatarView.scale(35);
+		post.avatarView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				Log.i(TAG, "click");
 				Intent intent = new Intent(post.context, HomepageActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putString("username", post.avatarView.mUsername);
 				bundle.putInt("userId", post.avatarView.mUserId);
 				bundle.putString("avatarSuffix", post.avatarView.mImagePath);
+				bundle.putString("signature", post.signature);
 				intent.putExtras(bundle);
 				post.context.startActivity(intent);
 			}
 		});
-		signature.setText(post.signature);
+		//signature.setText(post.signature);
 		content.setText(post.getContent());
-		time.setText(SimpleDateFormat.getDateTimeInstance().format(post.getTime() * 1000));
+//		time.setText(SimpleDateFormat.getDateTimeInstance().format(post.getTime() * 1000));
 
-		this.setOnClickListener(new OnClickListener()
+		/*this.setOnClickListener(new OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
@@ -92,7 +97,7 @@ public class PostView extends RelativeLayout
 				// TODO: 16-3-3 0804 Reply
 				Toast.makeText(context, post.floor + " get click", Toast.LENGTH_SHORT).show();
 			}
-		});
+		});*/
 
 		this.setOnLongClickListener(new OnLongClickListener()
 		{

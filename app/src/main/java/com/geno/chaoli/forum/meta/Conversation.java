@@ -2,7 +2,10 @@ package com.geno.chaoli.forum.meta;
 
 import android.graphics.drawable.Drawable;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class Conversation
 {
@@ -11,19 +14,27 @@ public class Conversation
 	public String title;
 	public String excerpt;
 	public String link;
+
+	public String startMemberId;
+
+	public String lastPostMemberId;
 	public String startMember;
+	@JSONField(name="startMemberAvatarFormat")
+	public String startMemberAvatarSuffix;
+
+	@JSONField(name="lastPostMemberAvatarFormat")
+	public String lastPostMemberAvatarSuffix;
+
 	public Drawable startAvatar;
 	public String lastPostMember;
 	public Drawable lastPostAvatar;
 	public String lastPostTime;
 	public int replies;
 	public List<ConversationState> state;
-
 	public int getConversationId()
 	{
 		return conversationId;
 	}
-
 	public void setConversationId(int conversationId)
 	{
 		this.conversationId = conversationId;
@@ -69,6 +80,22 @@ public class Conversation
 		this.link = link;
 	}
 
+	public String getStartMemberId() {
+		return startMemberId;
+	}
+
+	public void setStartMemberId(String startMemberId) {
+		this.startMemberId = startMemberId;
+	}
+
+	public String getLastPostMemberId() {
+		return lastPostMemberId;
+	}
+
+	public void setLastPostMemberId(String lastPostMemberId) {
+		this.lastPostMemberId = lastPostMemberId;
+	}
+
 	public String getStartMember()
 	{
 		return startMember;
@@ -107,6 +134,22 @@ public class Conversation
 	public void setLastPostAvatar(Drawable lastPostAvatar)
 	{
 		this.lastPostAvatar = lastPostAvatar;
+	}
+
+	public String getStartMemberAvatarSuffix() {
+		return startMemberAvatarSuffix;
+	}
+
+	public void setStartMemberAvatarSuffix(String startMemberAvatarSuffix) {
+		this.startMemberAvatarSuffix = startMemberAvatarSuffix;
+	}
+
+	public String getLastPostMemberAvatarSuffix() {
+		return lastPostMemberAvatarSuffix;
+	}
+
+	public void setLastPostMemberAvatarSuffix(String lastPostMemberAvatarSuffix) {
+		this.lastPostMemberAvatarSuffix = lastPostMemberAvatarSuffix;
 	}
 
 	public String getLastPostTime()

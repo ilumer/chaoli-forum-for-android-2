@@ -54,13 +54,7 @@ public class ConversationListFragment extends Fragment
 		sp = getActivity().getSharedPreferences(Constants.conversationSP, Context.MODE_PRIVATE);
 		Log.v(TAG, channel + ".");
 		swipeRefreshLayout = (SwipeRefreshLayout) conversationListView.findViewById(R.id.conversationListRefreshLayout);
-		//trigger the circle to animate
-		swipeRefreshLayout.post(new Runnable() {
-			@Override
-			public void run() {
-				swipeRefreshLayout.setRefreshing(true);
-			}
-		});
+		refresh();
 		swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
 		{
 			@Override
@@ -69,9 +63,19 @@ public class ConversationListFragment extends Fragment
 				getList();
 			}
 		});
-		getList();
 
 		return conversationListView;
+	}
+
+	public void refresh(){
+		//trigger the circle to animate
+		swipeRefreshLayout.post(new Runnable() {
+			@Override
+			public void run() {
+				swipeRefreshLayout.setRefreshing(true);
+			}
+		});
+		getList();
 	}
 
 	public void getList()
@@ -93,6 +97,12 @@ public class ConversationListFragment extends Fragment
 					c.title = sub.getString("title");
 					c.excerpt = sub.getString("firstPost");
 					c.replies = sub.getInteger("replies");
+					c.startMember = sub.getString("startMember");
+					c.startMemberAvatarSuffix = sub.getString("startMemberAvatarFormat");
+					c.startMemberId = sub.getString("startMemberId");
+					c.lastPostMember = sub.getString("lastPostMember");
+					c.lastPostMemberAvatarSuffix = sub.getString("lastPostMemberAvatarFormat");
+					c.lastPostMemberId = sub.getString("lastPostMemberId");
 					c.channel = Channel.getChannel(sub.getInteger("channelId"));
 					v[i] = new ConversationView(getActivity(), c);
 				}

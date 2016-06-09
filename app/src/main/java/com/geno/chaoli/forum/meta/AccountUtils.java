@@ -33,18 +33,13 @@ public class AccountUtils {
     public static int RETURN_ERROR = -1;
     public static int FILE_DOSENT_EXIST = -2;
 
-    public static void getProfile(Context context, final GetProfileObserver observer){
+    public static void getProfile(final Context context, final GetProfileObserver observer){
         CookieUtils.saveCookie(client, context);
         client.get(context, GET_PROFILE_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
-                Log.i("response", response);
-                Me.setInstanceFromJSONStr(response);
-                Log.d("AccountUtils", "suffix: " + Me.getMyAvatarSuffix() + ", " + String.valueOf(Me.getMyAvatarSuffix() == null));
-                Log.i("profile", Me.getMyStatus());
-                Log.i("profile", String.valueOf(Me.getMyHideOnline()));
-                //Log.i("profile", me.getPreferences().getSignature());
+                Me.setInstanceFromJSONStr(context, response);
                 observer.onGetProfileSuccess();
             }
 
