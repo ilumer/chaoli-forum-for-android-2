@@ -40,7 +40,8 @@ public class PostView extends RelativeLayout
 
 	public Post post;
 	public RelativeLayout avatar;
-	public TextView usernameAndSignature, floor, content, time;
+	public TextView usernameAndSignature, floor, time;
+	public LaTeXtView content;
 
 	public PostView(final Context context, final Post post)
 	{
@@ -54,7 +55,7 @@ public class PostView extends RelativeLayout
 		//username = (TextView) findViewById(R.id.username);
 		//signature = (TextView) findViewById(R.id.signature);
 		floor = (TextView) findViewById(R.id.floor);
-		content = (TextView) findViewById(R.id.content);
+		content = (LaTeXtView) findViewById(R.id.content);
 		time = (TextView) findViewById(R.id.time);
 
 		usernameAndSignature.setText(post.username + (post.signature == null ? "" : (", " + post.signature)));

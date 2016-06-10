@@ -36,7 +36,7 @@
 			android:maxLines="1"/>
 	</LinearLayout>
 
-	<TextView
+	<com.geno.chaoli.forum.meta.LaTeXtView
 		android:id="@+id/content"
 		android:textColor="@color/black"
 		android:lineSpacingMultiplier="1.5"
