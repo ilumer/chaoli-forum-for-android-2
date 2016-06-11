@@ -71,7 +71,7 @@ public class LaTeXtView extends TextView
 					public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
 					{
 						Log.d(TAG, "onResourceReady: executing " + text.substring(start, end));
-						span.setSpan(new ImageSpan(getContext(), resource, DynamicDrawableSpan.ALIGN_BASELINE), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+						span.setSpan(new CenteredImageSpan(getContext(), resource), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 						((TextView) findViewById(R.id.content)).setText(span);
 					}
 				});
@@ -87,7 +87,7 @@ public class LaTeXtView extends TextView
 				public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
 				{
 					Log.d(TAG, "onResourceReady: executing " + text.substring(start, end));
-					span.setSpan(new ImageSpan(getContext(), resource, DynamicDrawableSpan.ALIGN_BASELINE), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+					span.setSpan(new CenteredImageSpan(getContext(), resource), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 					((TextView) findViewById(R.id.content)).setText(span);
 				}
 			});
