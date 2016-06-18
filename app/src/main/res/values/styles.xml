@@ -56,6 +56,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="MainActivityTheme" parent="AppTheme"/>
+
     <style name="Widget.MyApp.ActionBar" parent="AppBaseTheme">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>

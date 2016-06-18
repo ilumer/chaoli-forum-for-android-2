@@ -56,10 +56,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="MainActivityTheme" parent="AppBaseTheme">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="MainActivityTheme" parent="AppTheme">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
