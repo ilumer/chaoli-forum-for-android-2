@@ -95,4 +95,7 @@
 	<string name="opened_a_conversation">%s 发表了帖子</string>
 	<string name="updated">%s 更新于</string>
 	<string name="modified_his_or_her_information">%s 修改简介为</string>
+	<string name="send_you_a_private_post">%s 给你发了一个私人帖子</string>
+	<string name="mention_you">%s 提到了你</string>
+	<string name="someone_update">%s 更新于</string>
 </resources>

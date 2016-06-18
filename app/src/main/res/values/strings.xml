@@ -101,6 +101,9 @@
 	<string name="opened_a_conversation">%s opened a conversation</string>
 	<string name="updated">%s updated </string>
 	<string name="modified_his_or_her_information">%s modified his/her information</string>
+	<string name="send_you_a_private_post">%s send you a private post</string>
+	<string name="mention_you">%s mentioned you</string>
+	<string name="someone_update">%s updated</string>
 
 	>>>>>>> polygen/master
 </resources>
