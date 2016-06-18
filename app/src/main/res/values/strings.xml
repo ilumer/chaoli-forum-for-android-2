@@ -138,4 +138,8 @@
 	<string name="months_ago">%d month(s) ago</string>
 	<string name="today">Today</string>
 	<string name="this_user_has_not_set_signature">This user hasn\'t set signature yet~</string>
+	<string name="send_you_a_private_post">%s send you a private post</string>
+	<string name="mention_you">%s mentioned you</string>
+	<string name="someone_update">%s updated</string>
+
 </resources>

@@ -132,4 +132,7 @@
 	<string name="months_ago">%d 月前</string>
 	<string name="today">今天</string>
 	<string name="this_user_has_not_set_signature">这个用户还没有签名哦~</string>
+	<string name="send_you_a_private_post">%s 给你发了一个私人帖子</string>
+	<string name="mention_you">%s 提到了你</string>
+	<string name="someone_update">%s 更新于</string>
 </resources>

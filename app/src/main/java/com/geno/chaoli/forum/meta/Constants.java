@@ -9,6 +9,7 @@ public class Constants
 
 	public static final String GET_CAPTCHA_URL = "https://chaoli.club/index.php/mscaptcha";
 	public static final String SIGN_UP_URL = "https://chaoli.club/index.php/user/join?invite=";
+	public static final String GET_ALL_NOTIFICATIONS_URL = "https://chaoli.club/index.php/settings/notifications.json";
 	// activity.json/32/2
 	public static final String GET_ACTIVITIES_URL = "https://chaoli.club/member/activity.json/";
 	// statistics.ajax/32
