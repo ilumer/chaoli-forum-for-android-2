@@ -10,8 +10,13 @@
 	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_margin="@dimen/marginForBackground"
 		tools:context="com.geno.chaoli.forum.MainActivity">
+		<ListView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_margin="@dimen/marginForBackground"
+			android:background="@color/white"
+			android:id="@+id/postList"/>
 		<android.support.design.widget.FloatingActionButton
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
@@ -21,11 +26,6 @@
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentRight="true"
 			app:borderWidth="0dp"
-			android:layout_margin="16dp"/>
-		<ListView
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:id="@+id/postList"/>
+			android:layout_margin="@dimen/fab_margin"/>
 	</RelativeLayout>
 </LinearLayout>

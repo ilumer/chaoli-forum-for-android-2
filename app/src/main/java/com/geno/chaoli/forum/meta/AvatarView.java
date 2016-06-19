@@ -63,11 +63,13 @@ public class AvatarView extends RelativeLayout
 		{
 			t.setText(String.format("%s", username.toUpperCase().charAt(0)));
 			i.setVisibility(INVISIBLE);
+			t.setVisibility(VISIBLE);
 		}
 		else
 		{
 			Glide.with(context).load(Constants.avatarURL + "avatar_" + userId + "." + imagePath).into(i);
 			t.setVisibility(INVISIBLE);
+			i.setVisibility(VISIBLE);
 		}
 	}
 
