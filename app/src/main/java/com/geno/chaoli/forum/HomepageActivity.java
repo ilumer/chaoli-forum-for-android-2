@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.LoginUtils;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 /**
  * Created by daquexian on 16-4-14.
@@ -44,8 +45,8 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
     TabLayout mTabLayout;
 
     HistoryFragment mHistoryFragment;
-    StatisticFragment mStastisticFragment;
-
+    StatisticFragment mStatisticFragment;
+    NotificationFragment mNotificationFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,8 +97,10 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
         tvSignature.setText("".equals(mSignature) ? getString(R.string.this_user_has_not_set_signature) : mSignature);
 
         mViewPager.setAdapter(new MyViewPagerAdapter(getSupportFragmentManager()));
+        mViewPager.setOffscreenPageLimit(2);
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.activity));
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.statistics));
+        mTabLayout.addTab(mTabLayout.newTab().setText(isSelf ? R.string.notification : R.string.statistics));
+        if(isSelf) mTabLayout.addTab(mTabLayout.newTab().setText(R.string.statistics));
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -139,18 +142,29 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
                     mHistoryFragment.setArguments(args0);
                     return mHistoryFragment;
                 case 1:
-                    mStastisticFragment = new StatisticFragment();
+                    if(isSelf) {
+                        mNotificationFragment = new NotificationFragment();
+                        return mNotificationFragment;
+                    }else {
+                        mStatisticFragment = new StatisticFragment();
+                        Bundle args1 = new Bundle();
+                        args1.putInt("userId", mUserId);
+                        mStatisticFragment.setArguments(args1);
+                        return mStatisticFragment;
+                    }
+                case 2:
+                    mStatisticFragment = new StatisticFragment();
                     Bundle args1 = new Bundle();
                     args1.putInt("userId", mUserId);
-                    mStastisticFragment.setArguments(args1);
-                    return mStastisticFragment;
+                    mStatisticFragment.setArguments(args1);
+                    return mStatisticFragment;
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return isSelf ? 3 : 2;
         }
     }
 
@@ -196,6 +210,7 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
         Log.d(TAG, String.valueOf(i));
         //The Refresh must be only active when the offset is zero :
         mHistoryFragment.setRefreshEnabled(i == 0);
+        if(mNotificationFragment != null) mNotificationFragment.setRefreshEnabled(i == 0);
     }
 
     @Override
