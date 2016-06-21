@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -87,7 +89,8 @@ public class PostView extends RelativeLayout
 			}
 		});
 		//signature.setText(post.signature);
-		content.setText(post.getContent());
+		SpannableStringBuilder str = SFXParser3.parse(context, post.getContent());
+		content.setText(str);
 //		time.setText(SimpleDateFormat.getDateTimeInstance().format(post.getTime() * 1000));
 
 		/*this.setOnClickListener(new OnClickListener()

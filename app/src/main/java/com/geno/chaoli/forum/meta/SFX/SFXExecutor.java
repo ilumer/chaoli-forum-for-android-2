@@ -11,10 +11,10 @@ public class SFXExecutor
 
 	public void execute(TextView textView)
 	{
-		if (new LaTeXtViewDollar().chkExists(textView))
+		/*if (new LaTeXtViewDollar().chkExists(textView))
 		{
 			Log.d(LaTeXtView.TAG, "executing");
 			new LaTeXtViewDollar().useSFX(textView);
-		}
+		}*/
 	}
 }
