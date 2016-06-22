@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -91,6 +92,7 @@ public class PostView extends RelativeLayout
 		//signature.setText(post.signature);
 		SpannableStringBuilder str = SFXParser3.parse(context, post.getContent());
 		content.setText(str);
+		content.setMovementMethod(LinkMovementMethod.getInstance());
 //		time.setText(SimpleDateFormat.getDateTimeInstance().format(post.getTime() * 1000));
 
 		/*this.setOnClickListener(new OnClickListener()

@@ -20,6 +20,7 @@ public class SFXUtils
 		string = string.replaceAll("\\[code\\]", "").replaceAll("\\[/code\\]", "");
 		//string = string.replaceAll("")
 		return string;
+		// curtain, code, quote
 		/*return string.replaceAll("\\[c=.+?\\]", "").replaceAll("\\[/c\\]", "")			// For [c=red] blah [/c]
 		.replaceAll("\\[curtain\\]", "").replaceAll("\\[/curtain\\]", "")				// For [curtain] blah [/curtain]
 		.replaceAll("\\[b\\]", "").replaceAll("\\[/b\\]", "")							// For [b] blah [/b]
