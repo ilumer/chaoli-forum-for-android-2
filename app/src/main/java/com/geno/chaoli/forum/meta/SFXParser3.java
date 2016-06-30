@@ -41,7 +41,7 @@ public class SFXParser3
 
 	public static final SpannableStringBuilder parse(final Context context, final TextView textView, String string)
 	{
-		SpannableStringBuilder spannable = new SpannableStringBuilder(string);
+		final SpannableStringBuilder spannable = new SpannableStringBuilder(string);
 //		tagDealer(s, "[b]", "[/b]", new StyleSpan(Typeface.BOLD));
 //		tagDealer(s, "[i]", "[/i]", new StyleSpan(Typeface.ITALIC));
 
@@ -153,7 +153,7 @@ public class SFXParser3
 				{
 					spannable.setSpan(new ImageSpan(context, resource), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 					Log.d(TAG, "onResourceReady: Inner: " + resource);
-					textview.setText(spannable);
+					textView.setText(spannable);
 				}
 			});
 		}
