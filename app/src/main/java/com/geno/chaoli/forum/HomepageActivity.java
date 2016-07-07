@@ -98,8 +98,8 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
 
         mViewPager.setAdapter(new MyViewPagerAdapter(getSupportFragmentManager()));
         mViewPager.setOffscreenPageLimit(2);
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.activity));
-        mTabLayout.addTab(mTabLayout.newTab().setText(isSelf ? R.string.notification : R.string.statistics));
+        mTabLayout.addTab(mTabLayout.newTab().setText(isSelf ? R.string.notification : R.string.activity));
+        mTabLayout.addTab(mTabLayout.newTab().setText(isSelf ? R.string.activity : R.string.statistics));
         if(isSelf) mTabLayout.addTab(mTabLayout.newTab().setText(R.string.statistics));
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -134,17 +134,27 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    mHistoryFragment = new HistoryFragment();
-                    Bundle args0 = new Bundle();
-                    args0.putInt("userId", mUserId);
-                    args0.putString("username", mUsername);
-                    args0.putString("avatarSuffix", mAvatarSuffix);
-                    mHistoryFragment.setArguments(args0);
-                    return mHistoryFragment;
-                case 1:
                     if(isSelf) {
                         mNotificationFragment = new NotificationFragment();
                         return mNotificationFragment;
+                    }else {
+                        mHistoryFragment = new HistoryFragment();
+                        Bundle args0 = new Bundle();
+                        args0.putInt("userId", mUserId);
+                        args0.putString("username", mUsername);
+                        args0.putString("avatarSuffix", mAvatarSuffix);
+                        mHistoryFragment.setArguments(args0);
+                        return mHistoryFragment;
+                    }
+                case 1:
+                    if(isSelf) {
+                        mHistoryFragment = new HistoryFragment();
+                        Bundle args0 = new Bundle();
+                        args0.putInt("userId", mUserId);
+                        args0.putString("username", mUsername);
+                        args0.putString("avatarSuffix", mAvatarSuffix);
+                        mHistoryFragment.setArguments(args0);
+                        return mHistoryFragment;
                     }else {
                         mStatisticFragment = new StatisticFragment();
                         Bundle args1 = new Bundle();

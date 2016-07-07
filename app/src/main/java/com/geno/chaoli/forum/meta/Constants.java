@@ -6,6 +6,7 @@ public class Constants
 	public static final int paddingTop = 16;
 	public static final int paddingRight = 16;
 	public static final int paddingBottom = 16;
+	public static final int getNotificationInterval = 15;
 
 	public static final String GET_CAPTCHA_URL = "https://chaoli.club/index.php/mscaptcha";
 	public static final String SIGN_UP_URL = "https://chaoli.club/index.php/user/join?invite=";

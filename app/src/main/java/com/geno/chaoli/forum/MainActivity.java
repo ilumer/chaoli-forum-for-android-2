@@ -8,34 +8,33 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentManager;
-import android.preference.PreferenceManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.util.ExceptionCatchingInputStream;
 import com.geno.chaoli.forum.meta.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.CookieUtils;
 import com.geno.chaoli.forum.meta.LoginUtils;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends BaseActivity// implements NavigationDrawerFragment.NavigationDrawerCallbacks
 {
@@ -56,6 +55,10 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 	//private Boolean delayShowConversations;
 
 	private Context mContext = this;
+
+	Timer timer;
+	TimerTask task;
+	Handler notificationHanlder;
 	/**
 	 * ATTENTION: This was auto-generated to implement the App Indexing API.
 	 * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -80,10 +83,60 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-		ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
-		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
+		final ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
+		actionBarDrawerToggle.setDrawerIndicatorEnabled(false);
+		actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+		actionBarDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mDrawerLayout.openDrawer(Gravity.LEFT);
+			}
+		});
 		actionBarDrawerToggle.syncState();
+		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
 
+		notificationHanlder = new Handler(){
+			@Override
+			public void handleMessage(Message msg) {
+				super.handleMessage(msg);
+				if(!Me.isEmpty()) {
+					AccountUtils.checkNotification(mContext, new AccountUtils.MessageObserver() {
+						@Override
+						public void onGetUpdateSuccess(Boolean hasUpdate) {
+
+						}
+
+						@Override
+						public void onGetUpdateFailure(int statusCode) {
+
+						}
+
+						@Override
+						public void onCheckNotificationSuccess(AccountUtils.NotificationList notificationList) {
+							if (notificationList.count > 0){
+								actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_with_a_circle_24dp);
+								actionBarDrawerToggle.syncState();
+							}else{
+								actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+								actionBarDrawerToggle.syncState();
+							}
+						}
+
+						@Override
+						public void onCheckNotificationFailure(int statusCode) {
+
+						}
+					});
+				}
+			}
+		};
+		timer = new Timer();
+		task = new TimerTask() {
+			@Override
+			public void run() {
+				notificationHanlder.sendEmptyMessage(0);
+			}
+		};
 		FloatingActionButton postBtn = (FloatingActionButton) findViewById(R.id.postBtn);
 		if (postBtn == null)
 			throw new NullPointerException();
@@ -166,6 +219,7 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 					}
 				});
 
+				timer.schedule(task, Constants.getNotificationInterval * 1000, Constants.getNotificationInterval * 1000);
 				selectItem(0);
 			}
 
@@ -184,28 +238,6 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 	}
 
-	/*@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == 1){
-			if(resultCode == RESULT_OK){
-				mConversationListFragment.refresh();
-			}
-		}
-	}*/
-/*
-	@Override
-	public void onNavigationDrawerItemSelected(int position)
-	{
-		if(delayShowConversations == null || delayShowConversations){
-			delayShowConversations = false;
-		}else {
-			FragmentManager fm = getFragmentManager();
-			ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
-			mConversationListFragment = c;
-			fm.beginTransaction().replace(R.id.main_view, c).commit();
-		}
-	}
-*/
 	public void selectItem(int position) {
 		FragmentManager fm = getFragmentManager();
 		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
@@ -234,44 +266,29 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		return channel[position];
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
 
-		// ATTENTION: This was auto-generated to implement the App Indexing API.
-		// See https://g.co/AppIndexing/AndroidStudio for more information.
-		client.connect();
-		Action viewAction = Action.newAction(
-				Action.TYPE_VIEW, // TODO: choose an action type.
-				"Main Page", // TODO: Define a title for the content shown.
-				// TODO: If you have web page content that matches this app activity's content,
-				// make sure this auto-generated web page URL is correct.
-				// Otherwise, set the URL to null.
-				Uri.parse("http://host/path"),
-				// TODO: Make sure this auto-generated app URL is correct.
-				Uri.parse("android-app://com.geno.chaoli.forum/http/host/path")
-		);
-		AppIndex.AppIndexApi.start(client, viewAction);
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		timer.cancel();
 	}
 
 	@Override
-	public void onStop() {
-		super.onStop();
-
-		// ATTENTION: This was auto-generated to implement the App Indexing API.
-		// See https://g.co/AppIndexing/AndroidStudio for more information.
-		Action viewAction = Action.newAction(
-				Action.TYPE_VIEW, // TODO: choose an action type.
-				"Main Page", // TODO: Define a title for the content shown.
-				// TODO: If you have web page content that matches this app activity's content,
-				// make sure this auto-generated web page URL is correct.
-				// Otherwise, set the URL to null.
-				Uri.parse("http://host/path"),
-				// TODO: Make sure this auto-generated app URL is correct.
-				Uri.parse("android-app://com.geno.chaoli.forum/http/host/path")
-		);
-		AppIndex.AppIndexApi.end(client, viewAction);
-		client.disconnect();
+	protected void onResume() {
+		super.onResume();
+		Log.d(TAG, "resume");
+		if(!Me.isEmpty()) {
+			//timer.cancel();
+			task.cancel();
+			task = new TimerTask() {
+				@Override
+				public void run() {
+					notificationHanlder.sendEmptyMessage(0);
+				}
+			};
+			//timer = new Timer();
+			timer.schedule(task, 0, Constants.getNotificationInterval * 1000);
+		}
 	}
 
 	class ChannelAdapter extends BaseAdapter {
@@ -356,5 +373,46 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
             }*/
 			return convertView;
 		}
+	}
+
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		// ATTENTION: This was auto-generated to implement the App Indexing API.
+		// See https://g.co/AppIndexing/AndroidStudio for more information.
+		client.connect();
+		Action viewAction = Action.newAction(
+				Action.TYPE_VIEW, // TODO: choose an action type.
+				"Main Page", // TODO: Define a title for the content shown.
+				// TODO: If you have web page content that matches this app activity's content,
+				// make sure this auto-generated web page URL is correct.
+				// Otherwise, set the URL to null.
+				Uri.parse("http://host/path"),
+				// TODO: Make sure this auto-generated app URL is correct.
+				Uri.parse("android-app://com.geno.chaoli.forum/http/host/path")
+		);
+		AppIndex.AppIndexApi.start(client, viewAction);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+
+		// ATTENTION: This was auto-generated to implement the App Indexing API.
+		// See https://g.co/AppIndexing/AndroidStudio for more information.
+		Action viewAction = Action.newAction(
+				Action.TYPE_VIEW, // TODO: choose an action type.
+				"Main Page", // TODO: Define a title for the content shown.
+				// TODO: If you have web page content that matches this app activity's content,
+				// make sure this auto-generated web page URL is correct.
+				// Otherwise, set the URL to null.
+				Uri.parse("http://host/path"),
+				// TODO: Make sure this auto-generated app URL is correct.
+				Uri.parse("android-app://com.geno.chaoli.forum/http/host/path")
+		);
+		AppIndex.AppIndexApi.end(client, viewAction);
+		client.disconnect();
 	}
 }

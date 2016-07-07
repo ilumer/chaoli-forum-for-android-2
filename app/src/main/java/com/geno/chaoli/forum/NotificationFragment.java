@@ -135,7 +135,8 @@ public class NotificationFragment extends HomepageListFragment {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(mCallback, PostActivity.class);
-                            intent.putExtra("conversationId", thisItem.data.conversationId);
+                            Log.d(TAG, thisItem.data.conversationId);
+                            intent.putExtra("conversationId", Integer.valueOf(thisItem.data.conversationId));
                             intent.putExtra("title", thisItem.data.title);
                             startActivity(intent);
                         }
