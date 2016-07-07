@@ -58,7 +58,6 @@ public class AccountUtils {
         client.get(context, CHECK_NOTIFICATION_URL, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Log.i("success", new String(responseBody));
                 String response = new String(responseBody);
                 try {
                     NotificationList notificationList = JSON.parseObject(response, NotificationList.class);
