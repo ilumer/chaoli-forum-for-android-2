@@ -39,6 +39,10 @@ public class SFXParser3
 
 	private static final String TAG = "SFXParser3";
 
+	public static final SpannableStringBuilder parse(final Context context, String string){
+		return parse(context, null, string);
+	}
+
 	public static final SpannableStringBuilder parse(final Context context, final TextView textView, String string)
 	{
 		final SpannableStringBuilder spannable = new SpannableStringBuilder(string);
@@ -153,7 +157,7 @@ public class SFXParser3
 				{
 					spannable.setSpan(new ImageSpan(context, resource), start, end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 					Log.d(TAG, "onResourceReady: Inner: " + resource);
-					textView.setText(spannable);
+					//textView.setText(spannable);
 				}
 			});
 		}
