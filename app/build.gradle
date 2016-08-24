@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     //buildToolsVersion '24 rc1'
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
         applicationId "com.geno.chaoli.forum"
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 0
         versionName "00.01.0001"
     }
@@ -24,13 +25,22 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'junit:junit:4.12'
     compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.alibaba:fastjson:1.1.46.android'
     compile 'com.loopj.android:android-async-http:1.4.9'
-    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:design:24.2.0'
     compile 'com.canyinghao:canrefresh:1.0.0'
     compile 'me.imid.swipebacklayout.lib:library:1.0.0'
 	compile 'com.github.bumptech.glide:glide:3.5.2'
     compile 'com.github.orangegangsters:swipy:1.2.3@aar'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    compile 'io.github.kexanie.library:MathView:0.0.6'
+    // https://mvnrepository.com/artifact/org.scilab.forge/jlatexmath
+    compile group: 'org.scilab.forge', name: 'jlatexmath', version: '1.0.2'
+    compile 'com.parse.bolts:bolts-tasks:1.4.0'
+    compile 'com.parse.bolts:bolts-applinks:1.4.0'
+
+
+    compile 'com.jakewharton:butterknife:8.2.1'
+    apt 'com.jakewharton:butterknife-compiler:8.2.1'
 }

@@ -16,9 +16,6 @@ import cz.msebera.android.httpclient.cookie.Cookie;
 
 public class LoginUtils {
     private static final String TAG = "LoginUtils";
-    public static final String LOGIN_URL = "https://chaoli.club/index.php/user/login?return=%2F";
-    public static final String HOMEPAGE_URL = "https://chaoli.club/index.php";
-    public static final String LOGOUT_PRE_URL = "https://chaoli.club/index.php/user/logout?token=";
     public static final String COOKIE_UN_AND_PW = "im^#@cookie^$&";
     public static final String LOGIN_SP_NAME = "username_and_password";
     public static final String IS_LOGGED_IN = "is_logged_in";
@@ -117,7 +114,8 @@ public class LoginUtils {
     }
 
     private static void pre_login(final Context context, final LoginObserver loginObserver){//获取登录页面的token
-        client.get(context, LOGIN_URL, new AsyncHttpResponseHandler() {
+        Log.d(TAG, "sdaf");
+        client.get(context, Constants.LOGIN_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
@@ -145,13 +143,14 @@ public class LoginUtils {
     }
 
     private static void login(final Context context, final LoginObserver loginObserver){ //发送请求登录
+        Log.d(TAG, "sdsafdaf");
         RequestParams params = new RequestParams();
         params.put("username", username);
         params.put("password", password);
         params.put("return", "/");
         params.put("login", "登录");
         params.put("token", getToken());
-        client.post(context, LOGIN_URL, params, new AsyncHttpResponseHandler() {
+        client.post(context, Constants.LOGIN_URL, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 //Log.i("after_login", new String(responseBody));
@@ -164,10 +163,12 @@ public class LoginUtils {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 error.printStackTrace(pw);
-                if ("Moved Temporarily".equals(error.getMessage())) { //表示登陆成功，若在浏览器中将会跳转到首页
+                if ("Moved Temporarily".equals(error.getMessage()) || "Found".equals(error.getMessage())) { //表示登陆成功，若在浏览器中将会跳转到首页
                     getNewToken(context, loginObserver);
                 } else {
                     CookieUtils.clearCookie(context);
+
+                    Log.d(TAG, error.getMessage());
 
                     loginObserver.onLoginFailure(FAILED_AT_LOGIN);
                 }
@@ -178,7 +179,7 @@ public class LoginUtils {
     private static void getNewToken(final Context context, final LoginObserver loginObserver){ //得到新的token
         CookieUtils.saveCookie(client, context);
         Log.d("login", "hi");
-        client.get(context, HOMEPAGE_URL, new AsyncHttpResponseHandler() {
+        client.get(context, Constants.HOMEPAGE_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
@@ -216,7 +217,7 @@ public class LoginUtils {
     }
 
     public static void logout(final Context context, final LogoutObserver logoutObserver){
-        String logoutURL = LOGOUT_PRE_URL + getToken();
+        String logoutURL = Constants.LOGOUT_PRE_URL + getToken();
         clear(context);
         Me.clear();
         client.get(context, logoutURL, new AsyncHttpResponseHandler() { //与服务器通信的作用似乎只是告诉服务器我下线了而已

@@ -24,6 +24,8 @@ import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.LoginUtils;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import java.util.regex.Pattern;
+
 /**
  * Created by daquexian on 16-4-14.
  */
