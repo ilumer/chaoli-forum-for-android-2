@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum.meta;
+package com.geno.chaoli.forum.model;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +28,7 @@ public class Post
 	public String signature;
 	public List<Attachment> attachments;
 
-	public AvatarView avatarView;
+	//public AvatarView avatarView;
 
 	public Post(){}
 /*
@@ -92,7 +92,7 @@ public class Post
 		this.groupNames = groupNames;
 		this.signature = signature;
 		this.attachments = attachments;
-		this.avatarView = new AvatarView(context, avatarFormat, memberId, username);
+		//this.avatarView = new AvatarView(context, avatarFormat, memberId, username);
 	}
 
 	public int getPostId()
@@ -235,7 +235,7 @@ public class Post
 		this.attachments = attachments;
 	}
 
-	public void setAvatarView(AvatarView avatarView)
+	/*public void setAvatarView(AvatarView avatarView)
 	{
 		this.avatarView = avatarView;
 	}
@@ -243,12 +243,12 @@ public class Post
 	public void setAvatarView()
 	{
 		this.avatarView = new AvatarView(context, avatarFormat, memberId, username);
-	}
+	}*/
 
-	public AvatarView getAvatarView()
+	/*public AvatarView getAvatarView()
 	{
 		return avatarView;
-	}
+	}*/
 
 	public class Attachment
 	{

@@ -1,36 +1,45 @@
-package com.geno.chaoli.forum.meta;
+package com.geno.chaoli.forum.model;
 
 import android.graphics.drawable.Drawable;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.geno.chaoli.forum.meta.Channel;
+import com.geno.chaoli.forum.meta.ConversationState;
 
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class Conversation
 {
-	public int conversationId;
-	public Channel channel;
-	public String title;
-	public String excerpt;
-	public String link;
-
-	public String startMemberId;
-
-	public String lastPostMemberId;
-	public String startMember;
+	private int conversationId;
+	private Channel channel;
+	private int channelId;
+	private String title;
+	private String firstPost;
+	private String link;
+	private String startMemberId;
+	private String lastPostMemberId;
+	private String startMember;
 	@JSONField(name="startMemberAvatarFormat")
-	public String startMemberAvatarSuffix;
-
+	private String startMemberAvatarSuffix;
 	@JSONField(name="lastPostMemberAvatarFormat")
-	public String lastPostMemberAvatarSuffix;
+	private String lastPostMemberAvatarSuffix;
+	private Drawable startAvatar;
+	private String lastPostMember;
+	private Drawable lastPostAvatar;
+	private String lastPostTime;
+	private int replies;
 
-	public Drawable startAvatar;
-	public String lastPostMember;
-	public Drawable lastPostAvatar;
-	public String lastPostTime;
-	public int replies;
-	public List<ConversationState> state;
+	private List<ConversationState> state;
+
+	public String getFirstPost() {
+		return firstPost;
+	}
+
+	public void setFirstPost(String firstPost) {
+		this.firstPost = firstPost;
+	}
+
 	public int getConversationId()
 	{
 		return conversationId;
@@ -58,16 +67,6 @@ public class Conversation
 	public void setTitle(String title)
 	{
 		this.title = title;
-	}
-
-	public String getExcerpt()
-	{
-		return excerpt;
-	}
-
-	public void setExcerpt(String excerpt)
-	{
-		this.excerpt = excerpt;
 	}
 
 	public String getLink()
@@ -175,6 +174,14 @@ public class Conversation
 	public List<ConversationState> getState()
 	{
 		return state;
+	}
+
+	public int getChannelId() {
+		return channelId;
+	}
+
+	public void setChannelId(int channelId) {
+		this.channelId = channelId;
 	}
 
 	public void setState(List<ConversationState> state)
