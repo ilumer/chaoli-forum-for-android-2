@@ -6,35 +6,39 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.ConversationUtils;
 import com.geno.chaoli.forum.meta.CookieUtils;
-import com.geno.chaoli.forum.meta.LoginUtils;
-import com.geno.chaoli.forum.meta.Post;
-import com.geno.chaoli.forum.meta.PostView;
+import com.geno.chaoli.forum.meta.LaTeXtView;
+import com.geno.chaoli.forum.model.Post;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
@@ -48,9 +52,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	public static final int menu_author_only = 2;
 	public static final int menu_star = 3;
 
+	@BindView(R.id.reply)
 	public FloatingActionButton reply;
-
-	public static ListView postList;
 
 	public static SharedPreferences sp;
 	public SharedPreferences.Editor e;
@@ -63,7 +66,11 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 	public static AsyncHttpClient client = new AsyncHttpClient();
 
-	public PostView[] v;
+	@BindView(R.id.postList)
+	RecyclerView postList;
+
+	PostListAdapter mPostListAdapter;
+	LinearLayoutManager mLinearLayoutManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -71,9 +78,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_activity);
 
+		ButterKnife.bind(this);
 
-//		setSupportActionBar((Toolbar) findViewById(R.id.titleBar));
-		postList = (ListView) findViewById(R.id.postList);
 		Bundle data = getIntent().getExtras();
 		conversationId = data.getInt("conversationId");
 		title = data.getString("title", "");
@@ -84,8 +90,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 		configToolbar(title);
 
-//		e = sp.edit();
-		reply = (FloatingActionButton) findViewById(R.id.reply);
 		reply.setOnClickListener(new View.OnClickListener()
 		{
 			@Override
@@ -96,6 +100,12 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				startActivity(toReply);
 			}
 		});
+
+		mLinearLayoutManager = new LinearLayoutManager(mContext);
+		mPostListAdapter = new PostListAdapter(mContext, new ArrayList<Post>());
+        postList.setLayoutManager(mLinearLayoutManager);
+		postList.setAdapter(mPostListAdapter);
+
 		CookieUtils.saveCookie(client, this);
 		final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.loading_posts));
 		client.get(this, Constants.postListURL + conversationId + intentToPage, new AsyncHttpResponseHandler()
@@ -105,7 +115,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			{
 				JSONObject o = JSON.parseObject(new String(responseBody));
 				JSONArray array = o.getJSONArray("posts");
-				v = new PostView[array.size()];
+				//v = new PostView[array.size()];
+				List<Post> posts = new ArrayList<>();
 				for (int i = 0; i < array.size(); i++)
 				{
 					JSONObject sub = array.getJSONObject(i);
@@ -124,44 +135,101 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 					p.deleteMemberId = Integer.parseInt(deleteMemberId == null ? "0" : deleteMemberId);
 					String deleteTime = sub.getString("deleteTime");
 					p.deleteTime = Long.parseLong(deleteTime == null ? "0" : deleteTime);
-					p.setAvatarView();
-					v[i] = new PostView(PostActivity.this, p);
+					//v[i] = new PostView(PostActivity.this, p);
+					posts.add(p);
 				}
-				postList.setAdapter(new BaseAdapter()
-				{
-					@Override
-					public int getCount()
-					{
-						return v.length;
-					}
-
-					@Override
-					public Object getItem(int position)
-					{
-						return v[position];
-					}
-
-					@Override
-					public long getItemId(int position)
-					{
-						return v[position].post.postId;
-					}
-
-					@Override
-					public View getView(int position, View convertView, ViewGroup parent)
-					{
-						return v[position];
-					}
-				});
+				mPostListAdapter.setPosts(posts);
+				mPostListAdapter.notifyDataSetChanged();
 				progressDialog.dismiss();
+
+				//mLinearLayoutManager.findViewByPosition(0).setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100));
 			}
 
 			@Override
 			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
 			{
-
+				progressDialog.dismiss();
+				Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
 			}
 		});
+	}
+
+	class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {
+		List<Post> mPosts;
+		Context mContext;
+		public PostListAdapter(Context context, List<Post> posts) {
+			mContext = context;
+			mPosts = posts;
+		}
+
+		public void setPosts(List<Post> posts) {
+			this.mPosts = posts;
+		}
+
+		@Override
+		public int getItemCount() {
+			return mPosts.size();
+		}
+
+		@Override
+		public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+			return new PostViewHolder(LayoutInflater.from(mContext).inflate(R.layout.post_view, parent, false));
+		}
+
+		@Override
+		public void onBindViewHolder(final PostViewHolder holder, int position) {
+			final Post post = mPosts.get(position);
+			holder.avatar.update(mContext, post.getAvatarFormat(), post.getMemberId(), post.getUsername());
+			holder.avatar.scale(35);
+			holder.usernameAndSignature.setText(post.username + (post.signature == null ? "" : (", " + post.signature)));
+			holder.floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
+
+			if (post.deleteMemberId != 0)
+			{
+				holder.itemView.setBackgroundColor(0xFF808080);
+				holder.avatar.setVisibility(View.GONE);
+				//signature.setVisibility(GONE);
+				holder.content.setVisibility(View.GONE);
+			} else {
+				holder.itemView.setBackgroundColor(Color.WHITE);
+				holder.avatar.setVisibility(View.VISIBLE);
+				holder.content.setVisibility(View.VISIBLE);
+			}
+
+			holder.avatar.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Log.i(TAG, "click");
+					Intent intent = new Intent(post.context, HomepageActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putString("username", holder.avatar.getUsername());
+					bundle.putInt("userId", holder.avatar.getUserId());
+					bundle.putString("avatarSuffix", holder.avatar.getImagePath());
+					bundle.putString("signature", post.signature);
+					intent.putExtras(bundle);
+					post.context.startActivity(intent);
+				}
+			});
+			//signature.setText(post.signature);
+			//SpannableStringBuilder str = SFXParser3.parse(context, content, post.getContent());
+			holder.content.setText(mContext, post.getContent());
+			holder.content.setMovementMethod(LinkMovementMethod.getInstance());
+		}
+
+		class PostViewHolder extends RecyclerView.ViewHolder {
+			@BindView(R.id.avatar)
+			AvatarView avatar;
+			@BindView(R.id.usernameAndSignature)
+			TextView usernameAndSignature;
+			@BindView(R.id.floor)
+			TextView floor;
+			@BindView(R.id.content)
+			LaTeXtView content;
+			PostViewHolder(View view){
+				super(view);
+				ButterKnife.bind(this, view);
+			}
+		}
 	}
 
 	@Override
@@ -251,4 +319,5 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	{
 		Toast.makeText(PostActivity.this, getString(R.string.failed, statusCode), Toast.LENGTH_SHORT).show();
 	}
+
 }
