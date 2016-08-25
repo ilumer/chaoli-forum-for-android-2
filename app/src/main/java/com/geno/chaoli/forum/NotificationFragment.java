@@ -90,7 +90,7 @@ public class NotificationFragment extends HomepageListFragment {
                             final ProgressDialog progressDialog = ProgressDialog.show(context, "", getResources().getString(R.string.just_a_sec));
                             AsyncHttpClient client = new AsyncHttpClient();
                             CookieUtils.saveCookie(client, mCallback);
-                            client.get(context, "https://chaoli.club/index.php/conversation/post/" + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
+                            client.get(context, Constants.GO_TO_POST_URL + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
                                 @Override
                                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                                     String response = new String(responseBody);

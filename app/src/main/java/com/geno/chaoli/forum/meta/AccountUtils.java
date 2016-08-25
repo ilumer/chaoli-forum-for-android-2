@@ -25,17 +25,12 @@ import cz.msebera.android.httpclient.Header;
 public class AccountUtils {
     private static AsyncHttpClient client = new AsyncHttpClient();
 
-    public static String GET_PROFILE_URL = "https://chaoli.club/index.php/settings/general.json";
-    public static String CHECK_NOTIFICATION_URL = "https://chaoli.club/index.php/?p=settings/notificationCheck.ajax";
-    public static String UPDATE_URL = "https://chaoli.club/index.php/?p=conversations/update.ajax/all/";
-    public static String MODIFY_SETTINGS_URL = "https://chaoli.club/index.php/settings/general";
-
     public static int RETURN_ERROR = -1;
     public static int FILE_DOSENT_EXIST = -2;
 
     public static void getProfile(final Context context, final GetProfileObserver observer){
         CookieUtils.saveCookie(client, context);
-        client.get(context, GET_PROFILE_URL, new AsyncHttpResponseHandler() {
+        client.get(context, Constants.GET_PROFILE_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
@@ -55,7 +50,7 @@ public class AccountUtils {
         RequestParams params = new RequestParams();
         params.put("userId", LoginUtils.getUserId());
         params.put("token", LoginUtils.getToken());
-        client.get(context, CHECK_NOTIFICATION_URL, params, new AsyncHttpResponseHandler() {
+        client.get(context, Constants.CHECK_NOTIFICATION_URL, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
@@ -107,7 +102,7 @@ public class AccountUtils {
         params.put("token", LoginUtils.getToken());
         params.put("conversationIds", conversationIds);
         Log.i("conversationIds", conversationIds);
-        client.get(context, UPDATE_URL, params, new AsyncHttpResponseHandler() {
+        client.get(context, Constants.UPDATE_URL, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
@@ -157,7 +152,7 @@ public class AccountUtils {
         if(starOnReply) params.put("starOnReply", starOnReply.toString());
         if(privateAdd) params.put("privateAdd", privateAdd.toString());
         params.put("save", "保存更改");
-        client.post(context, MODIFY_SETTINGS_URL, params, new AsyncHttpResponseHandler() {
+        client.post(context, Constants.MODIFY_SETTINGS_URL, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 Log.e("wrong", "wrong");
