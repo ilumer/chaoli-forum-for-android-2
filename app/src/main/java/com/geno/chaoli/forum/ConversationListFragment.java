@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,22 +14,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.ChannelTextView;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.Conversation;
-import com.geno.chaoli.forum.meta.ConversationView;
+import com.geno.chaoli.forum.model.Conversation;
 import com.geno.chaoli.forum.meta.CookieUtils;
+import com.geno.chaoli.forum.model.ConversationListResult;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
@@ -57,7 +52,7 @@ public class ConversationListFragment extends Fragment
 
 	public static AsyncHttpClient client = new AsyncHttpClient();
 
-	public ConversationView[] v;
+	//public ConversationView[] v;
 
 	public SwipyRefreshLayout swipyRefreshLayout;
 
@@ -102,63 +97,19 @@ public class ConversationListFragment extends Fragment
 	public void getList()
 	{
 		CookieUtils.saveCookie(client, context);
+
 		client.get(context, Constants.conversationListURL + channel, new AsyncHttpResponseHandler()
 		{
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 			{
-				JSONObject o = JSON.parseObject(new String(responseBody));
-				JSONArray array = o.getJSONArray("results");
-
-				List<Conversation> conversationList = new ArrayList<Conversation>();
-				for (int i = 0; i < array.size(); i++)
-				{
-					JSONObject sub = array.getJSONObject(i);
-					Conversation c = new Conversation();
-					c.conversationId = sub.getInteger("conversationId");
-					c.title = sub.getString("title");
-					c.excerpt = sub.getString("firstPost");
-					c.replies = sub.getInteger("replies");
-					c.startMember = sub.getString("startMember");
-					c.startMemberAvatarSuffix = sub.getString("startMemberAvatarFormat");
-					c.startMemberId = sub.getString("startMemberId");
-					c.lastPostMember = sub.getString("lastPostMember");
-					c.lastPostMemberAvatarSuffix = sub.getString("lastPostMemberAvatarFormat");
-					c.lastPostMemberId = sub.getString("lastPostMemberId");
-					c.channel = Channel.getChannel(sub.getInteger("channelId"));
-					conversationList.add(c);
-					//v[i] = new ConversationView(getActivity(), c);
-				}
+				String response = new String(responseBody);
+				ConversationListResult result = JSON.parseObject(response, ConversationListResult.class);
+				List<Conversation> conversationList = result.getResults();
 				DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(mAdapter.getConversationList(), conversationList), true);
 				mAdapter.setConversationList(conversationList);
 				diffResult.dispatchUpdatesTo(mAdapter);
-				//l.setAdapter(new ConversationRecyclerViewAdapter(context, conversationList));
-				/*l.setAdapter(new BaseAdapter()
-				{
-					@Override
-					public int getCount()
-					{
-						return v.length;
-					}
-
-					@Override
-					public Object getItem(int position)
-					{
-						return v[position];
-					}
-
-					@Override
-					public long getItemId(int position)
-					{
-						return v[position].conversation.conversationId;
-					}
-
-					@Override
-					public View getView(int position, View convertView, ViewGroup parent)
-					{
-						return v[position];
-					}
-				});*/
+				l.smoothScrollToPosition(0);
 				swipyRefreshLayout.setRefreshing(false);
 			}
 
@@ -206,15 +157,10 @@ public class ConversationListFragment extends Fragment
 					Integer.parseInt(conversation.getStartMemberId()), conversation.getStartMember());
 			holder.avatarView.scale(20);
 			holder.usernameTv.setText(conversation.getStartMember() + " 发表了帖子");
-			//((TextView) findViewById(R.id.conversationId)).setText(String.format(Locale.getDefault(), "%d", conversation.getConversationId()));
 			holder.titleTv.setText(conversation.getTitle());
-			String excerpt = conversation.getExcerpt();//.split("\\n")[0];  TextView有一个参数是可以自动把多出的字符变成...的(见xml文件),所以这个就不需要啦
-			holder.excerptTv.setText(excerpt);
-			//((TextView) findViewById(R.id.excerpt)).setText(excerpt.length() > 50 ?
-			//		excerpt.substring(0, 50) + "…" : excerpt);
-//		((TextView) findViewById(R.id.replies)).setText(String.format(Locale.getDefault(), "%d", conversation.getReplies()));
+			holder.excerptTv.setText(conversation.getFirstPost());
 			holder.channel.removeAllViews();
-			holder.channel.addView(new ChannelTextView(context, conversation.getChannel()));
+			holder.channel.addView(new ChannelTextView(context, Channel.getChannel(conversation.getChannelId())));
 			holder.replyNumTv.setText(String.valueOf(conversation.getReplies()));
 			holder.conversation = conversationList.get(position);
 		}
@@ -297,13 +243,15 @@ public class ConversationListFragment extends Fragment
 
 		@Override
 		public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-			Log.d(TAG, String.valueOf(oldConversationList.get(oldItemPosition).conversationId == newConversationList.get(newItemPosition).conversationId));
-			return oldConversationList.get(oldItemPosition).conversationId == newConversationList.get(newItemPosition).conversationId;
+			Conversation oldConversation = oldConversationList.get(oldItemPosition);
+			Conversation newConversation = newConversationList.get(newItemPosition);
+			return oldConversation.getFirstPost().equals(newConversation.getFirstPost()) && oldConversation.getReplies() == newConversation.getReplies();
 		}
 
 		@Override
 		public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-			return true;
+			Log.d(TAG, "areItemsTheSame() called with: " + "oldItemPosition = [" + oldItemPosition + "], newItemPosition = [" + newItemPosition + "]");
+			return oldConversationList.get(oldItemPosition).getConversationId() == newConversationList.get(newItemPosition).getConversationId();
 		}
 	}
 }

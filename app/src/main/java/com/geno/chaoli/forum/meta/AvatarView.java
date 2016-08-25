@@ -98,6 +98,18 @@ public class AvatarView extends RelativeLayout
 		super(context, attrs, defStyleAttr);
 	}
 
+	public String getImagePath() {
+		return mImagePath;
+	}
+
+	public String getUsername() {
+		return mUsername;
+	}
+
+	public int getUserId() {
+		return mUserId;
+	}
+
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes)
 	{

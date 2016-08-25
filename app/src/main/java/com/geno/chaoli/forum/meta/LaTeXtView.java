@@ -38,7 +38,7 @@ public class LaTeXtView extends TextView
 	//public static final Pattern PATTERN2 = Pattern.compile("(?<=\\\\\\()(.+?)(?=\\\\\\))");
 	private static final Pattern PATTERN1 = Pattern.compile("\\$\\$?(([^\\$]|\\n)+?)\\$?\\$");
 	private static final Pattern PATTERN2 = Pattern.compile("\\\\[(\\[]((.|\\n)*?)\\\\[\\])]");
-	private static final Pattern PATTERN3 = Pattern.compile("\\\\begin\\{.*?\\}(.|\\n)*?\\\\end\\{.*?\\}");
+	//private static final Pattern PATTERN3 = Pattern.compile("\\\\begin\\{.*?\\}(.|\\n)*?\\\\end\\{.*?\\}");
 
 	public static final String TAG = "LaTeXtView";
 
@@ -79,20 +79,15 @@ public class LaTeXtView extends TextView
 
 		Matcher m1 = PATTERN1.matcher(text);
 		Matcher m2 = PATTERN2.matcher(text);
-		Matcher m3 = PATTERN3.matcher(text);
 
-		_retrieveLaTeXImg(builder, m1, m2, m3);
+		_retrieveLaTeXImg(builder, m1, m2);
 	}
-	private void _retrieveLaTeXImg(final SpannableStringBuilder builder, final Matcher m1, final Matcher m2, final Matcher m3) {
+	private void _retrieveLaTeXImg(final SpannableStringBuilder builder, final Matcher m1, final Matcher m2) {
 		String formula;
-		Boolean flag1 = false, flag2 = false, flag3 = false;
-		if ((flag1 = m1.find()) || (flag2 = m2.find()) || (flag3 = m2.find())) {
+		Boolean flag1 = false, flag2 = false;
+		if ((flag1 = m1.find()) || (flag2 = m2.find())) {
 			int start, end;
-			if (flag3) {
-				start = m3.start();
-				end = m3.end();
-				formula = m3.group();//.replaceAll("[ \\t\\r\\n]", "");
-			} else if (flag2) {
+			if (flag2) {
 				start = m2.start();
 				end = m2.end();
 				formula = m2.group(1);//.replaceAll("[ \\t\\r\\n]", "");
@@ -106,22 +101,20 @@ public class LaTeXtView extends TextView
 			try {
 				formula = URLEncoder.encode(formula, "UTF-8");
 				final int fStart = start, fEnd = end;
-				final Boolean fFlag3 = flag3;
 				Glide.with(getContext()).load(SITE + formula).asBitmap().into(new SimpleTarget<Bitmap>()
 				{
 					@Override
 					public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
 					{
-						if (fFlag3) builder.setSpan(new ImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-						else builder.setSpan(new CenteredImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+						builder.setSpan(new CenteredImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 						setText(builder);
-						_retrieveLaTeXImg(builder, m1, m2, m3);
+						_retrieveLaTeXImg(builder, m1, m2);
 					}
 					@Override
 					public void onLoadFailed(Exception e, Drawable errorDrawable) {
 						super.onLoadFailed(e, errorDrawable);
 						e.printStackTrace();
-						_retrieveLaTeXImg(builder, m1, m2, m3);
+						_retrieveLaTeXImg(builder, m1, m2);
 					}
 				});
 			} catch (UnsupportedEncodingException e){
@@ -138,13 +131,11 @@ public class LaTeXtView extends TextView
 	private String removeNewlineInFormula(String str){
 		Matcher m1 = PATTERN1.matcher(str);
 		Matcher m2 = PATTERN2.matcher(str);
-		Matcher m3 = PATTERN3.matcher(str);
 		Boolean flag3 = false, flag2 = false, flag1 = false;
 		// remove all spaces, codecogs returns error if formula contains spaces
-		while ((flag1 = m1.find()) || (flag2 = m2.find()) || (flag3 = m3.find())){
+		while ((flag1 = m1.find()) || (flag2 = m2.find())) {
 			String oldStr;
-			if (flag3) oldStr = m3.group();
-			else if (flag2) oldStr = m2.group();
+			if (flag2) oldStr = m2.group();
 			else oldStr = m1.group();
 			String newStr = oldStr.replaceAll("[\\n\\r]", "");
 			str = str.replace(oldStr, newStr);
