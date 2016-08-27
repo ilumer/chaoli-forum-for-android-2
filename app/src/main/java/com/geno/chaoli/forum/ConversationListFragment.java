@@ -250,7 +250,6 @@ public class ConversationListFragment extends Fragment
 
 		@Override
 		public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-			Log.d(TAG, "areItemsTheSame() called with: " + "oldItemPosition = [" + oldItemPosition + "], newItemPosition = [" + newItemPosition + "]");
 			return oldConversationList.get(oldItemPosition).getConversationId() == newConversationList.get(newItemPosition).getConversationId();
 		}
 	}

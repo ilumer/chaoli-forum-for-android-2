@@ -49,7 +49,8 @@ public class SFXParser3
 //		tagDealer(s, "[b]", "[/b]", new StyleSpan(Typeface.BOLD));
 //		tagDealer(s, "[i]", "[/i]", new StyleSpan(Typeface.ITALIC));
 
-		Matcher c = Pattern.compile("(?<=\\[c=)(.+?)(?=\\[/c\\])").matcher(spannable);
+		Pattern cPattern = Pattern.compile("(?<=\\[c=)((.|\\n)+?)(?=\\[/c\\])");
+		Matcher c = cPattern.matcher(spannable);
 		while (c.find())
 		{
 			String[] inner = c.group().split("]", 2);
@@ -57,7 +58,7 @@ public class SFXParser3
 			spannable.setSpan(new ForegroundColorSpan(color), c.start(), c.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(c.end(), c.end() + 4, "");
 			spannable.replace(c.start() - 3, c.start() + inner[0].length() + 1, "");
-			c = Pattern.compile("(?<=\\[c=)(.+?)(?=\\[/c\\])").matcher(spannable);
+			//c = cPattern.matcher(spannable);
 		}
 
 		Matcher url = Pattern.compile("(?<=\\[url=)(.+?)(?=\\[/url\\])").matcher(spannable);
@@ -81,71 +82,78 @@ public class SFXParser3
 			url = Pattern.compile("(?<=\\[url=)(.+?)(?=\\[/url\\])").matcher(spannable);
 		}
 
-		Matcher curtain = Pattern.compile("(?<=\\[curtain\\])(.+?)(?=\\[/curtain\\])").matcher(spannable);
+		Pattern curtainPattern = Pattern.compile("(?<=\\[curtain\\])((.|\\n)+?)(?=\\[/curtain\\])");
+		Matcher curtain = curtainPattern.matcher(spannable);
 		while (curtain.find())
 		{
 			spannable.setSpan(new BackgroundColorSpan(Color.BLACK), curtain.start(), curtain.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 //			spannable.setSpan(new Touchable, curtain.start(), curtain.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(curtain.end(), curtain.end() + 10, "");
 			spannable.replace(curtain.start() - 9, curtain.start(), "");
-			curtain = Pattern.compile("(?<=\\[curtain\\])(.+?)(?=\\[/curtain\\])").matcher(spannable);
+			//curtain = Pattern.compile("(?<=\\[curtain\\])(.+?)(?=\\[/curtain\\])").matcher(spannable);
 		}
 
-		Matcher b = Pattern.compile("(?<=\\[b\\])(.+?)(?=\\[/b\\])").matcher(spannable);
+		Pattern bPattern = Pattern.compile("(?<=\\[b\\])((.|\\n)+?)(?=\\[/b\\])");
+		Matcher b = bPattern.matcher(spannable);
 		while (b.find())
 		{
 			spannable.setSpan(new StyleSpan(Typeface.BOLD), b.start(), b.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(b.end(), b.end() + 4, "");
 			spannable.replace(b.start() - 3, b.start(), "");
-			b = Pattern.compile("(?<=\\[b\\])(.+?)(?=\\[/b\\])").matcher(spannable);
+			//b = Pattern.compile("(?<=\\[b\\])(.+?)(?=\\[/b\\])").matcher(spannable);
 		}
 
-		Matcher i = Pattern.compile("(?<=\\[i\\])(.+?)(?=\\[/i\\])").matcher(spannable);
+		Pattern iPattern = Pattern.compile("(?<=\\[i\\])((.|\\n)+?)(?=\\[/i\\])");
+		Matcher i = iPattern.matcher(spannable);
 		while (i.find())
 		{
 			spannable.setSpan(new StyleSpan(Typeface.ITALIC), i.start(), i.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(i.end(), i.end() + 4, "");
 			spannable.replace(i.start() - 3, i.start(), "");
-			i = Pattern.compile("(?<=\\[i\\])(.+?)(?=\\[/i\\])").matcher(spannable);
+			//i = iPattern.matcher(spannable);
 		}
 
-		Matcher u = Pattern.compile("(?<=\\[u\\])(.+?)(?=\\[/u\\])").matcher(spannable);
+		Pattern uPattern = Pattern.compile("(?<=\\[u\\])((.|\\n)+?)(?=\\[/u\\])");
+		Matcher u = uPattern.matcher(spannable);
 		while (u.find())
 		{
 			spannable.setSpan(new UnderlineSpan(), u.start(), u.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(u.end(), u.end() + 4, "");
 			spannable.replace(u.start() - 3, u.start(), "");
-			u = Pattern.compile("(?<=\\[u\\])(.+?)(?=\\[/u\\])").matcher(spannable);
+			u = uPattern.matcher(spannable);
 		}
 
-		Matcher s = Pattern.compile("(?<=\\[s\\])(.+?)(?=\\[/s\\])").matcher(spannable);
+		Pattern sPattern = Pattern.compile("(?<=\\[s\\])((.|\\n)+?)(?=\\[/s\\])");
+		Matcher s = sPattern.matcher(spannable);
 		while (s.find())
 		{
 			spannable.setSpan(new StrikethroughSpan(), s.start(), s.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(s.end(), s.end() + 4, "");
 			spannable.replace(s.start() - 3, s.start(), "");
-			s = Pattern.compile("(?<=\\[s\\])(.+?)(?=\\[/s\\])").matcher(spannable);
+			s = sPattern.matcher(spannable);
 		}
 
-		Matcher center = Pattern.compile("(?<=\\[center\\])(.+?)(?=\\[/center\\])").matcher(spannable);
+		Pattern centerPattern = Pattern.compile("(?<=\\[center\\])((.|\\n)+?)(?=\\[/center\\])");
+		Matcher center = centerPattern.matcher(spannable);
 		while (center.find())
 		{
 			spannable.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), center.start(), center.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(center.end(), center.end() + 9, "\n\n");
 			spannable.replace(center.start() - 8, center.start(), "\n\n");
-			center = Pattern.compile("(?<=\\[center\\])(.+?)(?=\\[/center\\])").matcher(spannable);
+			center = centerPattern.matcher(spannable);
 		}
 
-		Matcher h = Pattern.compile("(?<=\\[h\\])(.+?)(?=\\[/h\\])").matcher(spannable);
+		Pattern hPattern = Pattern.compile("(?<=\\[h\\])((.|\\n)+?)(?=\\[/h\\])");
+		Matcher h = hPattern.matcher(spannable);
 		while (h.find())
 		{
 			spannable.setSpan(new RelativeSizeSpan(1.3f), h.start(), h.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(h.end(), h.end() + 4, "\n\n");
 			spannable.replace(h.start() - 3, h.start(), "\n\n");
-			h = Pattern.compile("(?<=\\[h\\])(.+?)(?=\\[/h\\])").matcher(spannable);
+			h = hPattern.matcher(spannable);
 		}
 
-		Matcher img = Pattern.compile("(?<=\\[img\\])(.+?)(?=\\[/img\\])").matcher(spannable);
+		/*Matcher img = Pattern.compile("(?<=\\[img\\])(.+?)(?=\\[/img\\])").matcher(spannable);
 		while (img.find())
 		{
 			final int start = img.start(), end = img.end();
@@ -160,7 +168,7 @@ public class SFXParser3
 					//textView.setText(spannable);
 				}
 			});
-		}
+		}*/
 
 		return spannable;
 	}

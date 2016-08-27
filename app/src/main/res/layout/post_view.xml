@@ -1,47 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
 	xmlns:auto="http://schemas.android.com/apk/res-auto"
+	android:orientation="vertical"
 	android:layout_margin="@dimen/middle_margin">
-	<TextView
-		android:id="@+id/floor"
-		android:layout_alignParentEnd="true"
-		android:layout_alignParentRight="true"
-		android:textSize="18sp"
-		android:textColor="@color/contentColor"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
-	<LinearLayout
-		android:id="@+id/firstLineInPost"
+	<RelativeLayout
 		android:layout_width="match_parent"
-		android:layout_marginRight="@dimen/right_margin_in_post_view"
-		android:layout_marginEnd="@dimen/right_margin_in_post_view"
-		android:layout_height="wrap_content"
-		android:gravity="center_vertical">
-		<com.geno.chaoli.forum.meta.AvatarView
-			android:id="@+id/avatar"
-			android:clickable="true"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-        </com.geno.chaoli.forum.meta.AvatarView>
-    <TextView
-			android:id="@+id/usernameAndSignature"
-			android:ellipsize="end"
-			android:textSize="16sp"
-			android:layout_marginLeft="15dp"
-			android:layout_marginStart="15dp"
-			android:textColor="@color/black"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:maxLines="1"/>
-	</LinearLayout>
+		android:layout_height="wrap_content">
 
-	<com.geno.chaoli.forum.meta.LaTeXtView
+		<TextView
+			android:id="@+id/floor"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentRight="true"
+			android:textSize="18sp"
+			android:textColor="@color/contentColor"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+		<LinearLayout
+			android:id="@+id/firstLineInPost"
+			android:layout_width="match_parent"
+			android:layout_marginRight="@dimen/right_margin_in_post_view"
+			android:layout_marginEnd="@dimen/right_margin_in_post_view"
+			android:layout_height="wrap_content"
+			android:gravity="center_vertical">
+			<com.geno.chaoli.forum.meta.AvatarView
+				android:id="@+id/avatar"
+				android:clickable="true"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+			</com.geno.chaoli.forum.meta.AvatarView>
+			<TextView
+				android:id="@+id/usernameAndSignature"
+				android:ellipsize="end"
+				android:textSize="16sp"
+				android:layout_marginLeft="15dp"
+				android:layout_marginStart="15dp"
+				android:textColor="@color/black"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:maxLines="1"/>
+		</LinearLayout>
+	</RelativeLayout>
+
+    <com.geno.chaoli.forum.meta.PostContentView
 		android:id="@+id/content"
-		android:textColor="@color/black"
-		android:lineSpacingMultiplier="1.5"
-		android:layout_below="@id/firstLineInPost"
+		android:orientation="vertical"
 		android:layout_marginTop="5dp"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
@@ -50,4 +54,4 @@
 		android:layout_marginRight="@dimen/right_margin_in_post_view"
 		android:layout_marginEnd="@dimen/right_margin_in_post_view" />
 
-</RelativeLayout>
+</LinearLayout>

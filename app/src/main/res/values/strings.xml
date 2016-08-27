@@ -141,5 +141,7 @@
 	<string name="send_you_a_private_post">%s send you a private post</string>
 	<string name="mention_you">%s mentioned you</string>
 	<string name="someone_update">%s updated</string>
+	<string name="collapse">collapse</string>
+	<string name="expand">expand</string>
 
 </resources>

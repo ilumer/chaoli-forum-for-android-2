@@ -69,4 +69,6 @@
     <string name="send_you_a_private_post">%s 給妳發了壹個私人帖子</string>
     <string name="mention_you">%s 提到了妳</string>
     <string name="someone_update">%s 更新於</string>
+    <string name="collapse">收起</string>
+    <string name="expand">展開</string>
 </resources>
