@@ -18,18 +18,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.bumptech.glide.Glide;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.ConversationUtils;
 import com.geno.chaoli.forum.meta.CookieUtils;
 import com.geno.chaoli.forum.meta.LaTeXtView;
+import com.geno.chaoli.forum.meta.PostContentView;
 import com.geno.chaoli.forum.model.Post;
+import com.geno.chaoli.forum.model.PostListResult;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -113,36 +116,12 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
 			{
-				JSONObject o = JSON.parseObject(new String(responseBody));
-				JSONArray array = o.getJSONArray("posts");
-				//v = new PostView[array.size()];
-				List<Post> posts = new ArrayList<>();
-				for (int i = 0; i < array.size(); i++)
-				{
-					JSONObject sub = array.getJSONObject(i);
-					Post p = new Post();
-					p.context = PostActivity.this;
-					p.conversationId = conversationId;
-					p.username = sub.getString("username");
-					p.floor = sub.getInteger("floor");
-					p.time = sub.getInteger("time");
-					p.content = sub.getString("content");
-					p.signature = sub.getString("signature");
-					p.avatarFormat = sub.getString("avatarFormat");
-					p.memberId = sub.getInteger("memberId");
-					p.postId = sub.getInteger("postId");
-					String deleteMemberId = sub.getString("deleteMemberId");
-					p.deleteMemberId = Integer.parseInt(deleteMemberId == null ? "0" : deleteMemberId);
-					String deleteTime = sub.getString("deleteTime");
-					p.deleteTime = Long.parseLong(deleteTime == null ? "0" : deleteTime);
-					//v[i] = new PostView(PostActivity.this, p);
-					posts.add(p);
-				}
+				String response = new String(responseBody);
+				PostListResult result = JSON.parseObject(response, PostListResult.class);
+				List<Post> posts = result.getPosts();
 				mPostListAdapter.setPosts(posts);
 				mPostListAdapter.notifyDataSetChanged();
 				progressDialog.dismiss();
-
-				//mLinearLayoutManager.findViewByPosition(0).setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100));
 			}
 
 			@Override
@@ -200,20 +179,37 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				@Override
 				public void onClick(View v) {
 					Log.i(TAG, "click");
-					Intent intent = new Intent(post.context, HomepageActivity.class);
+					Intent intent = new Intent(mContext, HomepageActivity.class);
 					Bundle bundle = new Bundle();
 					bundle.putString("username", holder.avatar.getUsername());
 					bundle.putInt("userId", holder.avatar.getUserId());
 					bundle.putString("avatarSuffix", holder.avatar.getImagePath());
 					bundle.putString("signature", post.signature);
 					intent.putExtras(bundle);
-					post.context.startActivity(intent);
+					mContext.startActivity(intent);
 				}
 			});
-			//signature.setText(post.signature);
-			//SpannableStringBuilder str = SFXParser3.parse(context, content, post.getContent());
-			holder.content.setText(mContext, post.getContent());
-			holder.content.setMovementMethod(LinkMovementMethod.getInstance());
+			holder.content.init(mContext);
+			holder.content.setText(post.getContent());
+			//holder.content.setText(mContext, post.getContent());
+			for (int i = 0; i < ((LinearLayout) holder.itemView).getChildCount(); i++) {
+				View child = ((LinearLayout) holder.itemView).getChildAt(i);
+				if(child instanceof ImageView) {
+					((LinearLayout) holder.itemView).removeViewAt(i);
+				}
+			}
+			if (post.getAttachments() != null && post.getAttachments().size() > 0) {
+				for (Post.Attachment attachment : post.getAttachments()) {
+					if (attachment.getFileName().endsWith(".jpg") || attachment.getFileName().endsWith(".png")) {
+						ImageView imageView = new ImageView(mContext);
+						Glide.with(mContext)
+								.load(Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret())
+								.into(imageView);
+						((LinearLayout)holder.itemView).addView(imageView);
+					}
+				}
+			}
+			//holder.content.setMovementMethod(LinkMovementMethod.getInstance());
 		}
 
 		class PostViewHolder extends RecyclerView.ViewHolder {
@@ -224,7 +220,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			@BindView(R.id.floor)
 			TextView floor;
 			@BindView(R.id.content)
-			LaTeXtView content;
+			PostContentView content;
 			PostViewHolder(View view){
 				super(view);
 				ButterKnife.bind(this, view);

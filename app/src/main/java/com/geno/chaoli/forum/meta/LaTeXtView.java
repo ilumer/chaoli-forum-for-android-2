@@ -19,13 +19,11 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import butterknife.OnClick;
+
 public class LaTeXtView extends TextView
 {
-	/*	private String text;
-
-        private SpannableString span;
-
-        private View v;*/
+	private Context mContext;
 	private String mText;
 	private SpannableStringBuilder mSpannableStringBuilder;
 
@@ -38,6 +36,7 @@ public class LaTeXtView extends TextView
 	//public static final Pattern PATTERN2 = Pattern.compile("(?<=\\\\\\()(.+?)(?=\\\\\\))");
 	private static final Pattern PATTERN1 = Pattern.compile("\\$\\$?(([^\\$]|\\n)+?)\\$?\\$");
 	private static final Pattern PATTERN2 = Pattern.compile("\\\\[(\\[]((.|\\n)*?)\\\\[\\])]");
+	private static final Pattern IMG_PATTERN = Pattern.compile("\\[img](.*?)\\[/img]");
 	//private static final Pattern PATTERN3 = Pattern.compile("\\\\begin\\{.*?\\}(.|\\n)*?\\\\end\\{.*?\\}");
 
 	public static final String TAG = "LaTeXtView";
@@ -45,33 +44,35 @@ public class LaTeXtView extends TextView
 	public LaTeXtView(Context context)
 	{
 		super(context);
-		//v = View.inflate(context, R.layout.latextview, null);
+		init(context);
 	}
 
 	public LaTeXtView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
+		init(context);
 	}
 
 	public LaTeXtView(Context context, AttributeSet attrs, int defStyleAttr)
 	{
 		super(context, attrs, defStyleAttr);
+		init(context);
 	}
 
-	public void setText(final Context context, String text){
+	public void setText(String text){
 		text = removeNewlineInFormula(text);
 		text += '\n';
-		Log.d(TAG, "setText: " + text);
+		//Log.d(TAG, "setText: " + text);
 		mText = text;
-		SpannableStringBuilder builder = SFXParser3.parse(context, text);
+		SpannableStringBuilder builder = SFXParser3.parse(mContext, text);
 		setText(builder);
 
 		retrieveLaTeXImg(builder);
 	}
 
-	public void setText(final Context context, String text, OnCompleteListener listener) {
+	public void setText(String text, OnCompleteListener listener) {
 		setListener(listener);
-		setText(context, text);
+		setText(text);
 	}
 
 	private void retrieveLaTeXImg(final SpannableStringBuilder builder) {
@@ -79,15 +80,20 @@ public class LaTeXtView extends TextView
 
 		Matcher m1 = PATTERN1.matcher(text);
 		Matcher m2 = PATTERN2.matcher(text);
+		Matcher imgMatcher = IMG_PATTERN.matcher(text);
 
-		_retrieveLaTeXImg(builder, m1, m2);
+		_retrieveLaTeXImg(builder, m1, m2, imgMatcher);
 	}
-	private void _retrieveLaTeXImg(final SpannableStringBuilder builder, final Matcher m1, final Matcher m2) {
+	private void _retrieveLaTeXImg(final SpannableStringBuilder builder, final Matcher m1, final Matcher m2, final Matcher imgMatcher) {
 		String formula;
-		Boolean flag1 = false, flag2 = false;
-		if ((flag1 = m1.find()) || (flag2 = m2.find())) {
+		Boolean flag1 = false, flag2 = false, flagImg = false;
+		if ((flagImg = imgMatcher.find()) || (flag1 = m1.find()) || (flag2 = m2.find())) {
 			int start, end;
-			if (flag2) {
+			if (flagImg) {
+				start = imgMatcher.start();
+				end = imgMatcher.end();
+				formula = imgMatcher.group(1);
+			} else if (flag2) {
 				start = m2.start();
 				end = m2.end();
 				formula = m2.group(1);//.replaceAll("[ \\t\\r\\n]", "");
@@ -96,25 +102,25 @@ public class LaTeXtView extends TextView
 				end = m1.end();
 				formula = m1.group(1);//.replaceAll("[ \\t\\r\\n]", "");
 			}
-			Log.d(TAG, "_retrieveLaTeXImg: " + start + ", " + end);
 			Log.d(TAG, "_retrieveLaTeXImg: " + formula);
 			try {
 				formula = URLEncoder.encode(formula, "UTF-8");
 				final int fStart = start, fEnd = end;
-				Glide.with(getContext()).load(SITE + formula).asBitmap().into(new SimpleTarget<Bitmap>()
+				String url = flagImg ? formula : SITE + formula;
+				Glide.with(getContext()).load(url).asBitmap().into(new SimpleTarget<Bitmap>()
 				{
 					@Override
 					public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
 					{
 						builder.setSpan(new CenteredImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 						setText(builder);
-						_retrieveLaTeXImg(builder, m1, m2);
+						_retrieveLaTeXImg(builder, m1, m2, imgMatcher);
 					}
 					@Override
 					public void onLoadFailed(Exception e, Drawable errorDrawable) {
 						super.onLoadFailed(e, errorDrawable);
 						e.printStackTrace();
-						_retrieveLaTeXImg(builder, m1, m2);
+						_retrieveLaTeXImg(builder, m1, m2, imgMatcher);
 					}
 				});
 			} catch (UnsupportedEncodingException e){
@@ -141,7 +147,7 @@ public class LaTeXtView extends TextView
 			str = str.replace(oldStr, newStr);
 		}
 
-		Log.d(TAG, "removeNewlineInFormula: str = " + str);
+		//Log.d(TAG, "removeNewlineInFormula: str = " + str);
 		return str;
 	}
 
@@ -162,5 +168,9 @@ public class LaTeXtView extends TextView
 
 	public SpannableStringBuilder getSpannableStringBuilder(){
 		return mSpannableStringBuilder;
+	}
+
+	private void init(Context context) {
+		mContext = context;
 	}
 }
