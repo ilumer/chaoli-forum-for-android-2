@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">超理论坛</string>
+	<string-array name="languages_array">
+		<item>简体中文</item>
+		<item>English</item>
+		<item>繁體中文</item>
+	</string-array>
 	<string name="username">用户名</string>
 	<string name="notification">通知</string>
 	<string name="avatar">头像</string>
@@ -135,6 +140,8 @@
 	<string name="send_you_a_private_post">%s 给你发了一个私人帖子</string>
 	<string name="mention_you">%s 提到了你</string>
 	<string name="someone_update">%s 更新于</string>
-	<string name="collapse">收起</string>
-	<string name="expand">展开</string>
+	<string name="collapse">收起  ↑</string>
+	<string name="expand">展开  ↓</string>
+	<string name="channel.all.detail">所有板块</string>
+	<string name="navigation_drawer_close">关闭抽屉</string>
 </resources>

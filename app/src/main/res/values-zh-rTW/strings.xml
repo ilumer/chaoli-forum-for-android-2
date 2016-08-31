@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">超理論壇</string>
+    <string-array name="languages_array">
+        <item>简体中文</item>
+        <item>English</item>
+        <item>繁體中文</item>
+    </string-array>
     <string name="username">用戶名</string>
     <string name="notification">通知</string>
     <string name="avatar">頭像</string>
@@ -69,6 +74,74 @@
     <string name="send_you_a_private_post">%s 給妳發了壹個私人帖子</string>
     <string name="mention_you">%s 提到了妳</string>
     <string name="someone_update">%s 更新於</string>
-    <string name="collapse">收起</string>
-    <string name="expand">展開</string>
+    <string name="collapse">收起  ↑</string>
+    <string name="expand">展開  ↓</string>
+    <string name="and_password">及密碼</string>
+    <string name="author_only">只看樓主</string>
+    <string name="cancel_author_only">取消只看樓主</string>
+    <string name="channel.ad">店鋪</string>
+    <string name="channel.ad.detail">為贊助商預留</string>
+    <string name="channel.admin">管理</string>
+    <string name="channel.admin.detail">超理論壇中央政府</string>
+    <string name="channel.all">所有板塊</string>
+    <string name="channel.all.detail">所有板塊</string>
+    <string name="channel.announ">公告</string>
+    <string name="channel.announ.detail">論壇事務公告</string>
+    <string name="channel.biology">生物</string>
+    <string name="channel.biology.detail">從生物分子到生態系統的生命科學集錦</string>
+    <string name="channel.caff">茶館</string>
+    <string name="channel.caff.detail">灌水、闲聊、漫游</string>
+    <string name="channel.chem">化学</string>
+    <string name="channel.chem.detail">化學相關的各種學術、各種各樣化學實驗！</string>
+    <string name="channel.court">申訴</string>
+    <string name="channel.court.detail">運維人員對用戶作出的處罰；對運維人員所作出決定的申訴。</string>
+    <string name="channel.lang">語言</string>
+    <string name="channel.lang.detail">語言學習交流</string>
+    <string name="channel.maths">數學</string>
+    <string name="channel.maths.detail">眼前是無窮的數學海洋，準備好啟程了嗎？</string>
+    <string name="channel.others">其他</string>
+    <string name="channel.others.detail">語言、社科</string>
+    <string name="channel.physics">物理</string>
+    <string name="channel.physics.detail">能量與動量齊飛，時間共空間壹色</string>
+    <string name="channel.socsci">社科</string>
+    <string name="channel.socsci.detail">社會科學</string>
+    <string name="network_err_get_token">在登錄頁面獲取 token 失敗。</string>
+    <string name="login_err_empty">用戶名或密碼為空。</string>
+    <string name="login_err_wrong_name_pwd">用戶名或密碼錯誤。</string>
+    <string name="ignore_this.failure">隱藏該主題失敗。狀態碼：$1%d。</string>
+    <string name="ignore_this.success">隱藏該主題成功。</string>
+    <string name="ignore_this">隱藏該主題</string>
+    <string name="network_err">網絡錯誤。</string>
+    <string name="refreshing">刷新中……</string>
+    <string name="channel.test.detail">試驗功能、報告問題</string>
+    <string name="failed">失敗。狀態碼：$1%d。</string>
+    <string name="settings">設置</string>
+    <string name="delete">刪除</string>
+    <string name="ignore_this.cancel.failure">取消隱藏該主題失敗。狀態碼：$1%d。</string>
+    <string name="ignore_this.cancel.success">取消隱藏該主題成功。</string>
+    <string name="star.cancel.failure">取消關註失敗。狀態碼：$1%d。</string>
+    <string name="star.cancel.success">取消關註成功。</string>
+    <string name="channel.tech.detail">妳為什麽不問問神奇海螺呢？</string>
+    <string name="channel.tech">技術</string>
+    <string name="channel_recycled">回收站</string>
+    <string name="reply">回復</string>
+    <string name="star.failure">關註失敗。狀態碼：$1%d。</string>
+    <string name="star.success">關註成功。</string>
+    <string name="star">關註</string>
+    <string name="navigation_drawer_clode">關閉抽屜</string>
+    <string name="share">分享</string>
+    <string name="post">發帖</string>
+    <string name="purge">丟棄</string>
+    <string name="click_login">點擊頭像登錄</string>
+    <string name="network_err_login">登錄失敗。</string>
+    <string name="network_err_homepage">打開主頁失敗。</string>
+    <string name="network_err_open_login_page">打開登錄頁失敗。</string>
+    <string name="navigation_drawer_open">打開抽屜</string>
+    <string name="save_as_draft">存為草稿</string>
+    <string name="channel.test">測試</string>
+    <string name="should_not_be_null">不能為空。</string>
+    <string name="mark_as_unread">標為未讀</string>
+    <string name="edit">編輯</string>
+    <string name="login_err_cookie_expire">Cookie 已過期。</string>
+    <string name="navigation_drawer_close">關閉抽屜</string>
 </resources>
