@@ -21,6 +21,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
@@ -36,6 +37,7 @@ public class ReplyAction extends AppCompatActivity
 	public int flag;
 
 	public int conversationId, postId;
+	public String replyTo;
 
 	public AsyncHttpClient client;
 
@@ -73,10 +75,17 @@ public class ReplyAction extends AppCompatActivity
 		Bundle data = getIntent().getExtras();
 		flag = data.getInt("flag");
 		conversationId = data.getInt("conversationId");
-		postId = data.getInt("postId");
+		postId = data.getInt("postId", -1);
+		replyTo = data.getString("replyTo", "");
 		replyMsg = data.getString("replyMsg", "");
+
 		replyText = (EditText) findViewById(R.id.replyText);
-		replyText.setText(String.format("%s", sp.getString("replyText", "") + replyMsg));
+        if (postId != -1) {
+            replyText.setText(String.format(Locale.ENGLISH, "[quote=%d:@%s]%s[/quote]", postId, replyTo, replyMsg));
+        }
+            /*replyMsg = data.getString("replyMsg", "");
+		replyText = (EditText) findViewById(R.id.replyText);
+		replyText.setText(String.format("%s", sp.getString("replyText", "") + replyMsg));*/
 	}
 
 	@Override
@@ -112,6 +121,7 @@ public class ReplyAction extends AppCompatActivity
 							public void onReplySuccess()
 							{
 								Toast.makeText(ReplyAction.this, R.string.reply, Toast.LENGTH_SHORT).show();
+								setResult(RESULT_OK);
 								finish();
 							}
 

@@ -114,8 +114,8 @@ public class NotificationFragment extends HomepageListFragment {
                                         pattern = Pattern.compile("\"startFrom\":(\\d+)");
                                         matcher = pattern.matcher(response);
                                         if (matcher.find()) {
-                                            String intentToPage = "/p" + String.valueOf(Integer.parseInt(matcher.group(1)) / 20 + 1);
-                                            intent.putExtra("intentToPage", intentToPage);
+                                            String intentToPage = String.valueOf(Integer.parseInt(matcher.group(1)) / 20 + 1);
+                                            intent.putExtra("page", intentToPage);
                                         }
                                     }
                                     progressDialog.dismiss();

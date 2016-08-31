@@ -23,6 +23,7 @@ import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.ChannelTextView;
 import com.geno.chaoli.forum.meta.Constants;
+import com.geno.chaoli.forum.meta.DividerItemDecoration;
 import com.geno.chaoli.forum.model.Conversation;
 import com.geno.chaoli.forum.meta.CookieUtils;
 import com.geno.chaoli.forum.model.ConversationListResult;
@@ -31,6 +32,8 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +44,8 @@ import cz.msebera.android.httpclient.Header;
 public class ConversationListFragment extends Fragment
 {
 	public static final String TAG = "ConversationListFrag";
+
+	private int mPage = 1;
 
 	public String channel;
 
@@ -72,11 +77,16 @@ public class ConversationListFragment extends Fragment
 			@Override
 			public void onRefresh(SwipyRefreshLayoutDirection direction)
 			{
-				getList();
+				if (direction == SwipyRefreshLayoutDirection.TOP) {
+					getList();
+				} else {
+					loadMore(mPage + 1);
+				}
 			}
 		});
 
 		l.setLayoutManager(new LinearLayoutManager(context));
+		l.addItemDecoration(new DividerItemDecoration(context));
 		mAdapter = new ConversationRecyclerViewAdapter(context, new ArrayList<Conversation>());
 		l.setAdapter(mAdapter);
 
@@ -94,6 +104,54 @@ public class ConversationListFragment extends Fragment
 		getList();
 	}
 
+	private int expandUnique(List<Conversation> A, List<Conversation> B) {
+		int lenA = A.size();
+		int i;
+		for (i = 0; i < B.size(); i++)
+			if (B.get(i).getLastPostTime().compareTo(A.get(A.size() - 1).getLastPostTime()) < 0)
+			//if (B.get(i).getLastPostTime() > A.get(A.size() - 1).getLastPostTime())
+				break;
+		A.addAll(B.subList(i, B.size()));
+		return lenA + i;
+	}
+
+	public void loadMore(final int page) {
+		CookieUtils.saveCookie(client, context);
+        channel = "all";
+        //try {
+		//	String query = "?search=%23第2页";
+		//String query = "?search=" + URLEncoder.encode("#第", "UTF-8") + "%202%20" + URLEncoder.encode("页", "UTF-8");
+			String query = "?page=" + page;
+		final String url = Constants.conversationListURL + channel + query;
+            client.get(context, url, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Log.d(TAG, "onSuccess: url = " + url);
+                    String response = new String(responseBody);
+                    Log.d(TAG, "onSuccess: response = " + response);
+                    ConversationListResult result = JSON.parseObject(response, ConversationListResult.class);
+                    List<Conversation> newConversationList = result.getResults();
+					List<Conversation> conversationList = mAdapter.getConversationList();
+					int index = expandUnique(conversationList, newConversationList);
+                    Log.d(TAG, "onSuccess: " + conversationList.size());
+                    mAdapter.setConversationList(conversationList);
+					mAdapter.notifyItemRangeInserted(index, conversationList.size());
+                    //diffResult.dispatchUpdatesTo(mAdapter);
+                    //l.smoothScrollToPosition(0);
+                    swipyRefreshLayout.setRefreshing(false);
+                    mPage = page;
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
+                    swipyRefreshLayout.setRefreshing(false);
+                }
+            });
+        /*} catch (UnsupportedEncodingException e) {
+
+        }*/
+	}
 	public void getList()
 	{
 		CookieUtils.saveCookie(client, context);

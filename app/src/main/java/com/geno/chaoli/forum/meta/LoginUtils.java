@@ -136,6 +136,7 @@ public class LoginUtils {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 //Log.e("login_error", "");
                 CookieUtils.clearCookie(context);
+
                 loginObserver.onLoginFailure(FAILED_AT_OPEN_LOGIN_PAGE);
             }
         });

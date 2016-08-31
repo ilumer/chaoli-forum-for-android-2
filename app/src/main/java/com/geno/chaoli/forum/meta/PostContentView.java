@@ -1,11 +1,20 @@
 package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
+import android.text.method.LinkMovementMethod;
 import android.text.style.QuoteSpan;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.bumptech.glide.Glide;
+import com.geno.chaoli.forum.model.Post;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,10 +22,18 @@ import java.util.regex.Pattern;
  * Created by jianhao on 16-8-26.
  */
 public class PostContentView extends LinearLayout {
+    private final static String TAG = "PostContentView";
+    private final static String QUOTE_START_TAG = "[quote";
     private final static Pattern QUOTE_START_PATTERN = Pattern.compile("\\[quote(=(\\d+?):@(.*?))?]");
     private final static String QUOTE_END_TAG = "[/quote]";
+    private final static Pattern ATTACHMENT_PATTERN = Pattern.compile("\\[attachment:(.*?)]");
 
     private Context mContext;
+    private Post mPost;
+    private int mConversationId;
+    private List<Post.Attachment> mAttachmentList;
+
+    private Boolean mShowQuote = true;
 
     public PostContentView(Context context) {
         super(context);
@@ -31,51 +48,123 @@ public class PostContentView extends LinearLayout {
         init(context);
     }
 
-    public void setText(String content) {
+    public void setPost(Post post) {
+        mPost = post;
+        mAttachmentList = post.getAttachments();
+        List<Post.Attachment> attachmentList = new ArrayList<>(post.getAttachments());
+        String content = post.getContent();
+
+        Matcher attachmentMatcher = ATTACHMENT_PATTERN.matcher(content);
+        while (attachmentMatcher.find()) {
+            String id = attachmentMatcher.group(1);
+            for (int i = attachmentList.size() - 1; i >= 0; i--) {
+                Post.Attachment attachment = attachmentList.get(i);
+                if (attachment.getAttachmentId().equals(id)) {
+                    attachmentList.remove(i);
+                }
+            }
+        }
+
         int quoteStartPos, quoteEndPos = 0;
         String piece, quote;
-        LaTeXtView laTeXtView;
         Matcher quoteMatcher = QUOTE_START_PATTERN.matcher(content);
         //while ((quoteStartPos = content.indexOf(QUOTE_START_TAG, quoteEndPos)) >= 0) {
-        while (quoteMatcher.find()) {
+        Log.d(TAG, "setText() called with: " + "content = [" + content + "]");
+        while (quoteEndPos != -1 && quoteMatcher.find(quoteEndPos)) {
             quoteStartPos = quoteMatcher.start();
 
             if (quoteEndPos != quoteStartPos) {
                 piece = content.substring(quoteEndPos, quoteStartPos);
-                laTeXtView = new LaTeXtView(mContext);
-                laTeXtView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                laTeXtView.setText(piece);
-                addView(laTeXtView);
-
+                addLaTeXView(piece);
             }
-            quoteEndPos = content.indexOf(QUOTE_END_TAG, quoteStartPos) + QUOTE_END_TAG.length();
+            quoteEndPos = pairedQuote(content, quoteStartPos);
+            //quoteEndPos = content.indexOf(QUOTE_END_TAG, quoteStartPos) + QUOTE_END_TAG.length();
             if (quoteEndPos == -1) {
                 piece = content.substring(quoteStartPos);
-                laTeXtView = new LaTeXtView(mContext);
-                laTeXtView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                laTeXtView.setText(piece);
-                addView(laTeXtView);
+                addLaTeXView(piece);
                 quoteEndPos = content.length();
-            } else {
+            } else if (mShowQuote) {
                 quote = content.substring(quoteStartPos + quoteMatcher.group().length(), quoteEndPos - QUOTE_END_TAG.length());
-                QuoteView quoteView = new QuoteView(mContext);
-                quoteView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                quoteView.setOrientation(VERTICAL);
-                quoteView.setText(quote);
-                addView(quoteView);
+                addQuoteView(quote);
+            } else {
+                addQuoteView("...");
             }
         }
         if (quoteEndPos != content.length()) {
             piece = content.substring(quoteEndPos);
-            laTeXtView = new LaTeXtView(mContext);
-            laTeXtView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            laTeXtView.setText(piece);
-            addView(laTeXtView);
+            addLaTeXView(piece);
         }
+        for (Post.Attachment attachment : attachmentList) {
+            if (attachment.getFileName().endsWith(".jpg") || attachment.getFileName().endsWith(".png")) {
+                String url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
+                ImageView imageView = new ImageView(mContext);
+                Glide.with(mContext).load(url).asBitmap().into(imageView);
+                addView(imageView);
+            }
+        }
+    }
+
+    private int pairedQuote(String str, int from) {
+        int times = 0;
+        for (int i = from; i < str.length(); i++) {
+            if (str.substring(i).startsWith(QUOTE_START_TAG)) {
+                times++;
+            } else if (str.substring(i).startsWith(QUOTE_END_TAG)) {
+                times--;
+                if (times == 0) {
+                    return i + QUOTE_END_TAG.length();
+                }
+            }
+        }
+        return -1;
+    }
+
+    private void addLaTeXView(String content) {
+        LaTeXtView laTeXtView;
+        laTeXtView = new LaTeXtView(mContext, mAttachmentList);
+        laTeXtView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        laTeXtView.setText(content);
+        laTeXtView.setMovementMethod(LinkMovementMethod.getInstance());
+        addView(laTeXtView);
+        //laTeXtView.setOnLongClickListener();
+    }
+
+    private void addQuoteView(String content) {
+        QuoteView quoteView = new QuoteView(mContext, mAttachmentList);
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = params.rightMargin = 20;
+        quoteView.setLayoutParams(params);
+        quoteView.setOrientation(VERTICAL);
+        quoteView.setText(content);
+        addView(quoteView);
     }
 
     public void init(Context context) {
         mContext = context;
         removeAllViews();
+    }
+
+    /*
+    /**
+     * Override it to react to long click
+     * @param ev motion event
+     * @return true
+     */
+    /*
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        return true;
+    }*/
+
+    public int getConversationId() {
+        return mConversationId;
+    }
+
+    public void setConversationId(int mConversationId) {
+        this.mConversationId = mConversationId;
+    }
+
+    public void showQuote(Boolean showQuote) {
+        mShowQuote = showQuote;
     }
 }
