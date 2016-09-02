@@ -252,7 +252,7 @@ public class Post
 
 	public class Attachment
 	{
-		public int attachmentId;
+		public String attachmentId;
 		public String fileName;
 		public String secret;
 		public int postId;
@@ -261,15 +261,15 @@ public class Post
 
 		public Attachment()
 		{
-			this(0, "", "", 0);
+			this("", "", "", 0);
 		}
 
-		public Attachment(int attachmentId, String fileName, String secret, int postId)
+		public Attachment(String attachmentId, String fileName, String secret, int postId)
 		{
 			this(attachmentId, fileName, secret, postId, 0, 0);
 		}
 
-		public Attachment(int attachmentId, String fileName, String secret, int postId,
+		public Attachment(String attachmentId, String fileName, String secret, int postId,
 				int draftMemberId, int draftConversationId)
 		{
 			this.attachmentId = attachmentId;
@@ -280,12 +280,12 @@ public class Post
 			this.draftConversationId = draftConversationId;
 		}
 
-		public int getAttachmentId()
+		public String getAttachmentId()
 		{
 			return attachmentId;
 		}
 
-		public void setAttachmentId(int attachmentId)
+		public void setAttachmentId(String attachmentId)
 		{
 			this.attachmentId = attachmentId;
 		}

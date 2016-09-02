@@ -59,13 +59,12 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
                         SignUpUtils.getQuestionObjList(mContext, (SignUpUtils.SubmitObserver) mContext, SignUpUtils.subjectTags.get(subjectTagsArr[which]));
                     }
                 })
-                .setCancelable(false)
-                /*.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        SignUpUtils.getQuestionObjList(mContext, (SignUpUtils.SubmitObserver)mContext, SignUpUtils.subjectTags.get("综合"));
+                        finish();
                     }
-                })*/
+                })
                 .show();
     }
 

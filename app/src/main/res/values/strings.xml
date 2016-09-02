@@ -11,6 +11,7 @@
     <string-array name="languages_array">
         <item>简体中文</item>
         <item>English</item>
+		<item>繁體中文</item>
     </string-array>
     <string name="notify_me_when_receiving_personal_conversation">notify me when receiving personal conversation</string>
     <string name="star_conversations_i_post_automatically">star conversations I post automatically</string>
@@ -20,7 +21,7 @@
     <string name="change_avatar">change avatar</string>
     <string name="submit">Submit</string>
     <string name="password">Password</string>
-    <string name="email">Email</string>
+    <string name="email" translatable="false">Email</string>
     <string name="retype_password">Retype password</string>
 	<string name="reply">Reply</string>
 	<string name="login">Login</string>
@@ -84,7 +85,7 @@
 	<string name="navigation_drawer_open">Open drawer</string>
 	<string name="navigation_drawer_close">Close drawer</string>
 	<string name="channel.all">All</string>
-	<string name="channel.all.detail" translatable="false"/>
+	<string name="channel.all.detail">All</string>
 	<string name="edit">Edit</string>
 	<string name="delete">Delete</string>
 	<string name="refresh_succeed">Refresh succeed</string>
@@ -141,5 +142,8 @@
 	<string name="send_you_a_private_post">%s send you a private post</string>
 	<string name="mention_you">%s mentioned you</string>
 	<string name="someone_update">%s updated</string>
+	<string name="collapse">collapse  ↑</string>
+	<string name="expand">expand  ↓</string>
+	<string name="navigation_drawer_clode">Close drawer</string>
 
 </resources>

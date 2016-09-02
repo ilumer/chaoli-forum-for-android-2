@@ -1,9 +1,6 @@
 package com.geno.chaoli.forum.meta.SFX;
 
-import android.util.Log;
 import android.widget.TextView;
-
-import com.geno.chaoli.forum.meta.LaTeXtView;
 
 public class SFXExecutor
 {

@@ -114,7 +114,6 @@ public class LoginUtils {
     }
 
     private static void pre_login(final Context context, final LoginObserver loginObserver){//获取登录页面的token
-        Log.d(TAG, "sdaf");
         client.get(context, Constants.LOGIN_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
@@ -137,13 +136,13 @@ public class LoginUtils {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 //Log.e("login_error", "");
                 CookieUtils.clearCookie(context);
+
                 loginObserver.onLoginFailure(FAILED_AT_OPEN_LOGIN_PAGE);
             }
         });
     }
 
     private static void login(final Context context, final LoginObserver loginObserver){ //发送请求登录
-        Log.d(TAG, "sdsafdaf");
         RequestParams params = new RequestParams();
         params.put("username", username);
         params.put("password", password);

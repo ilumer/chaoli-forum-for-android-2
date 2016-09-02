@@ -219,7 +219,11 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 					}
 				});
 
-				timer.schedule(task, Constants.getNotificationInterval * 1000, Constants.getNotificationInterval * 1000);
+				try {
+					timer.schedule(task, Constants.getNotificationInterval * 1000, Constants.getNotificationInterval * 1000);
+				} catch (Exception e) {
+
+				}
 				selectItem(0);
 			}
 
