@@ -1,30 +1,19 @@
 package com.geno.chaoli.forum;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.CookieUtils;
-import com.geno.chaoli.forum.meta.LoginUtils;
-import com.geno.chaoli.forum.meta.PostUtils;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.geno.chaoli.forum.utils.PostUtils;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import cz.msebera.android.httpclient.Header;
 
 public class ReplyAction extends AppCompatActivity
 {
@@ -38,8 +27,6 @@ public class ReplyAction extends AppCompatActivity
 
 	public int conversationId, postId;
 	public String replyTo;
-
-	public AsyncHttpClient client;
 
 	public String replyMsg;
 
@@ -69,7 +56,6 @@ public class ReplyAction extends AppCompatActivity
 				onBackPressed();
 			}
 		});
-		client = new AsyncHttpClient();
 		sp = getSharedPreferences("draftList", MODE_PRIVATE);
 		e = sp.edit();
 		Bundle data = getIntent().getExtras();
@@ -81,8 +67,9 @@ public class ReplyAction extends AppCompatActivity
 
 		replyText = (EditText) findViewById(R.id.replyText);
         if (postId != -1) {
-            replyText.setText(String.format(Locale.ENGLISH, "[quote=%d:@%s]%s[/quote]", postId, replyTo, replyMsg));
+            replyText.setText(String.format(Locale.ENGLISH, "[quote=%d:@%s]%s[/quote]\n", postId, replyTo, replyMsg));
         }
+		replyText.setSelection(replyText.getText().length());
             /*replyMsg = data.getString("replyMsg", "");
 		replyText = (EditText) findViewById(R.id.replyText);
 		replyText.setText(String.format("%s", sp.getString("replyText", "") + replyMsg));*/
@@ -132,8 +119,8 @@ public class ReplyAction extends AppCompatActivity
 							}
 						});
 						break;
-					case FLAG_REPLY:
-						PostUtils.quote(ReplyAction.this, conversationId, replyText.getText().toString(), new PostUtils.QuoteObserver()
+					/*case FLAG_REPLY:
+						PostUtils.quote(ReplyAction.this, mConversationId, replyText.getText().toString(), new PostUtils.QuoteObserver()
 						{
 							@Override
 							public void onQuoteSuccess()
@@ -148,6 +135,7 @@ public class ReplyAction extends AppCompatActivity
 							}
 						});
 						break;
+						*/
 					case FLAG_EDIT:
 						PostUtils.edit(ReplyAction.this, postId, replyText.getText().toString(), new PostUtils.EditObserver()
 						{

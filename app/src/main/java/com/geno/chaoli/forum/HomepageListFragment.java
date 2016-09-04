@@ -1,38 +1,30 @@
 package com.geno.chaoli.forum;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextPaint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
 import com.geno.chaoli.forum.meta.AvatarView;
-import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.CookieUtils;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.geno.chaoli.forum.network.MyOkHttp;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import cz.msebera.android.httpclient.Header;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by jianhao on 16-6-5.
@@ -50,9 +42,13 @@ abstract public class HomepageListFragment extends Fragment implements SwipyRefr
     final static String TAG = "HomepageListFragment";
 
     abstract public String getURL();
+    //abstract public retrofit2.Call<> getCall(int page, Class T);
     abstract public List<? extends ListItem> parseItems(String JSONString);
     abstract public void bindItemViewHolder(Context context, MyAdapter adapter, MyAdapter.MyViewHolder holder, ListItem listItem, int position);
 
+    /*public retrofit2.Call<List<ListItem>> getCall(){
+        return getCall(1);
+    }*/
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -108,7 +104,88 @@ abstract public class HomepageListFragment extends Fragment implements SwipyRefr
     @Override
     public void onRefresh(SwipyRefreshLayoutDirection direction) {
         final SwipyRefreshLayout swipyRefreshLayout = mSwipyRefreshLayout;
-        AsyncHttpClient client = new AsyncHttpClient();
+        if (direction == SwipyRefreshLayoutDirection.TOP) {
+            new MyOkHttp.MyOkHttpClient()
+                    .get(getURL())
+                    .enqueue(mCallback, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            swipyRefreshLayout.setRefreshing(false);
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseStr = response.body().string();
+                            Log.d(TAG, responseStr);
+                            List<? extends ListItem> listItems = parseItems(responseStr);
+
+                            int i = 0;
+                            for (; i < listItems.size(); i++) {
+                                if (Long.parseLong(startTime) >= Long.parseLong(listItems.get(i).getTime())) {
+                                    break;
+                                }
+                            }
+
+                            i--;
+
+                            for (; i >= 0; i--) {
+                                ListItem listItem = listItems.get(i);
+                                myAdapter.listItems.add(0, listItem);
+                            }
+
+                            startTime = listItems.size() > 0 ? listItems.get(0).getTime() : startTime;
+
+                            Log.d(TAG, String.valueOf(myAdapter.listItems.size()));
+                            addTimeDivider(myAdapter.listItems);
+                            myAdapter.notifyDataSetChanged();
+                            swipyRefreshLayout.setRefreshing(false);
+
+                        }
+                    });
+        } else {
+            new MyOkHttp.MyOkHttpClient()
+                    .get(getURL() + "/" + (mPage + 1))
+                    .enqueue(mCallback, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            swipyRefreshLayout.setRefreshing(false);
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseStr = response.body().string();
+                            List<? extends ListItem> listItems = parseItems(responseStr);
+
+                            final int listSize = listItems.size();
+                            if(listSize == 0){
+                                swipyRefreshLayout.setRefreshing(false);
+                                return;
+                            }
+
+                            int i = 0;
+                            for(; i < listSize; i++){
+                                if(Long.parseLong(endTime) > Long.parseLong(listItems.get(i).getTime())){
+                                    break;
+                                }
+                            }
+
+                            for (; i < listSize; i++) {
+                                ListItem listItem = listItems.get(i);
+                                myAdapter.listItems.add(listItem);
+                            }
+
+                            endTime = listItems.get(i - 1).getTime();
+                            mPage++;
+
+                            swipyRefreshLayout.setRefreshing(false);
+
+                            addTimeDivider(myAdapter.listItems);
+                            myAdapter.notifyDataSetChanged();
+
+                        }
+                    });
+        }
+        /*AsyncHttpClient client = new AsyncHttpClient();
         CookieUtils.saveCookie(client, mCallback);
         if(direction == SwipyRefreshLayoutDirection.TOP){
             client.get(mCallback, getURL(), new AsyncHttpResponseHandler() {
@@ -186,7 +263,7 @@ abstract public class HomepageListFragment extends Fragment implements SwipyRefr
                     swipyRefreshLayout.setRefreshing(false);
                 }
             });
-        }
+        }*/
     }
 
     public void setRefreshEnabled(Boolean enabled){
@@ -197,7 +274,7 @@ abstract public class HomepageListFragment extends Fragment implements SwipyRefr
         mSwipyRefreshLayout.setDirection(direction);
     }
 
-    abstract static class ListItem{
+    public abstract static class ListItem{
         public final static String ITEM         = "item";
         public final static String DIVIDER      = "divider";
         public final static String SPACE        = "space";

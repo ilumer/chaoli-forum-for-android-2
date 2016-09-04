@@ -21,10 +21,7 @@ import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.LoginUtils;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
-
-import java.util.regex.Pattern;
+import com.geno.chaoli.forum.utils.LoginUtils;
 
 /**
  * Created by daquexian on 16-4-14.

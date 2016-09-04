@@ -3,23 +3,23 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/QuestionItem">
-    <TextView
+    <com.geno.chaoli.forum.meta.OnlineImgTextView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <CheckBox
+    <com.geno.chaoli.forum.meta.OnlineImgCheckBox
         android:id="@+id/choice_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <CheckBox
+    <com.geno.chaoli.forum.meta.OnlineImgCheckBox
         android:id="@+id/choice_2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <CheckBox
+    <com.geno.chaoli.forum.meta.OnlineImgCheckBox
         android:id="@+id/choice_3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-    <CheckBox
+    <com.geno.chaoli.forum.meta.OnlineImgCheckBox
         android:id="@+id/choice_4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

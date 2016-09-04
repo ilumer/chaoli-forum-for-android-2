@@ -2,16 +2,12 @@ package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.support.v4.content.res.ResourcesCompat;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.SpannedString;
-import android.text.TextPaint;
 import android.text.style.AlignmentSpan;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ClickableSpan;
@@ -20,15 +16,10 @@ import android.text.style.ImageSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
-import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.geno.chaoli.forum.PostActivity;
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.model.Post;
@@ -65,18 +56,13 @@ public class SFXParser3
 		R.drawable.emoticons__0001_50, R.drawable.asonwwolf_smile, R.drawable.asonwwolf_laugh, R.drawable.asonwwolf_upset, R.drawable.asonwwolf_tear,
 		R.drawable.asonwwolf_worry, R.drawable.asonwwolf_shock, R.drawable.asonwwolf_amuse};
 
-	public static final SpannableStringBuilder parse(final Context context, String string, List<Post.Attachment> attachmentList){
-
-		return parse(context, null, string, attachmentList);
-	}
-
-	public static final SpannableStringBuilder parse(final Context context, final TextView textView, String string, List<Post.Attachment> attachmentList)
+	public static SpannableStringBuilder parse(final Context context, String string, List<Post.Attachment> attachmentList)
 	{
 		final SpannableStringBuilder spannable = new SpannableStringBuilder(string);
 //		tagDealer(s, "[b]", "[/b]", new StyleSpan(Typeface.BOLD));
 //		tagDealer(s, "[i]", "[/i]", new StyleSpan(Typeface.ITALIC));
 
-		Pattern cPattern = Pattern.compile("\\[c=(.*?)](.*?)\\[/c]");
+		Pattern cPattern = Pattern.compile("(?i)\\[c=(.*?)](.*?)\\[/c]");
 		Matcher c = cPattern.matcher(spannable);
 		while (c.find())
 		{
@@ -88,7 +74,7 @@ public class SFXParser3
 			c = cPattern.matcher(spannable);
 		}
 
-		Pattern urlPattern = Pattern.compile("\\[url=(.*?)](.*?)\\[/url]");
+		Pattern urlPattern = Pattern.compile("(?i)\\[url=(.*?)](.*?)\\[/url]");
 		Matcher url = urlPattern.matcher(spannable);
 		while (url.find())
 		{
@@ -112,18 +98,18 @@ public class SFXParser3
 			url = urlPattern.matcher(spannable);
 		}
 
-		Pattern curtainPattern = Pattern.compile("(?<=\\[curtain\\])((.|\\n)+?)(?=\\[/curtain\\])");
+		Pattern curtainPattern = Pattern.compile("(?i)(?<=\\[curtain\\])((.|\\n)+?)(?=\\[/curtain\\])");
 		Matcher curtain = curtainPattern.matcher(spannable);
 		while (curtain.find())
 		{
-			spannable.setSpan(new BackgroundColorSpan(Color.BLACK), curtain.start(), curtain.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+			spannable.setSpan(new BackgroundColorSpan(Color.DKGRAY), curtain.start(), curtain.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 //			spannable.setSpan(new Touchable, curtain.start(), curtain.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 			spannable.replace(curtain.end(), curtain.end() + 10, "");
 			spannable.replace(curtain.start() - 9, curtain.start(), "");
-			curtain = Pattern.compile("(?<=\\[curtain\\])(.+?)(?=\\[/curtain\\])").matcher(spannable);
+			curtain = Pattern.compile("(?i)(?<=\\[curtain\\])(.+?)(?=\\[/curtain\\])").matcher(spannable);
 		}
 
-		Pattern bPattern = Pattern.compile("\\[b]((.|\\n)+?)\\[/b]");
+		Pattern bPattern = Pattern.compile("(?i)\\[b]((.|\\n)+?)\\[/b]");
 		Matcher b = bPattern.matcher(spannable);
 		while (b.find())
 		{
@@ -133,7 +119,7 @@ public class SFXParser3
 			b = bPattern.matcher(spannable);
 		}
 
-		Pattern iPattern = Pattern.compile("(?<=\\[i\\])((.|\\n)+?)(?=\\[/i\\])");
+		Pattern iPattern = Pattern.compile("(?i)(?<=\\[i\\])((.|\\n)+?)(?=\\[/i\\])");
 		Matcher i = iPattern.matcher(spannable);
 		while (i.find())
 		{
@@ -143,7 +129,7 @@ public class SFXParser3
 			i = iPattern.matcher(spannable);
 		}
 
-		Pattern uPattern = Pattern.compile("(?<=\\[u\\])((.|\\n)+?)(?=\\[/u\\])");
+		Pattern uPattern = Pattern.compile("(?i)(?<=\\[u\\])((.|\\n)+?)(?=\\[/u\\])");
 		Matcher u = uPattern.matcher(spannable);
 		while (u.find())
 		{
@@ -153,7 +139,7 @@ public class SFXParser3
 			u = uPattern.matcher(spannable);
 		}
 
-		Pattern sPattern = Pattern.compile("(?<=\\[s\\])((.|\\n)+?)(?=\\[/s\\])");
+		Pattern sPattern = Pattern.compile("(?i)(?<=\\[s\\])((.|\\n)+?)(?=\\[/s\\])");
 		Matcher s = sPattern.matcher(spannable);
 		while (s.find())
 		{
@@ -163,7 +149,7 @@ public class SFXParser3
 			s = sPattern.matcher(spannable);
 		}
 
-		Pattern centerPattern = Pattern.compile("(?<=\\[center\\])((.|\\n)+?)(?=\\[/center\\])");
+		Pattern centerPattern = Pattern.compile("(?i)(?<=\\[center\\])((.|\\n)+?)(?=\\[/center\\])");
 		Matcher center = centerPattern.matcher(spannable);
 		while (center.find())
 		{
@@ -173,7 +159,7 @@ public class SFXParser3
 			center = centerPattern.matcher(spannable);
 		}
 
-		Pattern hPattern = Pattern.compile("(?<=\\[h\\])((.|\\n)+?)(?=\\[/h\\])");
+		Pattern hPattern = Pattern.compile("(?i)(?<=\\[h\\])((.|\\n)+?)(?=\\[/h\\])");
 		Matcher h = hPattern.matcher(spannable);
 		while (h.find())
 		{
@@ -184,23 +170,22 @@ public class SFXParser3
 		}
 
 
-		Pattern attachmentPattern = Pattern.compile("\\[attachment:(.*?)]");
+		Pattern attachmentPattern = Pattern.compile("(?i)\\[attachment:(.*?)]");
 		Matcher attachmentM = attachmentPattern.matcher(spannable);
 		while (attachmentList != null && attachmentM.find()) {
 			for (int j = attachmentList.size() - 1; j >= 0; j--) {
 				Post.Attachment attachment = attachmentList.get(j);
 				if (attachment.getAttachmentId().equals(attachmentM.group(1))) {
-					if (!(attachment.getFileName().endsWith(".jpg") || attachment.getFileName().endsWith(".png"))) {
+					if (!(attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png"))) {
 						try {
-							final String finalUrl = "https://chaoli.club/index.php/attachment/" + attachment.getAttachmentId() + "_" + URLEncoder.encode(attachment.getFileName(), "UTF-8");
-							Log.d(TAG, "parse: " + attachment.getFileName());
-							spannable.replace(attachmentM.start(), attachmentM.end(), attachment.getFileName());
+							final String finalUrl = "https://chaoli.club/index.php/attachment/" + attachment.getAttachmentId() + "_" + URLEncoder.encode(attachment.getFilename(), "UTF-8");
+							spannable.replace(attachmentM.start(), attachmentM.end(), attachment.getFilename());
 							spannable.setSpan(new ClickableSpan() {
 								@Override
 								public void onClick(View view) {
 									context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(finalUrl)));
 								}
-							}, attachmentM.start(), attachmentM.start() + attachment.getFileName().length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+							}, attachmentM.start(), attachmentM.start() + attachment.getFilename().length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 							attachmentM = attachmentPattern.matcher(spannable);
 						} catch (UnsupportedEncodingException e) {
 							Log.w(TAG, "parse: ", e);
@@ -230,7 +215,7 @@ public class SFXParser3
 //
 //	public static final void tagDealer(final SpannableStringBuilder s, String openTag, String closeTag, Object what)
 //	{
-//		Matcher matcher = Pattern.compile("(?<=" + openTag + ")(.+?)(?=" + closeTag + ")").matcher(s);
+//		Matcher matcher = Pattern.compile("(?i)(?<=" + openTag + ")(.+?)(?=" + closeTag + ")").matcher(s);
 //		while (matcher.find())
 //		{
 //			s.setSpan(what, matcher.start(), matcher.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -238,7 +223,7 @@ public class SFXParser3
 //			s.replace(matcher.start() - openTag.length() + 1, matcher.start() + 1, "");
 ////			s.replace(matcher.start() - openTag.length(), matcher.start(), "");
 ////			s.replace(matcher.end() - openTag.length(), matcher.end() - openTag.length() + closeTag.length(), "");
-//			matcher = Pattern.compile("(?<=" + openTag + ")(.+?)(?=" + closeTag + ")").matcher(s);
+//			matcher = Pattern.compile("(?i)(?<=" + openTag + ")(.+?)(?=" + closeTag + ")").matcher(s);
 //		}
 //	}
 }

@@ -1,7 +1,6 @@
 package com.geno.chaoli.forum.model;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import java.util.List;
@@ -253,7 +252,7 @@ public class Post
 	public class Attachment
 	{
 		public String attachmentId;
-		public String fileName;
+		public String filename;
 		public String secret;
 		public int postId;
 		public int draftMemberId;
@@ -264,16 +263,16 @@ public class Post
 			this("", "", "", 0);
 		}
 
-		public Attachment(String attachmentId, String fileName, String secret, int postId)
+		public Attachment(String attachmentId, String filename, String secret, int postId)
 		{
-			this(attachmentId, fileName, secret, postId, 0, 0);
+			this(attachmentId, filename, secret, postId, 0, 0);
 		}
 
-		public Attachment(String attachmentId, String fileName, String secret, int postId,
-				int draftMemberId, int draftConversationId)
+		public Attachment(String attachmentId, String filename, String secret, int postId,
+						  int draftMemberId, int draftConversationId)
 		{
 			this.attachmentId = attachmentId;
-			this.fileName = fileName;
+			this.filename = filename;
 			this.secret = secret;
 			this.postId = postId;
 			this.draftMemberId = draftMemberId;
@@ -290,14 +289,14 @@ public class Post
 			this.attachmentId = attachmentId;
 		}
 
-		public String getFileName()
+		public String getFilename()
 		{
-			return fileName;
+			return filename.toLowerCase();
 		}
 
-		public void setFileName(String fileName)
+		public void setFilename(String filename)
 		{
-			this.fileName = fileName;
+			this.filename = filename;
 		}
 
 		public String getSecret()

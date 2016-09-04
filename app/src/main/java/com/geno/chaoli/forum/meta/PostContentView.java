@@ -2,10 +2,7 @@ package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
 import android.text.method.LinkMovementMethod;
-import android.text.style.QuoteSpan;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,6 +16,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * 包含QuoteView和OnlineImgTextView
+ * 用于显示帖子
  * Created by jianhao on 16-8-26.
  */
 public class PostContentView extends LinearLayout {
@@ -69,7 +68,6 @@ public class PostContentView extends LinearLayout {
         String piece, quote;
         Matcher quoteMatcher = QUOTE_START_PATTERN.matcher(content);
         //while ((quoteStartPos = content.indexOf(QUOTE_START_TAG, quoteEndPos)) >= 0) {
-        Log.d(TAG, "setText() called with: " + "content = [" + content + "]");
         while (quoteEndPos != -1 && quoteMatcher.find(quoteEndPos)) {
             quoteStartPos = quoteMatcher.start();
 
@@ -95,7 +93,7 @@ public class PostContentView extends LinearLayout {
             addLaTeXView(piece);
         }
         for (Post.Attachment attachment : attachmentList) {
-            if (attachment.getFileName().endsWith(".jpg") || attachment.getFileName().endsWith(".png")) {
+            if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
                 String url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
                 ImageView imageView = new ImageView(mContext);
                 Glide.with(mContext).load(url).asBitmap().into(imageView);
@@ -120,12 +118,12 @@ public class PostContentView extends LinearLayout {
     }
 
     private void addLaTeXView(String content) {
-        LaTeXtView laTeXtView;
-        laTeXtView = new LaTeXtView(mContext, mAttachmentList);
-        laTeXtView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        laTeXtView.setText(content);
-        laTeXtView.setMovementMethod(LinkMovementMethod.getInstance());
-        addView(laTeXtView);
+        OnlineImgTextView onlineImgTextView;
+        onlineImgTextView = new OnlineImgTextView(mContext, mAttachmentList);
+        onlineImgTextView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        onlineImgTextView.setText(content);
+        onlineImgTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        addView(onlineImgTextView);
         //laTeXtView.setOnLongClickListener();
     }
 

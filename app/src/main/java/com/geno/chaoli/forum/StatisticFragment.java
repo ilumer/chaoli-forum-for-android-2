@@ -12,15 +12,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Constants;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.geno.chaoli.forum.network.MyOkHttp;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cz.msebera.android.httpclient.Header;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
 
 /**
+ * 在个人主页显示用户数据的Fragment
  * Created by jianhao on 16-6-5.
  */
 public class StatisticFragment extends Fragment {
@@ -62,47 +66,47 @@ public class StatisticFragment extends Fragment {
         joinBBSTxt = (TextView) view.findViewById(R.id.joinBBSTxt);
         jinpinTxt = (TextView) view.findViewById(R.id.jinpinTxt);
 
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.get(mCallback, Constants.GET_STATISTICS_URL + mUserId, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                String response = new String(responseBody);
-                Log.d(TAG, response);
-                Pattern pattern = Pattern.compile("<div>(\\\\n)?(.*?)<");
-                Matcher matcher = pattern.matcher(response);
-                if(matcher.find()){
-                    intStats[0] = Integer.parseInt(matcher.group(2));
-                    postTxt.setText(String.valueOf(intStats[0]));
-                }
-                if(matcher.find()){
-                    intStats[1] = Integer.parseInt(matcher.group(2));
-                    conversationTxt.setText(String.valueOf(intStats[1]));
-                }
-                if (matcher.find()) {
-                    intStats[2] = Integer.parseInt(matcher.group(2));
-                    joinedConversationTxt.setText(String.valueOf(intStats[2]));
-                }
-                if (matcher.find()) {
-                    strStats[0] = unicodeToString(matcher.group(2));
-                    earliestPostTxt.setText(strStats[0]);
-                }
-                if (matcher.find()) {
-                    strStats[1] = unicodeToString(matcher.group(2));
-                    joinBBSTxt.setText(strStats[1]);
-                }
-                if (matcher.find()) {
-                    strStats[2] = unicodeToString(matcher.group(2));
-                    jinpinTxt.setText(strStats[2]);
-                }
+        new MyOkHttp.MyOkHttpClient()
+                .get(Constants.GET_STATISTICS_URL + mUserId)
+                .enqueue(mCallback, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Toast.makeText(mCallback, R.string.network_err, Toast.LENGTH_SHORT).show();
+                    }
 
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(mCallback, R.string.network_err, Toast.LENGTH_SHORT).show();
-                Log.e(TAG, String.valueOf(statusCode));
-            }
-        });
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responseStr = response.body().string();
+                        response.body().close();
+                        Log.d(TAG, responseStr);
+                        Pattern pattern = Pattern.compile("<div>(\\\\n)?(.*?)<");
+                        Matcher matcher = pattern.matcher(responseStr);
+                        if(matcher.find()){
+                            intStats[0] = Integer.parseInt(matcher.group(2));
+                            postTxt.setText(String.valueOf(intStats[0]));
+                        }
+                        if(matcher.find()){
+                            intStats[1] = Integer.parseInt(matcher.group(2));
+                            conversationTxt.setText(String.valueOf(intStats[1]));
+                        }
+                        if (matcher.find()) {
+                            intStats[2] = Integer.parseInt(matcher.group(2));
+                            joinedConversationTxt.setText(String.valueOf(intStats[2]));
+                        }
+                        if (matcher.find()) {
+                            strStats[0] = unicodeToString(matcher.group(2));
+                            earliestPostTxt.setText(strStats[0]);
+                        }
+                        if (matcher.find()) {
+                            strStats[1] = unicodeToString(matcher.group(2));
+                            joinBBSTxt.setText(strStats[1]);
+                        }
+                        if (matcher.find()) {
+                            strStats[2] = unicodeToString(matcher.group(2));
+                            jinpinTxt.setText(strStats[2]);
+                        }
+                    }
+                });
         return view;
     }
 

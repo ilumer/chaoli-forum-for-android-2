@@ -1,18 +1,13 @@
 package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -22,14 +17,15 @@ import com.geno.chaoli.forum.model.Post;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import butterknife.OnClick;
-
-public class LaTeXtView extends TextView
+/**
+ * 需要在线获取的图片交给它来显示
+ * 其他处理在SFXParser3中进行
+ */
+public class OnlineImgTextView extends TextView
 {
 	private Context mContext;
 	private List<Post.Attachment> mAttachmentList;
@@ -40,31 +36,31 @@ public class LaTeXtView extends TextView
 
 	public static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{" + 440 / 2 + "}";
 
-	//public static final Pattern PATTERN1 = Pattern.compile("(?<=\\$)(.+?)(?=\\$)");
+	//public static final Pattern PATTERN1 = Pattern.compile("(?i)(?<=\\$)(.+?)(?=\\$)");
 
-	//public static final Pattern PATTERN2 = Pattern.compile("(?<=\\\\\\()(.+?)(?=\\\\\\))");
-	private static final Pattern PATTERN1 = Pattern.compile("\\$\\$?(([^\\$]|\\n)+?)\\$?\\$");
-	private static final Pattern PATTERN2 = Pattern.compile("\\\\[(\\[]((.|\\n)*?)\\\\[\\])]");
-	private static final Pattern PATTERN3 = Pattern.compile("\\[tex]((.|\\n)*?)\\[/tex]");
-	private static final Pattern IMG_PATTERN = Pattern.compile("\\[img](.*?)\\[/img]");
-	private static final Pattern ATTACHMENT_PATTERN = Pattern.compile("\\[attachment:(.*?)]");
-	//private static final Pattern PATTERN3 = Pattern.compile("\\\\begin\\{.*?\\}(.|\\n)*?\\\\end\\{.*?\\}");
+	//public static final Pattern PATTERN2 = Pattern.compile("(?i)(?<=\\\\\\()(.+?)(?=\\\\\\))");
+	private static final Pattern PATTERN1 = Pattern.compile("(?i)\\$\\$?(([^\\$]|\\n)+?)\\$?\\$");
+	private static final Pattern PATTERN2 = Pattern.compile("(?i)\\\\[(\\[]((.|\\n)*?)\\\\[\\])]");
+	private static final Pattern PATTERN3 = Pattern.compile("(?i)\\[tex]((.|\\n)*?)\\[/tex]");
+	private static final Pattern IMG_PATTERN = Pattern.compile("(?i)\\[img](.*?)\\[/img]");
+	private static final Pattern ATTACHMENT_PATTERN = Pattern.compile("(?i)\\[attachment:(.*?)]");
+	//private static final Pattern PATTERN3 = Pattern.compile("(?i)\\\\begin\\{.*?\\}(.|\\n)*?\\\\end\\{.*?\\}");
 
-	public static final String TAG = "LaTeXtView";
+	public static final String TAG = "OnlineImgTextView";
 
-	public LaTeXtView(Context context, List<Post.Attachment> attachmentList)
+	public OnlineImgTextView(Context context, List<Post.Attachment> attachmentList)
 	{
 		super(context);
 		init(context, attachmentList);
 	}
 
-	public LaTeXtView(Context context, AttributeSet attrs)
+	public OnlineImgTextView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
 		init(context, null);
 	}
 
-	public LaTeXtView(Context context, AttributeSet attrs, int defStyleAttr)
+	public OnlineImgTextView(Context context, AttributeSet attrs, int defStyleAttr)
 	{
 		super(context, attrs, defStyleAttr);
 		init(context, null);
@@ -137,20 +133,9 @@ public class LaTeXtView extends TextView
 					for (int i = mAttachmentList.size() - 1; i >= 0; i--) {
 						Post.Attachment attachment = mAttachmentList.get(i);
 						if (attachment.getAttachmentId().equals(formula)) {
-							if (attachment.getFileName().endsWith(".jpg") || attachment.getFileName().endsWith(".png")) {
+							if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
 								url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
-							}/* else {
-								final String finalUrl = "https://chaoli.club/index.php/attachment/" + attachment.getAttachmentId() + "_" + URLEncoder.encode(attachment.getFileName(), "UTF-8");
-								builder.replace(fStart, fEnd, attachment.getFileName());
-								builder.setSpan(new ClickableSpan() {
-									@Override
-									public void onClick(View view) {
-										mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(finalUrl)));
-									}
-								}, fStart, fStart + attachment.getFileName().length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-								_retrieveLaTeXImg(builder, m1, m2, m3, imgMatcher, attachmentMatcher);
-								return;
-							}*/
+							}
 						}
 					}
 				} else {
@@ -168,7 +153,6 @@ public class LaTeXtView extends TextView
 						post(new Runnable() {
 							@Override
 							public void run() {
-								//Log.d(TAG, "run: formula = " + fFormula + ", fStart = " + fStart + ", fEnd = " + fEnd);
 								if(finalFlagAttachment || finalFlagImg) builder.setSpan(new ImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 								else builder.setSpan(new CenteredImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 								setText(builder);

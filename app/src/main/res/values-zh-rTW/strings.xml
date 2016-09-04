@@ -144,4 +144,5 @@
     <string name="edit">編輯</string>
     <string name="login_err_cookie_expire">Cookie 已過期。</string>
     <string name="navigation_drawer_close">關閉抽屜</string>
+    <string name="length_of_username_should_be_between_4_and_21">用戶名長度要在4到21字符之間</string>
 </resources>

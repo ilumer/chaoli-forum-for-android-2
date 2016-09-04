@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -15,24 +17,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.geno.chaoli.forum.meta.SignUpUtils;
-import com.geno.chaoli.forum.meta.SignUpUtils.Question;
+import com.geno.chaoli.forum.meta.OnlineImgCheckBox;
+import com.geno.chaoli.forum.meta.OnlineImgRadioButton;
+import com.geno.chaoli.forum.meta.OnlineImgTextView;
+import com.geno.chaoli.forum.utils.SignUpUtils;
 
-import com.alibaba.fastjson.*;
+import com.geno.chaoli.forum.model.Question;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 注册时显示问题、回答问题的Activity
  * Created by jianhao on 16-3-28.
  */
 public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils.SubmitObserver {
@@ -121,8 +124,8 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
                 final int[] ids = {R.id.choice_1, R.id.choice_2, R.id.choice_3, R.id.choice_4};
 
                 if (getItemViewType(position) == RADIO_BTN_ITEM_TYPE) {
-                    RadioButton[] RadioBtnArray = {((RadioButton) convertView.findViewById(ids[0])), ((RadioButton) convertView.findViewById(ids[1])),
-                            ((RadioButton) convertView.findViewById(ids[2])), ((RadioButton) convertView.findViewById(ids[3]))};
+                    OnlineImgRadioButton[] RadioBtnArray = {((OnlineImgRadioButton) convertView.findViewById(ids[0])), ((OnlineImgRadioButton) convertView.findViewById(ids[1])),
+                            ((OnlineImgRadioButton) convertView.findViewById(ids[2])), ((OnlineImgRadioButton) convertView.findViewById(ids[3]))};
                     RadioGroup radioGroup = ((RadioGroup) convertView.findViewById(R.id.choices));
 
                     for (int i = 0; i < RadioBtnArray.length; i++) {
@@ -145,8 +148,8 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
                     //如果放在setOnCheckedChangeListener之前会导致当view被复用时，触发onCheckedChanged事件，还持有原question引用的OnCheckedChangeListener会将不该清空的answers清空
                     radioGroup.check(answers.size() == 0 ? -1 : ids[Integer.parseInt(answers.get(0))]);
                 } else {
-                    CheckBox[] checkGroup = {((CheckBox) convertView.findViewById(ids[0])), ((CheckBox) convertView.findViewById(ids[1])),
-                            ((CheckBox) convertView.findViewById(ids[2])), ((CheckBox) convertView.findViewById(ids[3]))};
+                    OnlineImgCheckBox[] checkGroup = {((OnlineImgCheckBox) convertView.findViewById(ids[0])), ((OnlineImgCheckBox) convertView.findViewById(ids[1])),
+                            ((OnlineImgCheckBox) convertView.findViewById(ids[2])), ((OnlineImgCheckBox) convertView.findViewById(ids[3]))};
 
                     CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
                         @Override
@@ -169,7 +172,7 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
                     }
                 }
             }
-            ((TextView)convertView.findViewById(R.id.content)).setText(questionObj.getQuestion());
+            ((OnlineImgTextView)convertView.findViewById(R.id.content)).setText(questionObj.getQuestion());
             return convertView;
         }
 
@@ -208,7 +211,6 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.i("hi!", JSON.toJSONString(questionObjList));
                     SignUpUtils.submitAnswers(mContext, questionObjList, (SignUpUtils.SubmitObserver) mContext);
                 }
             });

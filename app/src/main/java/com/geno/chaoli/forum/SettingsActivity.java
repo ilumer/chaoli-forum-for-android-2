@@ -1,6 +1,5 @@
 package com.geno.chaoli.forum;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -10,24 +9,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.geno.chaoli.forum.meta.AccountUtils;
+import com.geno.chaoli.forum.utils.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
-import com.geno.chaoli.forum.meta.ConversationUtils;
-import com.geno.chaoli.forum.meta.LoginUtils;
 
 import java.io.File;
-import java.util.List;
 
 import com.bumptech.glide.*;
 
@@ -36,6 +30,7 @@ import com.bumptech.glide.*;
  * Created by jianhao on 16-3-12.
  */
 public class SettingsActivity extends BaseActivity implements AccountUtils.GetProfileObserver{
+    private static final String TAG = "SettingsActivity";
     EditText username_txt, password_txt;
     TextView user_id_txt;
 
@@ -164,11 +159,13 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
             //将光标移至开头 ，这个很重要，不小心很容易引起越界
             cursor.moveToFirst();
             //最后根据索引值获取图片路径
-            String path = cursor.getString(column_index);*/
+            String selectedImagePath = cursor.getString(column_index);
             //Log.i("path", path);
-
+*/
             Uri selectedImageUri = data.getData();
+            Log.d(TAG, "onActivityResult: " + selectedImageUri.toString());
             String selectedImagePath = getPath(selectedImageUri);
+            Log.d(TAG, "onActivityResult: " + selectedImagePath);
             mAvatarFile = new File(selectedImagePath);
             Glide.with(this).load(mAvatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
             Log.i("name", mAvatarFile.getName());
@@ -186,13 +183,13 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
     }
 
     public void updateViews(){
-        avatar.update(this, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
-        private_add_chk.setChecked(Me.getMyPrivateAdd());
-        star_on_reply_chk.setChecked(Me.getMyStarOnReply());
-        star_private_chk.setChecked(Me.getMyStarPrivate());
-        hide_online_chk.setChecked(Me.getMyHideOnline());
-        signature_edtTxt.setText(Me.getMySignature());
-        user_status_edtTxt.setText(Me.getMyStatus());
+        avatar.update(this, Me.getAvatarSuffix(), Me.getMyUserId(), Me.getUsername());
+        private_add_chk.setChecked(Me.getPreferences().getPrivateAdd());
+        star_on_reply_chk.setChecked(Me.getPreferences().getStarOnReply());
+        star_private_chk.setChecked(Me.getPreferences().getStarPrivate());
+        hide_online_chk.setChecked(Me.getPreferences().getHideOnline());
+        signature_edtTxt.setText(Me.getPreferences().getSignature());
+        user_status_edtTxt.setText(Me.getStatus());
     }
 
     /**
@@ -215,5 +212,18 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
         }
         // this is our fallback here
         return uri.getPath();
+    }
+
+    /* Get the real path from the URI */
+    public String getPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        return res;
     }
 }

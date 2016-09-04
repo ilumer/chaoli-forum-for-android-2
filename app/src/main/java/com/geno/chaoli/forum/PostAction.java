@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.ChannelTextView;
-import com.geno.chaoli.forum.meta.ConversationUtils;
+import com.geno.chaoli.forum.utils.ConversationUtils;
 
 import java.util.List;
 
@@ -173,7 +173,7 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
 
     @Override
     public void onSetChannelFailure(int statusCode) {
-        Toast.makeText(this, getString(R.string.network_err), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.network_err) + statusCode, Toast.LENGTH_LONG).show();
         channel.removeAllViews();
         channel.addView(new ChannelTextView(this, preChannel));
         curChannel = preChannel;

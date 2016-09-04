@@ -1,18 +1,11 @@
 package com.geno.chaoli.forum.model;
 
-import android.graphics.drawable.Drawable;
-
-import com.alibaba.fastjson.annotation.JSONField;
-import com.geno.chaoli.forum.meta.Channel;
-import com.geno.chaoli.forum.meta.ConversationState;
-
-import java.util.List;
-import java.util.StringTokenizer;
+import com.google.gson.annotations.SerializedName;
 
 public class Conversation
 {
 	private int conversationId;
-	private Channel channel;
+	//private Channel channel;
 	private int channelId;
 	private String title;
 	private String firstPost;
@@ -20,17 +13,17 @@ public class Conversation
 	private String startMemberId;
 	private String lastPostMemberId;
 	private String startMember;
-	@JSONField(name="startMemberAvatarFormat")
+	@SerializedName("startMemberAvatarFormat")
 	private String startMemberAvatarSuffix;
-	@JSONField(name="lastPostMemberAvatarFormat")
+	@SerializedName("lastPostMemberAvatarFormat")
 	private String lastPostMemberAvatarSuffix;
-	private Drawable startAvatar;
+	//private Drawable startAvatar;
 	private String lastPostMember;
-	private Drawable lastPostAvatar;
+	//private Drawable lastPostAvatar;
 	private String lastPostTime;
 	private int replies;
 
-	private List<ConversationState> state;
+	//private List<ConversationState> state;
 
 	public String getFirstPost() {
 		return firstPost;
@@ -49,7 +42,7 @@ public class Conversation
 		this.conversationId = conversationId;
 	}
 
-	public Channel getChannel()
+	/*public Channel getChannel()
 	{
 		return channel;
 	}
@@ -57,7 +50,7 @@ public class Conversation
 	public void setChannel(Channel channel)
 	{
 		this.channel = channel;
-	}
+	}*/
 
 	public String getTitle()
 	{
@@ -105,7 +98,7 @@ public class Conversation
 		this.startMember = startMember;
 	}
 
-	public Drawable getStartAvatar()
+	/*public Drawable getStartAvatar()
 	{
 		return startAvatar;
 	}
@@ -113,7 +106,7 @@ public class Conversation
 	public void setStartAvatar(Drawable startAvatar)
 	{
 		this.startAvatar = startAvatar;
-	}
+	}*/
 
 	public String getLastPostMember()
 	{
@@ -125,7 +118,7 @@ public class Conversation
 		this.lastPostMember = lastPostMember;
 	}
 
-	public Drawable getLastPostAvatar()
+	/*public Drawable getLastPostAvatar()
 	{
 		return lastPostAvatar;
 	}
@@ -133,7 +126,7 @@ public class Conversation
 	public void setLastPostAvatar(Drawable lastPostAvatar)
 	{
 		this.lastPostAvatar = lastPostAvatar;
-	}
+	}*/
 
 	public String getStartMemberAvatarSuffix() {
 		return startMemberAvatarSuffix;
@@ -171,10 +164,10 @@ public class Conversation
 		this.replies = replies;
 	}
 
-	public List<ConversationState> getState()
+	/*public List<ConversationState> getState()
 	{
 		return state;
-	}
+	}*/
 
 	public int getChannelId() {
 		return channelId;
@@ -184,8 +177,8 @@ public class Conversation
 		this.channelId = channelId;
 	}
 
-	public void setState(List<ConversationState> state)
+	/*public void setState(List<ConversationState> state)
 	{
 		this.state = state;
-	}
+	}*/
 }
