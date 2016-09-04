@@ -2,40 +2,33 @@ package com.geno.chaoli.forum.app;
 
 import android.app.Application;
 
-import com.geno.chaoli.forum.meta.Constants;
-
-import java.util.List;
-
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import retrofit2.Retrofit;
-
 /**
  * Created by jianhao on 16-8-25.
  */
 public class ChaoliApplication extends Application {
-    Retrofit retrofit;
-    OkHttpClient okHttpClient;
+    /*private Retrofit retrofit;
+    private OkHttpClient okHttpClient;
+    private ChaoliService service;*/
     @Override
     public void onCreate() {
         super.onCreate();
-        okHttpClient = new OkHttpClient.Builder()
-                .cookieJar(new CookieJar() {
-                    @Override
-                    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-
-                    }
-
-                    @Override
-                    public List<Cookie> loadForRequest(HttpUrl url) {
-                        return null;
-                    }
-                }).build();
+        /*okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new ReceivedCookiesInterceptor(this))
+                .addInterceptor(new AddCookiesInterceptor(this))
+                .build();
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
+        service = retrofit.create(ChaoliService.class);*/
     }
+
+    /*public OkHttpClient getClient(){
+        return okHttpClient;
+    }
+
+    public ChaoliService getService(){
+        return service;
+    }*/
 }

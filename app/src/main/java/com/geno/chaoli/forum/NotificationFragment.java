@@ -13,21 +13,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.CookieUtils;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.geno.chaoli.forum.model.NotificationItem;
+import com.geno.chaoli.forum.network.MyOkHttp;
+import com.google.gson.Gson;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cz.msebera.android.httpclient.Header;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
+ * 在个人主页页面显示通知的Fragment
  * Created by jianhao on 16-6-5.
  */
 
@@ -43,7 +45,7 @@ public class NotificationFragment extends HomepageListFragment {
 
     @Override
     public List<? extends ListItem> parseItems(String JSONString) {
-        OuterObject outerObject = JSON.parseObject(JSONString, OuterObject.class);
+        OuterObject outerObject = new Gson().fromJson(JSONString, OuterObject.class);
         return outerObject.results;
     }
 
@@ -59,24 +61,22 @@ public class NotificationFragment extends HomepageListFragment {
 
         if(adapter.getItemViewType(position) == ITEM_TYPE) {
             final NotificationItem thisItem = (NotificationItem) listItem;
-            Resources res = getResources();
-            Log.d(TAG, thisItem.avatarSuffix + thisItem.fromMemberId);
-            holder.avatarView.update(context, thisItem.avatarSuffix, Integer.parseInt(thisItem.fromMemberId), thisItem.fromMemberName);
+            holder.avatarView.update(context, thisItem.getAvatarSuffix(), Integer.parseInt(thisItem.getFromMemberId()), thisItem.getFromMemberName());
             holder.avatarView.scale(20);
 
-            holder.content_tv.setText(thisItem.data.title);
-            holder.description_tv.setText(getString(R.string.mention_you, thisItem.fromMemberName));
-            holder.content_tv.setHint(thisItem.data.postId);
-            holder.description_tv.setHint(thisItem.data.conversationId);
+            holder.content_tv.setText(thisItem.getData().getTitle());
+            holder.description_tv.setText(getString(R.string.mention_you, thisItem.getFromMemberName()));
+            holder.content_tv.setHint(thisItem.getData().getPostId());
+            holder.description_tv.setHint(thisItem.getData().getConversationId());
             switch (thisItem.getType()){
                 case TYPE_MENTION:
-                    holder.description_tv.setText(getString(R.string.mention_you, thisItem.fromMemberName));
+                    holder.description_tv.setText(getString(R.string.mention_you, thisItem.getFromMemberName()));
                     break;
                 case TYPE_POST:
-                    holder.description_tv.setText(getString(R.string.someone_update, thisItem.fromMemberName));
+                    holder.description_tv.setText(getString(R.string.someone_update, thisItem.getFromMemberName()));
                     break;
                 case TYPE_PRIVATE_ADD:
-                    holder.description_tv.setText(getString(R.string.send_you_a_private_post, thisItem.fromMemberName));
+                    holder.description_tv.setText(getString(R.string.send_you_a_private_post, thisItem.getFromMemberName()));
                     break;
             }
 
@@ -88,45 +88,46 @@ public class NotificationFragment extends HomepageListFragment {
                         @Override
                         public void onClick(final View v) {
                             final ProgressDialog progressDialog = ProgressDialog.show(context, "", getResources().getString(R.string.just_a_sec));
-                            AsyncHttpClient client = new AsyncHttpClient();
-                            CookieUtils.saveCookie(client, mCallback);
-                            client.get(context, Constants.GO_TO_POST_URL + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                                    String response = new String(responseBody);
-                                    Intent intent = new Intent(mCallback, PostActivity.class);
-
-                                    Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");
-                                    Matcher matcher = pattern.matcher(response);
-                                    if (matcher.find()) {
-                                        int conversationId = Integer.parseInt(matcher.group(1));
-                                        intent.putExtra("conversationId", conversationId);
-                                    }
-
-                                    pattern = Pattern.compile("<h1 id='conversationTitle'>(.*?)</h1>");
-                                    matcher = pattern.matcher(response);
-                                    if (matcher.find()) {
-                                        String title = matcher.group(1);
-                                        intent.putExtra("title", title);
-                                    }
-
-                                    if (v.equals(holder.content_tv)) {
-                                        pattern = Pattern.compile("\"startFrom\":(\\d+)");
-                                        matcher = pattern.matcher(response);
-                                        if (matcher.find()) {
-                                            String intentToPage = String.valueOf(Integer.parseInt(matcher.group(1)) / 20 + 1);
-                                            intent.putExtra("page", intentToPage);
+                            new MyOkHttp.MyOkHttpClient()
+                                    .get(Constants.GO_TO_POST_URL + ((TextView) v).getHint())
+                                    .enqueue(context, new Callback() {
+                                        @Override
+                                        public void onFailure(Call call, IOException e) {
+                                            progressDialog.dismiss();
                                         }
-                                    }
-                                    progressDialog.dismiss();
-                                    startActivity(intent);
-                                }
 
-                                @Override
-                                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                                    progressDialog.dismiss();
-                                }
-                            });
+                                        @Override
+                                        public void onResponse(Call call, Response response) throws IOException {
+                                            String responseStr = response.body().string();
+                                            Intent intent = new Intent(mCallback, PostActivity.class);
+
+                                            Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");
+                                            Matcher matcher = pattern.matcher(responseStr);
+                                            if (matcher.find()) {
+                                                int conversationId = Integer.parseInt(matcher.group(1));
+                                                intent.putExtra("conversationId", conversationId);
+                                            }
+
+                                            pattern = Pattern.compile("<h1 id='conversationTitle'>(.*?)</h1>");
+                                            matcher = pattern.matcher(responseStr);
+                                            if (matcher.find()) {
+                                                String title = matcher.group(1);
+                                                title = title.replaceAll("(^<(.*?)>)|(<(.*?)>$)", "");
+                                                intent.putExtra("title", title);
+                                            }
+
+                                            if (v.equals(holder.content_tv)) {
+                                                pattern = Pattern.compile("\"startFrom\":(\\d+)");
+                                                matcher = pattern.matcher(responseStr);
+                                                if (matcher.find()) {
+                                                    int intentToPage = Integer.parseInt(matcher.group(1)) / 20 + 1;
+                                                    intent.putExtra("page", intentToPage);
+                                                }
+                                            }
+                                            progressDialog.dismiss();
+                                            startActivity(intent);
+                                        }
+                                    });
                         }
                     };
                     break;
@@ -135,9 +136,8 @@ public class NotificationFragment extends HomepageListFragment {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(mCallback, PostActivity.class);
-                            Log.d(TAG, thisItem.data.conversationId);
-                            intent.putExtra("conversationId", Integer.valueOf(thisItem.data.conversationId));
-                            intent.putExtra("title", thisItem.data.title);
+                            intent.putExtra("conversationId", Integer.valueOf(thisItem.getData().getConversationId()));
+                            intent.putExtra("title", thisItem.getData().getTitle());
                             startActivity(intent);
                         }
                     };
@@ -174,95 +174,5 @@ public class NotificationFragment extends HomepageListFragment {
         }
 
         List<NotificationItem> results;
-    }
-
-    private static class NotificationItem extends ListItem{
-        String fromMemberId;
-        String fromMemberName;
-
-        public String getFromMemberId() {
-            return fromMemberId;
-        }
-
-        public void setFromMemberId(String fromMemberId) {
-            this.fromMemberId = fromMemberId;
-        }
-
-        public String getFromMemberName() {
-            return fromMemberName;
-        }
-
-        public void setFromMemberName(String fromMemberName) {
-            this.fromMemberName = fromMemberName;
-        }
-
-        public Boolean getUnread() {
-            return unread;
-        }
-
-        public void setUnread(Boolean unread) {
-            this.unread = unread;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public String getAvatarSuffix() {
-            return avatarSuffix;
-        }
-
-        public void setAvatarSuffix(String avatarSuffix) {
-            this.avatarSuffix = avatarSuffix;
-        }
-
-        public Data getData() {
-            return data;
-        }
-
-        public void setData(Data data) {
-            this.data = data;
-        }
-
-        Boolean unread;
-        String content;
-        @JSONField(name = "avatarFormat")
-        String avatarSuffix;
-        Data data;
-
-        private static class Data{
-            String conversationId;
-            String postId;
-
-            public String getTitle() {
-                return title;
-            }
-
-            public void setTitle(String title) {
-                this.title = title;
-            }
-
-            public String getConversationId() {
-                return conversationId;
-            }
-
-            public void setConversationId(String conversationId) {
-                this.conversationId = conversationId;
-            }
-
-            public String getPostId() {
-                return postId;
-            }
-
-            public void setPostId(String postId) {
-                this.postId = postId;
-            }
-
-            String title;
-        }
     }
 }

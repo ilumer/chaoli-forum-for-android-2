@@ -144,4 +144,5 @@
 	<string name="expand">展开  ↓</string>
 	<string name="channel.all.detail">所有板块</string>
 	<string name="navigation_drawer_close">关闭抽屉</string>
+	<string name="length_of_username_should_be_between_4_and_21">用户名长度要在4到21字符之间 </string>
 </resources>

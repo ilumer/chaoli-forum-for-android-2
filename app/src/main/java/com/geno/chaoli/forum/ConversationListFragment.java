@@ -1,5 +1,6 @@
 package com.geno.chaoli.forum;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,28 +19,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.ChannelTextView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.meta.DividerItemDecoration;
 import com.geno.chaoli.forum.model.Conversation;
-import com.geno.chaoli.forum.meta.CookieUtils;
 import com.geno.chaoli.forum.model.ConversationListResult;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.geno.chaoli.forum.network.MyRetrofit;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cz.msebera.android.httpclient.Header;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ConversationListFragment extends Fragment
 {
@@ -49,15 +47,11 @@ public class ConversationListFragment extends Fragment
 
 	public String channel;
 
-	public static RecyclerView l;
+	RecyclerView l;
 
-	public static Context context;
+	Context mContext;
 
-	public static SharedPreferences sp;
-
-	public static AsyncHttpClient client = new AsyncHttpClient();
-
-	//public ConversationView[] v;
+	SharedPreferences sp;
 
 	public SwipyRefreshLayout swipyRefreshLayout;
 
@@ -66,34 +60,12 @@ public class ConversationListFragment extends Fragment
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View conversationListView = inflater.inflate(R.layout.conversation_list_fragment, container, false);
-		context = getActivity();
+		mContext = getActivity();
 		l = (RecyclerView) conversationListView.findViewById(R.id.conversationList);
 		sp = getActivity().getSharedPreferences(Constants.conversationSP, Context.MODE_PRIVATE);
 		swipyRefreshLayout = (SwipyRefreshLayout) conversationListView.findViewById(R.id.conversationListRefreshLayout);
 		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
-		refresh();
-		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
-		{
-			@Override
-			public void onRefresh(SwipyRefreshLayoutDirection direction)
-			{
-				if (direction == SwipyRefreshLayoutDirection.TOP) {
-					getList();
-				} else {
-					loadMore(mPage + 1);
-				}
-			}
-		});
 
-		l.setLayoutManager(new LinearLayoutManager(context));
-		l.addItemDecoration(new DividerItemDecoration(context));
-		mAdapter = new ConversationRecyclerViewAdapter(context, new ArrayList<Conversation>());
-		l.setAdapter(mAdapter);
-
-		return conversationListView;
-	}
-
-	public void refresh(){
 		//trigger the circle to animate
 		swipyRefreshLayout.post(new Runnable() {
 			@Override
@@ -101,39 +73,68 @@ public class ConversationListFragment extends Fragment
 				swipyRefreshLayout.setRefreshing(true);
 			}
 		});
-		getList();
+		refresh();
+
+		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
+		{
+			@Override
+			public void onRefresh(SwipyRefreshLayoutDirection direction)
+			{
+				if (direction == SwipyRefreshLayoutDirection.TOP) {
+					refresh();
+				} else {
+					getList(mPage += 1);
+				}
+			}
+		});
+
+		l.setLayoutManager(new LinearLayoutManager(mContext));
+		l.addItemDecoration(new DividerItemDecoration(mContext));
+		mAdapter = new ConversationRecyclerViewAdapter(mContext, new ArrayList<Conversation>());
+		l.setAdapter(mAdapter);
+
+		return conversationListView;
 	}
 
+	public void refresh(){
+		getList(1);
+	}
+
+	/**
+	 * 针对可能有其他帖子被顶到最上方，导致下一页的主题帖与这一页的主题帖有重合的现象
+	 * @param A 已有的主题帖列表
+	 * @param B 下一页主题帖列表
+     * @return 合成后的新列表的长度
+     */
 	private int expandUnique(List<Conversation> A, List<Conversation> B) {
 		int lenA = A.size();
+		if (lenA == 0) {
+			A.addAll(B);
+		}
 		int i;
 		for (i = 0; i < B.size(); i++)
 			if (B.get(i).getLastPostTime().compareTo(A.get(A.size() - 1).getLastPostTime()) < 0)
 			//if (B.get(i).getLastPostTime() > A.get(A.size() - 1).getLastPostTime())
 				break;
 		A.addAll(B.subList(i, B.size()));
-		return lenA + i;
+		return A.size();
 	}
 
-	public void loadMore(final int page) {
-		CookieUtils.saveCookie(client, context);
-        channel = "all";
+	/*public void loadMore(final int page) {
+		CookieUtils.saveCookie(client, mContext);
         //try {
 		//	String query = "?search=%23第2页";
 		//String query = "?search=" + URLEncoder.encode("#第", "UTF-8") + "%202%20" + URLEncoder.encode("页", "UTF-8");
 			String query = "?page=" + page;
 		final String url = Constants.conversationListURL + channel + query;
-            client.get(context, url, new AsyncHttpResponseHandler() {
+            client.get(mContext, url, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    Log.d(TAG, "onSuccess: url = " + url);
                     String response = new String(responseBody);
-                    Log.d(TAG, "onSuccess: response = " + response);
                     ConversationListResult result = JSON.parseObject(response, ConversationListResult.class);
                     List<Conversation> newConversationList = result.getResults();
 					List<Conversation> conversationList = mAdapter.getConversationList();
 					int index = expandUnique(conversationList, newConversationList);
-                    Log.d(TAG, "onSuccess: " + conversationList.size());
                     mAdapter.setConversationList(conversationList);
 					mAdapter.notifyItemRangeInserted(index, conversationList.size());
                     //diffResult.dispatchUpdatesTo(mAdapter);
@@ -148,32 +149,32 @@ public class ConversationListFragment extends Fragment
                     swipyRefreshLayout.setRefreshing(false);
                 }
             });
-        /*} catch (UnsupportedEncodingException e) {
-
-        }*/
-	}
-	public void getList()
+	}*/
+	private void getList(final int page)
 	{
-		CookieUtils.saveCookie(client, context);
-
-		client.get(context, Constants.conversationListURL + channel, new AsyncHttpResponseHandler()
-		{
+		Log.d(TAG, "getList() called with: " + "page = [" + page + "]");
+		Call<ConversationListResult> call = MyRetrofit.getService().listConversations(channel, page);
+		call.enqueue(new Callback<ConversationListResult>() {
 			@Override
-			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
-			{
-				String response = new String(responseBody);
-				ConversationListResult result = JSON.parseObject(response, ConversationListResult.class);
-				List<Conversation> conversationList = result.getResults();
-				DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(mAdapter.getConversationList(), conversationList), true);
-				mAdapter.setConversationList(conversationList);
+			public void onResponse(Call<ConversationListResult> call, Response<ConversationListResult> response) {
+				Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
+				List<Conversation> conversationList = mAdapter.getConversationList();
+				int oldLen = conversationList.size();
+				List<Conversation> newConversationList = response.body().getResults();
+				expandUnique(conversationList, newConversationList);
+				mAdapter.notifyItemRangeInserted(oldLen + 1, conversationList.size() - oldLen);
+				/*DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(mAdapter.getConversationList(), newConversationList), true);
+				mAdapter.setConversationList(newConversationList);
 				diffResult.dispatchUpdatesTo(mAdapter);
-				l.smoothScrollToPosition(0);
+				Log.d(TAG, "onResponse: " + newConversationList.size());*/
+				l.smoothScrollToPosition(page == 1 ? 0 : oldLen);
 				swipyRefreshLayout.setRefreshing(false);
 			}
 
 			@Override
-			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
-			{
+			public void onFailure(Call<ConversationListResult> call, Throwable t) {
+				Log.d(TAG, "onFailure() called with: " + "call = [" + call + "], t = [" + t + "]");
+				t.printStackTrace();
 				Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
 				swipyRefreshLayout.setRefreshing(false);
 			}
@@ -211,14 +212,14 @@ public class ConversationListFragment extends Fragment
 		@Override
 		public void onBindViewHolder(ConversationViewHolder holder, int position) {
 			Conversation conversation = conversationList.get(position);
-			holder.avatarView.update(context, conversation.getStartMemberAvatarSuffix(),
+			holder.avatarView.update(mContext, conversation.getStartMemberAvatarSuffix(),
 					Integer.parseInt(conversation.getStartMemberId()), conversation.getStartMember());
 			holder.avatarView.scale(20);
 			holder.usernameTv.setText(conversation.getStartMember() + " 发表了帖子");
 			holder.titleTv.setText(conversation.getTitle());
 			holder.excerptTv.setText(conversation.getFirstPost());
 			holder.channel.removeAllViews();
-			holder.channel.addView(new ChannelTextView(context, Channel.getChannel(conversation.getChannelId())));
+			holder.channel.addView(new ChannelTextView(mContext, Channel.getChannel(conversation.getChannelId())));
 			holder.replyNumTv.setText(String.valueOf(conversation.getReplies()));
 			holder.conversation = conversationList.get(position);
 		}
@@ -260,18 +261,18 @@ public class ConversationListFragment extends Fragment
 						Intent jmp = new Intent();
 						jmp.putExtra("conversationId", conversation.getConversationId());
 						jmp.putExtra("title", conversation.getTitle());
-						jmp.setClass(context, PostActivity.class);
-						context.startActivity(jmp);
+						jmp.setClass(mContext, PostActivity.class);
+						mContext.startActivity(jmp);
 					}
 				});
 				view.setOnLongClickListener(new View.OnLongClickListener() {
 					@Override
 					public boolean onLongClick(View v) {
-						LinearLayout menuList = new LinearLayout(context);
+						LinearLayout menuList = new LinearLayout(mContext);
 						menuList.setPadding(Constants.paddingLeft, Constants.paddingTop,
 								Constants.paddingRight, Constants.paddingBottom);
 
-						AlertDialog.Builder menuBuilder = new AlertDialog.Builder(context).setView(menuList);
+						AlertDialog.Builder menuBuilder = new AlertDialog.Builder(mContext).setView(menuList);
 						final Dialog menu = menuBuilder.create();
 						return true;
 					}

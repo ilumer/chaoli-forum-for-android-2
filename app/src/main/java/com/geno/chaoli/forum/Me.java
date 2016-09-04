@@ -2,97 +2,35 @@ package com.geno.chaoli.forum;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.geno.chaoli.forum.meta.Constants;
+import com.geno.chaoli.forum.model.User;
+import com.google.gson.Gson;
 
 /**
- * Created by daquexian on 16-4-8.
- * 保存用户自己的账户信息的类
+ * Created by jianhao on 16-9-3.
  */
-public class Me implements Parcelable {
-    private static final String TAG = "Me";
-    private boolean isEmpty = true;
-    private int userId;
-    private String username;
-
-    @JSONField(name="avatarFormat")
-    private String avatarSuffix;
-    private String status;
-    private Preferences preferences;
-    private static Me me;
-
-    private Me(){}
-
-    private Me(Parcel in){
-        userId = in.readInt();
-        username = in.readString();
-        avatarSuffix = in.readString();
-        status = in.readString();
-        preferences.privateAdd = (in.readByte() == 1);
-        preferences.starOnReply = (in.readByte() == 1);
-        preferences.starPrivate = (in.readByte() == 1);
-        preferences.hideOnline = (in.readByte() == 1);
-    }
-
-    private static Me getInstance(){
-        if(me == null)
-            me = new Me();
-        return me;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(userId);
-        dest.writeString(username);
-        dest.writeString(avatarSuffix);
-        dest.writeString(status);
-        dest.writeString(preferences.signature);
-        dest.writeByte((byte)(preferences.privateAdd ? 1 : 0));
-        dest.writeByte((byte)(preferences.starOnReply ? 1 : 0));
-        dest.writeByte((byte)(preferences.starPrivate ? 1 : 0));
-        dest.writeByte((byte)(preferences.hideOnline ? 1 : 0));
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    private static final Parcelable.Creator<Me> CREATOR
-            = new Parcelable.Creator<Me>() {
-        public Me createFromParcel(Parcel in) {
-            return new Me(in);
-        }
-
-        public Me[] newArray(int size) {
-            return new Me[size];
-        }
-    };
-
+public class Me {
+    private static User me = new User();
 
     public static void clear(){
-        me = new Me();
+        me = new User();
     }
 
     public static boolean isEmpty(){
-        return Me.getInstance().isEmpty;
+        return me.isEmpty();
     }
 
     public static int getMyUserId(){
-        return Me.getInstance().userId;
+        return me.getUserId();
     }
 
     public static String getMyUsername(){
-        return Me.getInstance().username;
+        return me.getUsername();
     }
 
     public static String getMyAvatarSuffix(){
-        return Me.getInstance().avatarSuffix;
+        return me.getAvatarSuffix();
     }
 
     public static String getMyAvatarURL(){
@@ -100,39 +38,43 @@ public class Me implements Parcelable {
     }
 
     public static String getMyStatus(){
-        return Me.getInstance().status;
+        return me.getStatus();
     }
 
     public static String getMySignature(){
-        return Me.getInstance().preferences.signature != null ? Me.getInstance().preferences.signature : "";
+        return me.getPreferences().getSignature() != null ? me.getPreferences().getSignature() : "";
     }
 
     public static Boolean getMyPrivateAdd(){
-        return Me.getInstance().preferences.privateAdd;
+        return me.getPreferences().getPrivateAdd();
     }
 
     public static Boolean getMyStarOnReply(){
-        return Me.getInstance().preferences.starOnReply;
+        return me.getPreferences().getStarOnReply();
     }
 
     public static Boolean getMyStarPrivate(){
-        return Me.getInstance().preferences.starPrivate;
+        return me.getPreferences().getStarPrivate();
     }
 
     public static Boolean getMyHideOnline(){
-        return Me.getInstance().preferences.hideOnline != null ? Me.getInstance().preferences.hideOnline : false;
+        return me.getPreferences().getHideOnline() != null ? me.getPreferences().getHideOnline() : false;
     }
 
-    public Preferences getPreferences() {
-        return preferences;
+    public static User.Preferences getPreferences() {
+        return me.getPreferences();
+    }
+
+    public static String getUsername(){
+        return me.getUsername();
     }
 
     public static void setUsername(String username){
-        Me.getInstance().username = username;
+        me.setUsername(username);
     }
 
-    public void setPreferences(Preferences preferences) {
-        this.preferences = preferences;
+    public static void setPreferences(User.Preferences preferences){
+        me.setPreferences(preferences);
     }
 
 
@@ -141,88 +83,51 @@ public class Me implements Parcelable {
     }
 
     public static void setUserId(int userId) {
-        Log.d("me", "id = " + Me.getInstance().userId);
-        Me.getInstance().userId = userId;
-        Log.d("me", "id = " + Me.getInstance().userId);
+        me.setUserId(userId);
     }
 
-    public String getStatus() {
-        return status;
+    public static String getStatus() {
+        return me.getStatus();
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public static void setStatus(String status) {
+        me.setStatus(status);
     }
 
-    public String getAvatarSuffix() {
-        return avatarSuffix;
+    public static String getAvatarSuffix() {
+        return me.getAvatarSuffix();
     }
 
-    public void setAvatarSuffix(String avatarSuffix) {
-        this.avatarSuffix = avatarSuffix;
+    public static void setAvatarSuffix(String avatarSuffix) {
+        me.setAvatarSuffix(avatarSuffix);
     }
 
-    public static class Preferences{
-        private String signature;
-        @JSONField(name="email.privateAdd")
-        private Boolean privateAdd;
-        private Boolean starOnReply;
-        private Boolean starPrivate;
-        private Boolean hideOnline;
-
-        public String getSignature() {
-            return signature;
+    public static void setProfile(Context context, User user) {
+        user.setUsername(me.getUsername());
+        user.setUserId(me.getUserId());
+        me = user;
+        me.setEmpty(false);
+        if(user.getAvatarSuffix() == null){
+            user.setAvatarSuffix(Constants.NONE);
         }
-
-        public void setSignature(String signature) {
-            this.signature = signature;
-        }
-
-        public Boolean getPrivateAdd() {
-            return privateAdd;
-        }
-
-        public void setPrivateAdd(Boolean privateAdd) {
-            this.privateAdd = privateAdd;
-        }
-
-        public Boolean getStarOnReply() {
-            return starOnReply;
-        }
-
-        public void setStarOnReply(Boolean starOnReply) {
-            this.starOnReply = starOnReply;
-        }
-
-        public Boolean getStarPrivate() {
-            return starPrivate;
-        }
-
-        public void setStarPrivate(Boolean starPrivate) {
-            this.starPrivate = starPrivate;
-        }
-
-        public Boolean getHideOnline() {
-            return hideOnline;
-        }
-
-        public void setHideOnline(Boolean hideOnline) {
-            this.hideOnline = hideOnline;
-        }
+        SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getUsername(), new Gson().toJson(user));
+        editor.apply();
     }
 
     public static void setInstanceFromJSONStr(Context context, String jsonStr){
-        Me me2 = JSON.parseObject(jsonStr, Me.class);
-        me2.userId = me.userId;
-        me2.username = me.username;
-        me = me2;
-        me.isEmpty = false;
-        if(getMyAvatarSuffix() == null){
+        User user2 = new Gson().fromJson(jsonStr, User.class);
+        user2.setUserId(me.getUserId());
+        user2.setUsername(me.getUsername());
+        me = user2;
+        me.setEmpty(false);
+        if(getAvatarSuffix() == null){
             me.setAvatarSuffix(Constants.NONE);
         }
         SharedPreferences sharedPreferences = context.getSharedPreferences("userInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(getMyUsername(), JSON.toJSONString(me));
+        editor.putString(getMyUsername(), new Gson().toJson(me));
         editor.apply();
     }
     public static void setInstanceFromSharedPreference(Context context, String username) {
@@ -232,4 +137,5 @@ public class Me implements Parcelable {
             setInstanceFromJSONStr(context, info);
         }
     }
+
 }

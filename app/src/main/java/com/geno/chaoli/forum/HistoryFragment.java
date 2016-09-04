@@ -1,38 +1,27 @@
 package com.geno.chaoli.forum;
 
-import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextPaint;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
-import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.CookieUtils;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
+import com.geno.chaoli.forum.network.MyOkHttp;
+import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cz.msebera.android.httpclient.Header;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * Created by jianhao on 16-6-5.
@@ -54,7 +43,7 @@ public class HistoryFragment extends HomepageListFragment {
 
     @Override
     public List<? extends ListItem> parseItems(String JSONString) {
-        OuterActivity outerActivity = JSON.parseObject(JSONString, OuterActivity.class);
+        OuterActivity outerActivity = new Gson().fromJson(JSONString, OuterActivity.class);
         return outerActivity.activity;
     }
 
@@ -88,53 +77,55 @@ public class HistoryFragment extends HomepageListFragment {
                         @Override
                         public void onClick(final View v) {
                             final ProgressDialog progressDialog = ProgressDialog.show(context, "", getResources().getString(R.string.just_a_sec));
-                            AsyncHttpClient client = new AsyncHttpClient();
-                            CookieUtils.saveCookie(client, mCallback);
-                            client.get(context, "https://chaoli.club/index.php/conversation/post/" + ((TextView) v).getHint(), new AsyncHttpResponseHandler() {
-                                @Override
-                                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                                    String response = new String(responseBody);
-                                    Intent intent = new Intent(mCallback, PostActivity.class);
+                            new MyOkHttp.MyOkHttpClient()
+                                    .get(Constants.GO_TO_POST_URL + ((TextView) v).getHint())
+                                    .enqueue(context, new Callback() {
+                                        @Override
+                                        public void onFailure(okhttp3.Call call, IOException e) {
 
-                                    Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");
-                                    Matcher matcher = pattern.matcher(response);
-                                    if (matcher.find()) {
-                                        int conversationId = Integer.parseInt(matcher.group(1));
-                                        intent.putExtra("conversationId", conversationId);
-                                    }
-
-                                    pattern = Pattern.compile("<h1 id='conversationTitle'>(.*?)</h1>");
-                                    matcher = pattern.matcher(response);
-                                    if (matcher.find()) {
-                                        String title = matcher.group(1);
-                                        intent.putExtra("title", title);
-                                    }
-
-                                    if (v.equals(holder.content_tv)) {
-                                        pattern = Pattern.compile("\"startFrom\":(\\d+)");
-                                        matcher = pattern.matcher(response);
-                                        if (matcher.find()) {
-                                            String intentToPage = String.valueOf(Integer.parseInt(matcher.group(1)) / 20 + 1);
-                                            Log.d(TAG, "page = " +  intentToPage);
-                                            intent.putExtra("page", intentToPage);
                                         }
-                                    }
-                                    progressDialog.dismiss();
-                                    startActivity(intent);
-                                }
 
-                                @Override
-                                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                                    progressDialog.dismiss();
-                                }
-                            });
+                                        @Override
+                                        public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                                            String responseStr = response.body().string();
+                                            Intent intent = new Intent(mCallback, PostActivity.class);
+
+                                            Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");
+                                            Matcher matcher = pattern.matcher(responseStr);
+                                            if (matcher.find()) {
+                                                int conversationId = Integer.parseInt(matcher.group(1));
+                                                intent.putExtra("conversationId", conversationId);
+                                            }
+
+                                            pattern = Pattern.compile("<h1 id='conversationTitle'>(.*?)</h1>");
+                                            matcher = pattern.matcher(responseStr);
+                                            if (matcher.find()) {
+                                                String title = matcher.group(1);
+                                                title = title.replaceAll("(^<(.*?)>)|(<(.*?)>$)", "");
+                                                intent.putExtra("title", title);
+                                            }
+
+                                            if (v.equals(holder.content_tv)) {
+                                                pattern = Pattern.compile("\"startFrom\":(\\d+)");
+                                                matcher = pattern.matcher(responseStr);
+                                                if (matcher.find()) {
+                                                    int intentToPage = Integer.parseInt(matcher.group(1)) / 20 + 1;
+                                                    Log.d(TAG, "page = " +  intentToPage);
+                                                    intent.putExtra("page", intentToPage);
+                                                }
+                                            }
+                                            progressDialog.dismiss();
+                                            startActivity(intent);
+
+                                        }
+                                    });
                         }
                     };
                     holder.content_tv.setOnClickListener(onClickListener);
                     break;
                 case STATUS:
                     holder.description_tv.setText(R.string.modified_his_or_her_information);
-                    MyActivity.Data data = JSON.parseObject(thisActivity.data, MyActivity.Data.class);
+                    MyActivity.Data data = new Gson().fromJson(thisActivity.data, MyActivity.Data.class);
                     holder.content_tv.setText("");
                     if (data != null && data.newStatus != null) {
                         holder.content_tv.setText(data.newStatus);
@@ -158,6 +149,11 @@ public class HistoryFragment extends HomepageListFragment {
             }
         }
     }
+
+    /*@Override
+    public Call<HistoryResult> getCall(int page){
+        return MyRetrofit.getService().getHistory(mUserId, page);
+    }*/
 
     @Override
     public String getURL() {

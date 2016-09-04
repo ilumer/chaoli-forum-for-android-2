@@ -1,7 +1,6 @@
 package com.geno.chaoli.forum;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,19 +21,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.bumptech.glide.Glide;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.ConversationUtils;
-import com.geno.chaoli.forum.meta.CookieUtils;
+import com.geno.chaoli.forum.utils.ConversationUtils;
 import com.geno.chaoli.forum.meta.DividerItemDecoration;
-import com.geno.chaoli.forum.meta.LaTeXtView;
+import com.geno.chaoli.forum.meta.OnlineImgTextView;
 import com.geno.chaoli.forum.meta.PostContentView;
 import com.geno.chaoli.forum.model.Post;
 import com.geno.chaoli.forum.model.PostListResult;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.geno.chaoli.forum.network.MyRetrofit;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -45,7 +39,6 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cz.msebera.android.httpclient.Header;
 
 public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
@@ -67,14 +60,12 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	public static SharedPreferences sp;
 	public SharedPreferences.Editor e;
 
-	public int conversationId;
+	int mConversationId;
 
-	public String title;
-	public int mPage;
+	String mTitle;
+	int mPage;
 
-	public boolean isAuthorOnly;
-
-	public static AsyncHttpClient client = new AsyncHttpClient();
+	boolean isAuthorOnly;
 
 	@BindView(R.id.postList)
 	RecyclerView postListRv;
@@ -93,16 +84,16 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		ButterKnife.bind(this);
 
 		Bundle data = getIntent().getExtras();
-		conversationId = data.getInt("conversationId");
-		title = data.getString("title", "");
-		setTitle(title);
+		mConversationId = data.getInt("conversationId");
+		mTitle = data.getString("title", "");
+		setTitle(mTitle);
 		mPage = data.getInt("page", 1);
 		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
-		sp = getSharedPreferences(Constants.postSP + conversationId, MODE_PRIVATE);
+		sp = getSharedPreferences(Constants.postSP + mConversationId, MODE_PRIVATE);
 
-		configToolbar(title);
+		configToolbar(mTitle);
 
-		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTTOM);
+		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh(SwipyRefreshLayoutDirection direction) {
@@ -116,7 +107,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			public void onClick(View v)
 			{
 				Intent toReply = new Intent(PostActivity.this, ReplyAction.class);
-				toReply.putExtra("conversationId", conversationId);
+				toReply.putExtra("conversationId", mConversationId);
 				startActivityForResult(toReply, REPLY_CODE);
 			}
 		});
@@ -128,10 +119,17 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		postListRv.addItemDecoration(new DividerItemDecoration(mContext));
 
 
-		CookieUtils.saveCookie(client, this);
-		final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.loading_posts));
+		//final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.loading_posts));
 
-		String url = Constants.postListURL + conversationId + "/p" + mPage;
+		//trigger the circle to animate
+		swipyRefreshLayout.post(new Runnable() {
+			@Override
+			public void run() {
+				swipyRefreshLayout.setRefreshing(true);
+			}
+		});
+		getList(0);
+		/*String url = Constants.postListURL + mConversationId + "/p" + mPage;
 		client.get(this, url, new AsyncHttpResponseHandler()
 		{
 			@Override
@@ -151,51 +149,93 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				progressDialog.dismiss();
 				Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
 			}
-		});
+		});*/
 	}
 
+	/**
+	 * 针对帖子读取到最后的情况，只往帖子列表中增加多出来的帖子
+	 * @param A 已有的帖子列表
+	 * @param B 获取到的一页帖子列表
+     * @return 新帖子列表的长度
+     */
 	private int expandUnique(List<Post> A, List<Post> B) {
 		int lenA = A.size();
-		int i;
-		for (i = 0; i < B.size(); i++)
-			if (B.get(i).getTime() > A.get(A.size() - 1).getTime())
-				break;
-		A.addAll(B.subList(i, B.size()));
-		return lenA + i;
+		if (lenA == 0) {
+			A.addAll(B);
+		} else {
+			int i;
+			for (i = 0; i < B.size(); i++)
+				if (B.get(i).getTime() > A.get(lenA - 1).getTime())
+					break;
+			A.addAll(B.subList(i, B.size()));
+		}
+		return A.size();
 	}
 
-	private void loadMore(){
-		CookieUtils.saveCookie(client, mContext);
+	private void getList(int page) {
+		MyRetrofit.getService()
+				.listPosts(mConversationId, page)
+				.enqueue(new retrofit2.Callback<PostListResult>() {
+					@Override
+					public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
+						List<Post> newPostList = response.body().getPosts();
+						List<Post> postList = mPostListAdapter.getPosts();
+						int oldLen = postList.size();
+						expandUnique(postList, newPostList);
+						mPostListAdapter.setPosts(postList);
+						mPostListAdapter.notifyItemRangeInserted(oldLen, postList.size() - oldLen);
+
+						//postListRv.smoothScrollToPosition(mPage * POST_NUM_PER_PAGE + 1);
+						swipyRefreshLayout.setRefreshing(false);
+					}
+
+					@Override
+					public void onFailure(retrofit2.Call<PostListResult> call, Throwable t) {
+						swipyRefreshLayout.setRefreshing(false);
+						Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
+						t.printStackTrace();
+					}
+				});
+	}
+
+	private void loadMore() {
 		final List<Post> postList = mPostListAdapter.getPosts();
-		final String url = Constants.postListURL + conversationId + "/p" + (postList.size() < mPage * POST_NUM_PER_PAGE ? mPage : mPage + 1);
-		client.get(mContext, url, new AsyncHttpResponseHandler()
-		{
-			@Override
-			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
-			{
-				String response = new String(responseBody);
-				Log.d(TAG, "onSuccess: response = " + response);
-				PostListResult result = JSON.parseObject(response, PostListResult.class);
-				List<Post> extraPostList = result.getPosts();
-				if (extraPostList.size() > 0) {
-					int index = expandUnique(postList, extraPostList);
-					//postList.addAll(extraPostList);
-					mPostListAdapter.setPosts(postList);
-					mPostListAdapter.notifyItemRangeInserted(index, postList.size() - index);
-					//postListRv.smoothScrollToPosition(mPage * POST_NUM_PER_PAGE + 1);
-					mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
-				}
-				swipyRefreshLayout.setRefreshing(false);
-			}
-
-			@Override
-			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
-			{
-				Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
-				swipyRefreshLayout.setRefreshing(false);
-			}
-		});
+		getList(postList.size() < mPage * POST_NUM_PER_PAGE ? mPage : mPage + 1);
+		mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
 	}
+	/*private void loadMore(){
+		final List<Post> postList = mPostListAdapter.getPosts();
+		final String url = Constants.postListURL + mConversationId + "/p" + (postList.size() < mPage * POST_NUM_PER_PAGE ? mPage : mPage + 1);
+		new MyOkHttp.MyOkHttpClient()
+				.get(url)
+				.enqueue(mContext, new Callback() {
+					@Override
+					public void onFailure(Call call, IOException e) {
+						Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
+						swipyRefreshLayout.setRefreshing(false);
+					}
+
+					@Override
+					public void onResponse(Call call, Response response) throws IOException {
+						if (response.code() != 200) Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
+						else {
+							String responseStr = response.body().string();
+							Log.d(TAG, "onSuccess: response = " + responseStr);
+							PostListResult result = JSON.parseObject(responseStr, PostListResult.class);
+							List<Post> extraPostList = result.getPosts();
+							if (extraPostList.size() > 0) {
+								int index = expandUnique(postList, extraPostList);
+								//postList.addAll(extraPostList);
+								mPostListAdapter.setPosts(postList);
+								mPostListAdapter.notifyItemRangeInserted(index, postList.size() - index);
+								//postListRv.smoothScrollToPosition(mPage * POST_NUM_PER_PAGE + 1);
+								mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
+							}
+						}
+						swipyRefreshLayout.setRefreshing(false);
+					}
+				});
+	}*/
 
 	class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {
 		List<Post> mPosts;
@@ -227,7 +267,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			final Post post = mPosts.get(position);
 			holder.avatar.update(mContext, post.getAvatarFormat(), post.getMemberId(), post.getUsername());
 			holder.avatar.scale(35);
-			holder.usernameAndSignature.setText(post.username + (post.signature == null ? "" : (", " + post.signature)));
+			holder.usernameAndSignature.setText(post.signature == null ? post.username : getString(R.string.comma, post.username, post.signature));
 			holder.floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
 
 			if (post.deleteMemberId != 0)
@@ -258,10 +298,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			});
 			holder.content.init(mContext);
 			holder.content.setPost(post);
-			holder.content.setConversationId(conversationId);
+			holder.content.setConversationId(mConversationId);
 			for (int i = 0; i < holder.content.getChildCount(); i++) {
 				View child = holder.content.getChildAt(i);
-				if (child instanceof LaTeXtView) {
+				if (child instanceof OnlineImgTextView) {
 					child.setOnLongClickListener(new View.OnLongClickListener() {
 						@Override
 						public boolean onLongClick(View view) {
@@ -272,7 +312,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 											switch (i){
 												case 0:
 													Intent toReply = new Intent(PostActivity.this, ReplyAction.class);
-													toReply.putExtra("conversationId", conversationId);
+													toReply.putExtra("conversationId", mConversationId);
 													toReply.putExtra("postId", post.getPostId());
 													toReply.putExtra("replyTo", post.getUsername());
 													toReply.putExtra("replyMsg", post.getContent());
@@ -303,7 +343,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			}
 			/*if (post.getAttachments() != null && post.getAttachments().size() > 0) {
 				for (Post.Attachment attachment : post.getAttachments()) {
-					if (attachment.getFileName().endsWith(".jpg") || attachment.getFileName().endsWith(".png")) {
+					if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
 						ImageView imageView = new ImageView(mContext);
 						Glide.with(mContext)
 								.load(Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret())
@@ -373,7 +413,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 								switch (which)
 								{
 									case 0:
-										ConversationUtils.ignoreConversation(PostActivity.this, conversationId, PostActivity.this);
+										ConversationUtils.ignoreConversation(PostActivity.this, mConversationId, PostActivity.this);
 										break;
 									case 1:
 										Toast.makeText(PostActivity.this, R.string.mark_as_unread, Toast.LENGTH_SHORT).show();
@@ -386,22 +426,22 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			case menu_share:
 				Intent share = new Intent();
 				share.setAction(Intent.ACTION_SEND);
-				share.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + conversationId);
+				share.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + mConversationId);
 				share.setType("text/plain");
 				startActivity(Intent.createChooser(share, getString(R.string.share)));
 				break;
 			case menu_author_only:
 				finish();
 				Intent author_only = new Intent(PostActivity.this, PostActivity.class);
-				author_only.putExtra("conversationId", conversationId);
+				author_only.putExtra("conversationId", mConversationId);
 				author_only.putExtra("page", isAuthorOnly ? "" : "?author=lz");
-				author_only.putExtra("title", title);
+				author_only.putExtra("title", mTitle);
 				author_only.putExtra("isAuthorOnly", !isAuthorOnly);
 				startActivity(author_only);
 				break;
 			case menu_star:
 				// TODO: 16-3-28 2201 Star light
-				ConversationUtils.starConversation(PostActivity.this, conversationId, PostActivity.this);
+				ConversationUtils.starConversation(PostActivity.this, mConversationId, PostActivity.this);
 				break;
 		}
 		return true;

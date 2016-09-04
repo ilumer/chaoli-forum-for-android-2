@@ -1,40 +1,53 @@
-package com.geno.chaoli.forum.meta;
+package com.geno.chaoli.forum.utils;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
 import com.geno.chaoli.forum.Me;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
+import com.geno.chaoli.forum.model.NotificationList;
+import com.geno.chaoli.forum.model.User;
+import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyRetrofit;
+import com.geno.chaoli.forum.utils.LoginUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.io.IOException;
 
-import cz.msebera.android.httpclient.Header;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by daquexian on 16-3-17.
  * 和账户相关的类，包括获取自己的用户信息、检查是否帖子更新、是否有新动态及更改账户设置
  */
 public class AccountUtils {
-    private static AsyncHttpClient client = new AsyncHttpClient();
+    private static final String TAG = "AccountUtils";
 
     public static int RETURN_ERROR = -1;
     public static int FILE_DOSENT_EXIST = -2;
 
     public static void getProfile(final Context context, final GetProfileObserver observer){
-        CookieUtils.saveCookie(client, context);
+        MyRetrofit.getService().getProfile()
+                .enqueue(new Callback<User>() {
+                    @Override
+                    public void onResponse(Call<User> call, Response<User> response) {
+                        Log.d(TAG, "onResponse: " + response.body().getAvatarSuffix());
+                        Log.d(TAG, "onResponse: " + response.body().getPreferences().getHideOnline());
+                        Me.setProfile(context, response.body());
+                    }
+
+                    @Override
+                    public void onFailure(Call<User> call, Throwable t) {
+                        observer.onGetProfileFailure();
+                    }
+                });
+        /*CookieUtils.saveCookie(client, context);
         client.get(context, Constants.GET_PROFILE_URL, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 String response = new String(responseBody);
-                Me.setInstanceFromJSONStr(context, response);
+                User.setInstanceFromJSONStr(context, response);
                 observer.onGetProfileSuccess();
             }
 
@@ -42,60 +55,32 @@ public class AccountUtils {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 observer.onGetProfileFailure();
             }
-        });
+        });*/
     }
 
     public static void checkNotification(Context context, final MessageObserver observer){
-        CookieUtils.saveCookie(client, context);
-        RequestParams params = new RequestParams();
-        params.put("userId", LoginUtils.getUserId());
-        params.put("token", LoginUtils.getToken());
-        client.get(context, Constants.CHECK_NOTIFICATION_URL, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                String response = new String(responseBody);
-                try {
-                    NotificationList notificationList = JSON.parseObject(response, NotificationList.class);
-                    if (notificationList != null) {
-                        observer.onCheckNotificationSuccess(notificationList);
-                    } else {
+        MyRetrofit.getService().checkNotification()
+                .enqueue(new Callback<NotificationList>() {
+                    @Override
+                    public void onResponse(Call<NotificationList> call, Response<NotificationList> response) {
+                        NotificationList notificationList = response.body();
+                        if (notificationList != null) {
+                            observer.onCheckNotificationSuccess(notificationList);
+                        } else {
+                            observer.onCheckNotificationFailure(RETURN_ERROR);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<NotificationList> call, Throwable t) {
                         observer.onCheckNotificationFailure(RETURN_ERROR);
                     }
-                } catch (Exception e){
-                    observer.onCheckNotificationFailure(RETURN_ERROR);
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.e("cn_error", String.valueOf(statusCode), error);
-                observer.onCheckNotificationFailure(statusCode);
-            }
-        });
+                });
     }
 
-    public static class NotificationList{
-        public int count;
-        public List<Notification> results;
-    }
-
-    public static class Notification{
-        public String fromMemberId;
-        public String fromMemberName;
-        @JSONField(name="avatarFormat")
-        public String avatarSuffix;
-        public Data data;
-        public String type;
-
-        public static class Data{
-            public String conversationId;
-            public String postId;
-            public String title;
-        }
-    }
-
+    @Deprecated
     public static void hasUpdate(Context context, int[] conversationIdArr, final MessageObserver observer){
-        CookieUtils.saveCookie(client, context);
+        /*CookieUtils.saveCookie(client, context);
         String conversationIds = intJoin(conversationIdArr, ",");
         RequestParams params = new RequestParams();
         params.put("userId", LoginUtils.getUserId());
@@ -127,12 +112,35 @@ public class AccountUtils {
                 Log.e("failure", String.valueOf(statusCode));
                 observer.onGetUpdateFailure(statusCode);
             }
-        });
+        });*/
     }
 
     public static void modifySettings(Context context, File avatar, String language, Boolean privateAdd, Boolean starOnReply, Boolean starPrivate, Boolean hideOnline,
                                       final String signature, String userStatus, final ModifySettingsObserver observer){
-        CookieUtils.saveCookie(client, context);
+        MyOkHttp.MyOkHttpClient myOkHttpClient = new MyOkHttp.MyOkHttpClient()
+                .add("token", LoginUtils.getToken())
+                .add("language", language)
+                .add("userStatus", userStatus)
+                .add("signature", signature);
+        myOkHttpClient.add("avatar", "image/*", avatar);
+        if(hideOnline) myOkHttpClient.add("hideOnline", hideOnline.toString());
+        if(starPrivate) myOkHttpClient.add("starPrivate", starPrivate.toString());
+        if(starOnReply) myOkHttpClient.add("starOnReply", starOnReply.toString());
+        if(privateAdd) myOkHttpClient.add("privateAdd", privateAdd.toString());
+        myOkHttpClient.add("save", "保存更改");
+        myOkHttpClient.enqueue(context, new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                observer.onModifySettingsFailure(-3);
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                Log.d(TAG, "onResponse: " + response.body().string());
+                observer.onModifySettingsSuccess();
+            }
+        });
+        /*CookieUtils.saveCookie(client, context);
         client.setTimeout(60000);
         Log.i("begin", "b");
         RequestParams params = new RequestParams();
@@ -169,7 +177,7 @@ public class AccountUtils {
                     observer.onModifySettingsFailure(statusCode);
                 }
             }
-        });
+        });*/
     }
 
 

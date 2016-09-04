@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/QuestionItem">
-    <TextView
+    <com.geno.chaoli.forum.meta.OnlineImgTextView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

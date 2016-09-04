@@ -2,7 +2,6 @@ package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -10,20 +9,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.model.Post;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
+ * 用于显示帖子中的引用
  * Created by jianhao on 16-8-26.
  */
 public class QuoteView extends LinearLayout {
     PostContentView mPostContentView;
-    LaTeXtView mTextView;
+    OnlineImgTextView mTextView;
     Button mButton;
     Boolean mCollapsed;
     Context mContext;
@@ -131,7 +129,7 @@ public class QuoteView extends LinearLayout {
     private void init(Context context, List<Post.Attachment> attachmentList) {
         mContext = context;
         mCollapsed = false;
-        mTextView = new LaTeXtView(context, attachmentList);
+        mTextView = new OnlineImgTextView(context, attachmentList);
         //mButton = new Button(context);
         mButton = (Button) LinearLayout.inflate(context, R.layout.button, null);
         LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

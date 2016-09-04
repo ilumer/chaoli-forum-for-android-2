@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum.meta;
+package com.geno.chaoli.forum.utils;
 
 import android.content.Context;
 import android.util.DisplayMetrics;

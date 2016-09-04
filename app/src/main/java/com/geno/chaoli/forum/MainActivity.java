@@ -24,11 +24,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.geno.chaoli.forum.meta.AccountUtils;
+import com.geno.chaoli.forum.utils.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.meta.LoginUtils;
+import com.geno.chaoli.forum.utils.LoginUtils;
+import com.geno.chaoli.forum.model.NotificationList;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 						}
 
 						@Override
-						public void onCheckNotificationSuccess(AccountUtils.NotificationList notificationList) {
+						public void onCheckNotificationSuccess(NotificationList notificationList) {
 							if (notificationList.count > 0){
 								actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_with_a_circle_24dp);
 								actionBarDrawerToggle.syncState();
@@ -175,10 +176,10 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 					if(!Me.isEmpty()) {
 						Intent intent = new Intent(mContext, HomepageActivity.class);
 						Bundle bundle = new Bundle();
-						bundle.putString("username", Me.getMyUsername());
+						bundle.putString("username", Me.getUsername());
 						bundle.putInt("userId", Me.getUserId());
-						bundle.putString("signature", Me.getMySignature());
-						bundle.putString("avatarSuffix", Me.getMyAvatarSuffix() == null ? Constants.NONE : Me.getMyAvatarSuffix());
+						bundle.putString("signature", Me.getPreferences().getSignature());
+						bundle.putString("avatarSuffix", Me.getAvatarSuffix() == null ? Constants.NONE : Me.getAvatarSuffix());
 						bundle.putBoolean("isSelf", true);
 						intent.putExtras(bundle);
 						startActivity(intent);
@@ -201,14 +202,14 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 				((TextView) ((Activity) mContext).findViewById(R.id.loginHWndUsername)).setText(username);
 				Me.setInstanceFromSharedPreference(mContext, username);
 				if (!Me.isEmpty()) {
-					//Log.d(TAG, "AvatarSuffix: " + Me.getMyAvatarSuffix());
+					//Log.d(TAG, "AvatarSuffix: " + User.getMyAvatarSuffix());
 					avatar.update(mContext, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
 					signatureTxt.setText(Me.getMySignature());
 				}
 				AccountUtils.getProfile(mContext, new AccountUtils.GetProfileObserver() {
 					@Override
 					public void onGetProfileSuccess() {
-						//Log.d(TAG, "AvatarSuffix: " + Me.getMyAvatarSuffix());
+						//Log.d(TAG, "AvatarSuffix: " + User.getMyAvatarSuffix());
 						avatar.update(mContext, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
 						signatureTxt.setText(Me.getMySignature());
 					}
@@ -389,7 +390,7 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		client.connect();
 		Action viewAction = Action.newAction(
 				Action.TYPE_VIEW, // TODO: choose an action type.
-				"Main Page", // TODO: Define a title for the content shown.
+				"Main Page", // TODO: Define a mTitle for the content shown.
 				// TODO: If you have web page content that matches this app activity's content,
 				// make sure this auto-generated web page URL is correct.
 				// Otherwise, set the URL to null.
@@ -408,7 +409,7 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		// See https://g.co/AppIndexing/AndroidStudio for more information.
 		Action viewAction = Action.newAction(
 				Action.TYPE_VIEW, // TODO: choose an action type.
-				"Main Page", // TODO: Define a title for the content shown.
+				"Main Page", // TODO: Define a mTitle for the content shown.
 				// TODO: If you have web page content that matches this app activity's content,
 				// make sure this auto-generated web page URL is correct.
 				// Otherwise, set the URL to null.
