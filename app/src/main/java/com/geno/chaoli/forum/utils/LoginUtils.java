@@ -17,7 +17,6 @@ import okhttp3.Response;
 
 public class LoginUtils {
     private static final String TAG = "LoginUtils";
-    public static final String COOKIE_UN_AND_PW = "im^#@cookie^$&";
     public static final String LOGIN_SP_NAME = "username_and_password";
     public static final String IS_LOGGED_IN = "is_logged_in";
     public static final String SP_USERNAME_KEY = "username";
@@ -53,7 +52,6 @@ public class LoginUtils {
     private static int userId;
 
     private static SharedPreferences sharedPreferences;
-    private static SharedPreferences.Editor editor;
 
     public static void begin_login(final Context context, final String username, final String password, final LoginObserver loginObserver){
         sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
@@ -95,8 +93,6 @@ public class LoginUtils {
             //username = password = COOKIE_UN_AND_PW;
             return;
         }
-
-        //Log.i("login_2", "username = " + username + ", password = " + password);
 
         if("".equals(username) || "".equals(password)){
             loginObserver.onLoginFailure(EMPTY_UN_OR_PW);
@@ -171,7 +167,6 @@ public class LoginUtils {
     }*/
 
     private static void pre_login(final Context context, final LoginObserver loginObserver){//获取登录页面的token
-        Log.d(TAG, "pre_login() called with: " + "context = [" + context + "], loginObserver = [" + loginObserver + "]");
         new MyOkHttp.MyOkHttpClient()
                 .get(Constants.LOGIN_URL)
                 .enqueue(context, new Callback() {
@@ -184,7 +179,6 @@ public class LoginUtils {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         String responseStr = response.body().string();
-                        Log.d(TAG, "onResponse: " + responseStr);
                         String tokenFormat = "\"token\":\"([\\dabcdef]+)";
                         Pattern pattern = Pattern.compile(tokenFormat);
                         Matcher matcher = pattern.matcher(responseStr);
@@ -200,9 +194,6 @@ public class LoginUtils {
     }
 
     private static void login(final Context context, final LoginObserver loginObserver){ //发送请求登录
-        Log.d(TAG, "login() called with: " + "context = [" + context + "], loginObserver = [" + loginObserver + "]");
-        Log.d(TAG, "login: username = " + username);
-        Log.d(TAG, "login: " + getToken());
         new MyOkHttp.MyOkHttpClient()
                 .add("username", username)
                 .add("password", password)
@@ -221,7 +212,6 @@ public class LoginUtils {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         String responseStr = response.body().string();
-                        Log.d(TAG, "onResponse: " + responseStr);
                         String tokenFormat = "\"userId\":(\\d+),\"token\":\"([\\dabcdef]+)";
                         Pattern pattern = Pattern.compile(tokenFormat);
                         Matcher matcher = pattern.matcher(responseStr);
@@ -255,18 +245,18 @@ public class LoginUtils {
                     public void onFailure(Call call, IOException e) {
                         e.printStackTrace();
                         setSPIsLoggedIn(false);
-                        //loginObserver.onLoginFailure(COOKIE_EXPIRED);
                         begin_login(context, loginObserver);
                     }
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
-                        String responseStr = response.toString();
-                        Log.d(TAG, "onResponse: " + response.body().string());
+                        String responseStr = response.body().string();
+                        Log.d(TAG, "onResponse: " + responseStr);
                         String tokenFormat = "\"userId\":(\\d+),\"token\":\"([\\dabcdef]+)";
                         Pattern pattern = Pattern.compile(tokenFormat);
                         Matcher matcher = pattern.matcher(responseStr);
                         if (matcher.find()) {
+                            Log.d(TAG, "onResponse: found");
                             int userId = Integer.parseInt(matcher.group(1));
                             setUserId(userId);
                             Me.setUserId(userId);
@@ -279,6 +269,7 @@ public class LoginUtils {
                             Me.setUsername(username);
                             loginObserver.onLoginSuccess(getUserId(), getToken());
                         } else {
+                            Log.d(TAG, "onResponse: not found");
                             setSPIsLoggedIn(false);
                             //loginObserver.onLoginFailure(COOKIE_EXPIRED);
                             begin_login(context, loginObserver);
@@ -351,13 +342,13 @@ public class LoginUtils {
 
     public interface LoginObserver
     {
-        public void onLoginSuccess(int userId, String token);
-        public void onLoginFailure(int statusCode);
+        void onLoginSuccess(int userId, String token);
+        void onLoginFailure(int statusCode);
     }
 
     public interface LogoutObserver
     {
-        public void onLogoutSuccess();
-        public void onLogoutFailure(int statusCode);
+        void onLogoutSuccess();
+        void onLogoutFailure(int statusCode);
     }
 }

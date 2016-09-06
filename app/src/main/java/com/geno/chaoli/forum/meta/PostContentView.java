@@ -3,6 +3,7 @@ package com.geno.chaoli.forum.meta;
 import android.content.Context;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;

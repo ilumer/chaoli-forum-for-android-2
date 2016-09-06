@@ -3,6 +3,7 @@ package com.geno.chaoli.forum.model;
 import com.geno.chaoli.forum.HomepageListFragment;
 
 /**
+ * 存储个人主页中的历史活动的类
  * Created by jianhao on 16-9-3.
  */
 public class HistoryItem extends HomepageListFragment.ListItem {
@@ -49,20 +50,20 @@ public class HistoryItem extends HomepageListFragment.ListItem {
         this.description = description;
     }
 
-    public String getData() {
+    public Data getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(Data data) {
         this.data = data;
     }
 
     String content;
     String title;
     String description;
-    String data;
+    Data data;
 
-    private static class Data{
+    public static class Data{
         public String getNewStatus() {
             return newStatus;
         }

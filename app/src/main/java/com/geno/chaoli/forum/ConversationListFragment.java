@@ -152,7 +152,6 @@ public class ConversationListFragment extends Fragment
 	}*/
 	private void getList(final int page)
 	{
-		Log.d(TAG, "getList() called with: " + "page = [" + page + "]");
 		Call<ConversationListResult> call = MyRetrofit.getService().listConversations(channel, page);
 		call.enqueue(new Callback<ConversationListResult>() {
 			@Override
@@ -161,12 +160,15 @@ public class ConversationListFragment extends Fragment
 				List<Conversation> conversationList = mAdapter.getConversationList();
 				int oldLen = conversationList.size();
 				List<Conversation> newConversationList = response.body().getResults();
-				expandUnique(conversationList, newConversationList);
-				mAdapter.notifyItemRangeInserted(oldLen + 1, conversationList.size() - oldLen);
-				/*DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(mAdapter.getConversationList(), newConversationList), true);
-				mAdapter.setConversationList(newConversationList);
-				diffResult.dispatchUpdatesTo(mAdapter);
-				Log.d(TAG, "onResponse: " + newConversationList.size());*/
+				if (page == 1) {
+					Log.d(TAG, "onResponse: " + mAdapter.getItemCount());
+					DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(mAdapter.getConversationList(), newConversationList), true);
+                    mAdapter.setConversationList(newConversationList);
+                    diffResult.dispatchUpdatesTo(mAdapter);
+                } else {
+					expandUnique(conversationList, newConversationList);
+					mAdapter.notifyItemRangeInserted(oldLen + 1, conversationList.size() - oldLen);
+				}
 				l.smoothScrollToPosition(page == 1 ? 0 : oldLen);
 				swipyRefreshLayout.setRefreshing(false);
 			}
@@ -304,7 +306,10 @@ public class ConversationListFragment extends Fragment
 		public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
 			Conversation oldConversation = oldConversationList.get(oldItemPosition);
 			Conversation newConversation = newConversationList.get(newItemPosition);
-			return oldConversation.getFirstPost().equals(newConversation.getFirstPost()) && oldConversation.getReplies() == newConversation.getReplies();
+			return !(oldConversation.getFirstPost() == null && newConversation.getFirstPost() != null)
+					&& !(oldConversation.getFirstPost() != null && newConversation.getFirstPost() == null)
+					&& ((oldConversation.getFirstPost() == null && newConversation.getFirstPost() == null) || oldConversation.getFirstPost().equals(newConversation.getFirstPost()))
+					&& oldConversation.getReplies() == newConversation.getReplies();
 		}
 
 		@Override

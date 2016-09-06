@@ -154,6 +154,7 @@ abstract public class HomepageListFragment extends Fragment implements SwipyRefr
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             String responseStr = response.body().string();
+                            Log.d(TAG, "onResponse: " + responseStr);
                             List<? extends ListItem> listItems = parseItems(responseStr);
 
                             final int listSize = listItems.size();

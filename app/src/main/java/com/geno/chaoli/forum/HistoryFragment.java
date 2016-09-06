@@ -12,8 +12,17 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.geno.chaoli.forum.meta.Constants;
+import com.geno.chaoli.forum.model.HistoryItem;
+import com.geno.chaoli.forum.model.HistoryResult;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,8 +52,42 @@ public class HistoryFragment extends HomepageListFragment {
 
     @Override
     public List<? extends ListItem> parseItems(String JSONString) {
-        OuterActivity outerActivity = new Gson().fromJson(JSONString, OuterActivity.class);
-        return outerActivity.activity;
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(new HistoryAdapterFactory()).create();
+        HistoryResult historyResult = gson.fromJson(JSONString, HistoryResult.class);
+        return historyResult.activity;
+    }
+
+    private static class HistoryAdapterFactory implements TypeAdapterFactory {
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (type.getRawType() != HistoryItem.Data.class) return null;
+
+            TypeAdapter<HistoryItem.Data> defaultAdapter = (TypeAdapter<HistoryItem.Data>) gson.getDelegateAdapter(this, type);
+            return (TypeAdapter<T>) new DataAdapter(defaultAdapter);
+
+        }
+
+        public class DataAdapter extends TypeAdapter<HistoryItem.Data> {
+            TypeAdapter<HistoryItem.Data> defaultAdapter;
+
+            DataAdapter(TypeAdapter<HistoryItem.Data> defaultAdapter) {
+                this.defaultAdapter = defaultAdapter;
+            }
+            @Override
+            public void write(JsonWriter out, HistoryItem.Data value) throws IOException {
+                defaultAdapter.write(out, value);
+            }
+
+            @Override
+            public HistoryItem.Data read(JsonReader in) throws IOException {
+                if (in.peek() == JsonToken.BOOLEAN) {
+                    in.skipValue();
+                    return null;
+                }
+                return defaultAdapter.read(in);
+            }
+        }
     }
 
     @Override
@@ -53,26 +96,26 @@ public class HistoryFragment extends HomepageListFragment {
         final int DIVIDER_TYPE  = 1;
         final int SPACE_TYPE    = 2;
 
-        final String POST_ACTIVITY   = "postActivity";
+        final String POST_ACTIVITY  = "postActivity";
         final String STATUS         = "status";
         final String JOIN           = "join";
 
         if(adapter.getItemViewType(position) == ITEM_TYPE) {
-            MyActivity thisActivity = (MyActivity) listItem;
+            HistoryItem historyItem = (HistoryItem) listItem;
             Resources res = getResources();
             holder.avatarView.update(context, mAvatarSuffix, mUserId, mUsername);
             holder.avatarView.scale(20);
-            switch (thisActivity.type) {
+            switch (historyItem.getType()) {
                 case POST_ACTIVITY:
-                    holder.content_tv.setHint(thisActivity.postId);
-                    if ("1".equals(thisActivity.start)) {
+                    holder.content_tv.setHint(historyItem.getPostId());
+                    if ("1".equals(historyItem.getStart())) {
                         holder.description_tv.setText(R.string.opened_a_conversation);
-                        holder.content_tv.setText(thisActivity.title);
+                        holder.content_tv.setText(historyItem.getTitle());
                     } else {
-                        holder.description_tv.setText(res.getString(R.string.updated, thisActivity.title));
-                        holder.content_tv.setText(thisActivity.content);
+                        holder.description_tv.setText(res.getString(R.string.updated, historyItem.getTitle()));
+                        holder.content_tv.setText(historyItem.getContent());
                     }
-                    holder.description_tv.setHint(thisActivity.postId);
+                    holder.description_tv.setHint(historyItem.getPostId());
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
@@ -125,10 +168,10 @@ public class HistoryFragment extends HomepageListFragment {
                     break;
                 case STATUS:
                     holder.description_tv.setText(R.string.modified_his_or_her_information);
-                    MyActivity.Data data = new Gson().fromJson(thisActivity.data, MyActivity.Data.class);
                     holder.content_tv.setText("");
-                    if (data != null && data.newStatus != null) {
-                        holder.content_tv.setText(data.newStatus);
+                    HistoryItem.Data data = historyItem.getData();
+                    if (data != null && data.getNewStatus() != null) {
+                        holder.content_tv.setText(data.getNewStatus());
                     }
                     break;
                 case JOIN:
@@ -160,7 +203,7 @@ public class HistoryFragment extends HomepageListFragment {
         return Constants.GET_ACTIVITIES_URL + mUserId;
     }
 
-    private static class OuterActivity{
+    /*private static class OuterActivity{
         public List<MyActivity> getActivity() {
             return activity;
         }
@@ -248,5 +291,5 @@ public class HistoryFragment extends HomepageListFragment {
             String newStatus;
             String newSignature;
         }
-    }
+    }*/
 }

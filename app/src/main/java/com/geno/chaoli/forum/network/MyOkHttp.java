@@ -3,10 +3,10 @@ package com.geno.chaoli.forum.network;
 import android.content.Context;
 import android.os.Handler;
 
+import com.geno.chaoli.forum.app.ChaoliApplication;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
@@ -28,26 +28,28 @@ import okhttp3.Response;
 public class MyOkHttp {
     private final static String TAG = "MyOkHttp";
     private static OkHttpClient okHttpClient;
-    private static HashMap<String, List<Cookie>> cookieStore;
-    //private static Context mContext;
+    private static CookiesManager mCookiesManager;
+    //private static HashMap<String, List<Cookie>> mCookieStore = new HashMap<>();
+    private static Context mContext = ChaoliApplication.getAppContext();
 
     public synchronized static OkHttpClient getClient(){
         if (okHttpClient == null) {
             //mContext = context;
-            cookieStore = new HashMap<>();
+            mCookiesManager = new CookiesManager();
             okHttpClient = new OkHttpClient.Builder()
-                    .cookieJar(new CookieJar() {
+                    .cookieJar(mCookiesManager)
+                    /*.cookieJar(new CookieJar() {
                         @Override
                         public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                            cookieStore.put(url.host(), cookies);
+                            mCookieStore.put(url.host(), cookies);
                         }
 
                         @Override
                         public List<Cookie> loadForRequest(HttpUrl url) {
-                            List<Cookie> cookies = cookieStore.get(url.host());
+                            List<Cookie> cookies = mCookieStore.get(url.host());
                             return cookies != null ? cookies : new ArrayList<Cookie>();
                         }
-                    })
+                    })*/
                     //.addInterceptor(new ReceivedCookiesInterceptor(context))
                     //.addInterceptor(new AddCookiesInterceptor(context))
                     .build();
@@ -56,7 +58,7 @@ public class MyOkHttp {
     }
 
     public synchronized static void clearCookie(){
-        cookieStore.clear();
+        mCookiesManager.clear();
     }
 
     public static class MyOkHttpClient {
@@ -123,6 +125,31 @@ public class MyOkHttp {
                     });
                 }
             });
+        }
+    }
+
+    /**
+     * https://segmentfault.com/a/1190000004345545
+     */
+    private static class CookiesManager implements CookieJar {
+        private final PersistentCookieStore cookieStore = new PersistentCookieStore(mContext);
+
+        @Override
+        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+            if (cookies != null && cookies.size() > 0) {
+                for (Cookie item : cookies) {
+                    cookieStore.add(url, item);
+                }
+            }
+        }
+
+        @Override
+        public List<Cookie> loadForRequest(HttpUrl url) {
+            return cookieStore.get(url);
+        }
+
+        public void clear(){
+            cookieStore.removeAll();
         }
     }
 }

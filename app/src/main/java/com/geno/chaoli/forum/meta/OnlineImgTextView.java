@@ -3,6 +3,7 @@ package com.geno.chaoli.forum.meta;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.support.v4.util.Pair;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
@@ -17,6 +18,9 @@ import com.geno.chaoli.forum.model.Post;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,20 +35,23 @@ public class OnlineImgTextView extends TextView
 	private List<Post.Attachment> mAttachmentList;
 	private String mText;
 	private SpannableStringBuilder mSpannableStringBuilder;
+	private List<Formula> mFormulaList;
 
 	private OnCompleteListener mListener;
 
-	public static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{" + 440 / 2 + "}";
 
+
+	public static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{" + 440 / 2 + "}";
 	//public static final Pattern PATTERN1 = Pattern.compile("(?i)(?<=\\$)(.+?)(?=\\$)");
 
 	//public static final Pattern PATTERN2 = Pattern.compile("(?i)(?<=\\\\\\()(.+?)(?=\\\\\\))");
-	private static final Pattern PATTERN1 = Pattern.compile("(?i)\\$\\$?(([^\\$]|\\n)+?)\\$?\\$");
+	private static final Pattern PATTERN1 = Pattern.compile("(?i)\\$\\$?((.|\\n)+?)\\$\\$?");
 	private static final Pattern PATTERN2 = Pattern.compile("(?i)\\\\[(\\[]((.|\\n)*?)\\\\[\\])]");
 	private static final Pattern PATTERN3 = Pattern.compile("(?i)\\[tex]((.|\\n)*?)\\[/tex]");
 	private static final Pattern IMG_PATTERN = Pattern.compile("(?i)\\[img](.*?)\\[/img]");
 	private static final Pattern ATTACHMENT_PATTERN = Pattern.compile("(?i)\\[attachment:(.*?)]");
-	//private static final Pattern PATTERN3 = Pattern.compile("(?i)\\\\begin\\{.*?\\}(.|\\n)*?\\\\end\\{.*?\\}");
+	private static final Pattern PATTERN4 = Pattern.compile("(?i)\\\\begin\\{.*?\\}(.|\\n)*?\\\\end\\{.*?\\}");
+	private static final Pattern PATTERN5 = Pattern.compile("(?i)\\$\\$(.+?)\\$\\$");
 
 	public static final String TAG = "OnlineImgTextView";
 
@@ -75,7 +82,7 @@ public class OnlineImgTextView extends TextView
 		SpannableStringBuilder builder = SFXParser3.parse(mContext, text, mAttachmentList);
 		setText(builder);
 
-		retrieveLaTeXImg(builder);
+		retrieveOnlineImg(builder);
 	}
 
 	public void setText(String text, OnCompleteListener listener) {
@@ -83,97 +90,164 @@ public class OnlineImgTextView extends TextView
 		setText(text);
 	}
 
-	private void retrieveLaTeXImg(final SpannableStringBuilder builder) {
+	/**
+	 * 此操作是异步的，注意
+	 * @param builder 包含公式的文本，以SpannableStringBuilder身份传入
+     */
+	private void retrieveOnlineImg(final SpannableStringBuilder builder) {
 		String text = builder.toString();
 
-		Matcher m1 = PATTERN1.matcher(text);
-		Matcher m2 = PATTERN2.matcher(text);
-		Matcher m3 = PATTERN3.matcher(text);
-		Matcher imgMatcher = IMG_PATTERN.matcher(text);
-		Matcher attachmentMatcher = ATTACHMENT_PATTERN.matcher(text);
+		mFormulaList = getAllFormulas(text);
 
-		_retrieveLaTeXImg(builder, m1, m2, m3, imgMatcher, attachmentMatcher);
+		retrieveFormulaOnlineImg(builder, 0);
 	}
-	private void _retrieveLaTeXImg(final SpannableStringBuilder builder, final Matcher m1, final Matcher m2, final Matcher m3, final Matcher imgMatcher,
-								   final Matcher attachmentMatcher) {
-		String formula;
-		Boolean flag1 = false, flag2 = false, flag3 = false, flagImg = false, flagAttachment = false;
-		if ((flagAttachment = attachmentMatcher.find()) || (flagImg = imgMatcher.find()) || (flag1 = m1.find()) || (flag2 = m2.find()) || (flag3 = m3.find())) {
+
+	/**
+	 * 获取所有起始位置和终止位置不相交的公式
+	 * @param string 包含公式的字符串
+	 * @return 公式List
+     */
+	private List<Formula> getAllFormulas(String string) {
+		Matcher m1 = PATTERN1.matcher(string);
+		Matcher m2 = PATTERN2.matcher(string);
+		Matcher m3 = PATTERN3.matcher(string);
+		Matcher m4 = PATTERN4.matcher(string);
+		Matcher m5 = PATTERN5.matcher(string);
+		Matcher imgMatcher = IMG_PATTERN.matcher(string);
+		Matcher attachmentMatcher = ATTACHMENT_PATTERN.matcher(string);
+
+		List<Formula> formulaList = new ArrayList<>();
+		String content;
+		int type;
+		Boolean flag1 = false, flag2 = false, flag3 = false, flag4 = false, flag5 = false, flagImg = false, flagAttachment = false;
+		while ((flagAttachment = attachmentMatcher.find()) || (flagImg = imgMatcher.find()) || (flag1 = m1.find()) || (flag2 = m2.find()) || (flag3 = m3.find())
+				|| (flag4 = m4.find()) || (flag5 = m5.find())) {
 			int start, end;
 			if (flagAttachment) {
 				start = attachmentMatcher.start();
 				end = attachmentMatcher.end();
-				formula = attachmentMatcher.group(1);
+				content = attachmentMatcher.group(1);
+				type = Formula.TYPE_ATT;
 			} else if (flagImg) {
 				start = imgMatcher.start();
 				end = imgMatcher.end();
-				formula = imgMatcher.group(1);
+				content = imgMatcher.group(1);
+				type = Formula.TYPE_IMG;
+			} else if (flag5) {
+				start = m5.start();
+				end = m5.end();
+				content = m5.group(1);
+				type = Formula.TYPE_5;
+			} else if (flag4) {
+				start = m4.start();
+				end = m4.end();
+				content = m4.group(0);
+				Log.d(TAG, "getAllFormulas: ");
+				type = Formula.TYPE_4;
 			} else if (flag3) {
 				start = m3.start();
 				end = m3.end();
-				formula = m3.group(1);
+				content = m3.group(1);
+				type = Formula.TYPE_3;
 			} else if (flag2) {
 				start = m2.start();
 				end = m2.end();
-				formula = m2.group(1);//.replaceAll("[ \\t\\r\\n]", "");
+				content = m2.group(1);//.replaceAll("[ \\t\\r\\n]", "");
+				type = Formula.TYPE_2;
 			} else {
 				start = m1.start();
 				end = m1.end();
-				formula = m1.group(1);//.replaceAll("[ \\t\\r\\n]", "");
+				content = m1.group(1);//.replaceAll("[ \\t\\r\\n]", "");
+				type = Formula.TYPE_1;
 			}
-			//Log.d(TAG, "_retrieveLaTeXImg: " + formula);
+			Log.d(TAG, "getAllFormulas: " + content);
 			try {
-				if(!flagImg) formula = URLEncoder.encode(formula, "UTF-8");
-				final int fStart = start, fEnd = end;
-				//String url = flagImg ? formula : SITE + formula;
+				if (!flagImg) content = URLEncoder.encode(content, "UTF-8");
 				String url = "";
 				if (flagImg) {
-					url = formula;
+					url = content;
 				} else if (flagAttachment) {
 					for (int i = mAttachmentList.size() - 1; i >= 0; i--) {
 						Post.Attachment attachment = mAttachmentList.get(i);
-						if (attachment.getAttachmentId().equals(formula)) {
+						if (attachment.getAttachmentId().equals(content)) {
 							if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
 								url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
 							}
 						}
 					}
 				} else {
-					url = SITE + formula;
+					url = SITE + content;
 				}
-				//Log.d(TAG, "_retrieveLaTeXImg: url = " + url);
-				final Boolean finalFlagImg = flagImg;
-				final Boolean finalFlagAttachment = flagAttachment;
-				Glide.with(getContext()).load(url).asBitmap().into(new SimpleTarget<Bitmap>()
-				{
-					@Override
-					public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
-					{
-						// post to avoid ConcurrentModificationException, from https://github.com/bumptech/glide/issues/375
-						post(new Runnable() {
-							@Override
-							public void run() {
-								if(finalFlagAttachment || finalFlagImg) builder.setSpan(new ImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-								else builder.setSpan(new CenteredImageSpan(getContext(), resource), fStart, fEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-								setText(builder);
-								_retrieveLaTeXImg(builder, m1, m2, m3, imgMatcher, attachmentMatcher);
-							}
-						});
-					}
-					@Override
-					public void onLoadFailed(Exception e, Drawable errorDrawable) {
-						super.onLoadFailed(e, errorDrawable);
-						e.printStackTrace();
-						_retrieveLaTeXImg(builder, m1, m2, m3, imgMatcher, attachmentMatcher);
-					}
-				});
-			} catch (UnsupportedEncodingException e){
+				formulaList.add(new Formula(start, end, content, url, type));
+			} catch (UnsupportedEncodingException e) {
 
 			}
-		} else {
+		}
+		removeOverlappingFormula(formulaList);
+		return formulaList;
+	}
+
+	/**
+	 * 获取特定的公式渲染出的图片，结束时会调用回调函数（假如存在listener的话）
+	 * @param builder 包含公式的builder
+	 * @param i 公式在mFormulaList中的下标
+     */
+	private void retrieveFormulaOnlineImg(final SpannableStringBuilder builder, final int i) {
+		if (i >= mFormulaList.size()) {
 			mSpannableStringBuilder = builder;
 			if (mListener != null) {
 				mListener.onComplete(builder);
+			}
+			return;
+		}
+		Formula formula = mFormulaList.get(i);
+		Log.d(TAG, "retrieveFormulaOnlineImg: " + formula.content);
+		final int finalType = formula.type;
+        final int finalStart = formula.start;
+        final int finalEnd = formula.end;
+        Glide.with(getContext()).load(formula.url).asBitmap().into(new SimpleTarget<Bitmap>()
+        {
+            @Override
+            public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
+            {
+                // post to avoid ConcurrentModificationException, from https://github.com/bumptech/glide/issues/375
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG) builder.setSpan(new ImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                        else builder.setSpan(new CenteredImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                        setText(builder);
+                        retrieveFormulaOnlineImg(builder, i + 1);
+                    }
+                });
+            }
+            @Override
+            public void onLoadFailed(Exception e, Drawable errorDrawable) {
+                super.onLoadFailed(e, errorDrawable);
+                e.printStackTrace();
+                retrieveFormulaOnlineImg(builder, i + 1);
+            }
+        });
+	}
+
+	/**
+	 * 一个常用的算法-w- 去掉相交的区间
+	 * @param formulaList 每个LaTeX公式的起始下标和终止下标组成的List
+     */
+	private void removeOverlappingFormula(List<Formula> formulaList) {
+		Collections.sort(formulaList, new Comparator<Formula>() {
+			@Override
+			public int compare(Formula p1, Formula p2) {
+				return p1.start - p2.start;
+			}
+		});
+		int size = formulaList.size();
+		for (int i = 0; i < size - 1; i++) {
+			for (int j = i + 1; j < size;) {
+				if (formulaList.get(j).start < formulaList.get(i).end) {
+					formulaList.remove(j);
+					size--;
+				} else j++;
 			}
 		}
 	}
@@ -182,18 +256,21 @@ public class OnlineImgTextView extends TextView
 		Matcher m1 = PATTERN1.matcher(str);
 		Matcher m2 = PATTERN2.matcher(str);
 		Matcher m3 = PATTERN3.matcher(str);
-		Boolean flag3 = false, flag2 = false, flag1 = false;
+		Matcher m4 = PATTERN4.matcher(str);
+		Matcher m5 = PATTERN5.matcher(str);
+		Boolean flag5 = false, flag4 = false, flag3 = false, flag2 = false, flag1 = false;
 		// remove all spaces, codecogs returns error if formula contains spaces
-		while ((flag1 = m1.find()) || (flag2 = m2.find()) || (flag3 = m3.find())) {
+		while ((flag1 = m1.find()) || (flag2 = m2.find()) || (flag3 = m3.find()) || (flag4 = m4.find()) || (flag5 = m5.find())) {
 			String oldStr;
-			if (flag3) oldStr = m3.group();
+			if (flag5) oldStr = m5.group();
+			else if (flag4) oldStr = m4.group();
+			else if (flag3) oldStr = m3.group();
 			else if (flag2) oldStr = m2.group();
 			else oldStr = m1.group();
 			String newStr = oldStr.replaceAll("[\\n\\r]", "");
 			str = str.replace(oldStr, newStr);
 		}
 
-		//Log.d(TAG, "removeNewlineInFormula: str = " + str);
 		return str;
 	}
 
@@ -219,5 +296,26 @@ public class OnlineImgTextView extends TextView
 	private void init(Context context, List<Post.Attachment> attachmentList) {
 		mContext = context;
 		mAttachmentList = attachmentList;
+	}
+
+	private static class Formula {
+		public static final int TYPE_1 = 1;
+		public static final int TYPE_2 = 2;
+		public static final int TYPE_3 = 3;
+		public static final int TYPE_4 = 4;
+		public static final int TYPE_5 = 5;
+		public static final int TYPE_IMG = 4;
+		public static final int TYPE_ATT = 5;
+		int start, end;
+		String content, url;
+		int type;
+
+		public Formula(int start, int end, String content, String url, int type) {
+			this.start = start;
+			this.end = end;
+			this.content = content;
+			this.url = url;
+			this.type = type;
+		}
 	}
 }

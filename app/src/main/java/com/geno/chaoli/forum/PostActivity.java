@@ -129,27 +129,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			}
 		});
 		getList(0);
-		/*String url = Constants.postListURL + mConversationId + "/p" + mPage;
-		client.get(this, url, new AsyncHttpResponseHandler()
-		{
-			@Override
-			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
-			{
-				String response = new String(responseBody);
-				PostListResult result = JSON.parseObject(response, PostListResult.class);
-				List<Post> posts = result.getPosts();
-				mPostListAdapter.setPosts(posts);
-				mPostListAdapter.notifyDataSetChanged();
-				progressDialog.dismiss();
-			}
-
-			@Override
-			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
-			{
-				progressDialog.dismiss();
-				Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
-			}
-		});*/
 	}
 
 	/**
@@ -203,39 +182,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		getList(postList.size() < mPage * POST_NUM_PER_PAGE ? mPage : mPage + 1);
 		mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
 	}
-	/*private void loadMore(){
-		final List<Post> postList = mPostListAdapter.getPosts();
-		final String url = Constants.postListURL + mConversationId + "/p" + (postList.size() < mPage * POST_NUM_PER_PAGE ? mPage : mPage + 1);
-		new MyOkHttp.MyOkHttpClient()
-				.get(url)
-				.enqueue(mContext, new Callback() {
-					@Override
-					public void onFailure(Call call, IOException e) {
-						Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
-						swipyRefreshLayout.setRefreshing(false);
-					}
-
-					@Override
-					public void onResponse(Call call, Response response) throws IOException {
-						if (response.code() != 200) Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
-						else {
-							String responseStr = response.body().string();
-							Log.d(TAG, "onSuccess: response = " + responseStr);
-							PostListResult result = JSON.parseObject(responseStr, PostListResult.class);
-							List<Post> extraPostList = result.getPosts();
-							if (extraPostList.size() > 0) {
-								int index = expandUnique(postList, extraPostList);
-								//postList.addAll(extraPostList);
-								mPostListAdapter.setPosts(postList);
-								mPostListAdapter.notifyItemRangeInserted(index, postList.size() - index);
-								//postListRv.smoothScrollToPosition(mPage * POST_NUM_PER_PAGE + 1);
-								mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
-							}
-						}
-						swipyRefreshLayout.setRefreshing(false);
-					}
-				});
-	}*/
 
 	class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {
 		List<Post> mPosts;

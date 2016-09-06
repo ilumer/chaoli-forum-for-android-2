@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,15 +15,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader;
-import com.bumptech.glide.load.model.GlideUrl;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.geno.chaoli.forum.utils.LoginUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -226,7 +222,7 @@ public class SignUpActivity extends BaseActivity {
 
     private void getAndShowCaptchaImage(final ImageView captcha_iv){
         Log.d(TAG, "getAndShowCaptchaImage() called with: " + "captcha_iv = [" + captcha_iv + "]");
-        captcha_iv.setImageDrawable(getResources().getDrawable(R.drawable.refreshing));
+        captcha_iv.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.refreshing, null));
         //OkHttpUrlLoader.Factory factory = new OkHttpUrlLoader.Factory(MyOkHttp.getClient());
         //Glide.get(this).register(GlideUrl.class, InputStream.class, factory);
         //Glide.with(this).load(Constants.GET_CAPTCHA_URL).into(captcha_iv);
