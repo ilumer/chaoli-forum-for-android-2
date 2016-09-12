@@ -121,8 +121,7 @@ public class OnlineImgRadioButton extends RadioButton {
                 formula = m1.group(1);//.replaceAll("[ \\t\\r\\n]", "");
             }
             //Log.d(TAG, "_retrieveLaTeXImg: " + formula);
-            try {
-                if(!flagImg) formula = URLEncoder.encode(formula, "UTF-8");
+//                if(!flagImg) formula = URLEncoder.encode(formula, "UTF-8");
                 final int fStart = start, fEnd = end;
                 //String url = flagImg ? formula : SITE + formula;
                 String url = "";
@@ -166,9 +165,6 @@ public class OnlineImgRadioButton extends RadioButton {
                         _retrieveLaTeXImg(builder, m1, m2, m3, imgMatcher, attachmentMatcher);
                     }
                 });
-            } catch (UnsupportedEncodingException e){
-
-            }
         } else {
             mSpannableStringBuilder = builder;
             if (mListener != null) {

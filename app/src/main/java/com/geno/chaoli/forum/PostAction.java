@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,9 @@ import com.geno.chaoli.forum.utils.ConversationUtils;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by jianhao on 16-5-31.
  */
@@ -28,9 +33,9 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
 
     private static final String TAG = "PostAction";
 
-    public static final int MENU_DRAFT = 0;
+    //public static final int MENU_DRAFT = 0;
     public static final int MENU_POST = 1;
-    public static final int MENU_PURGE = 2;
+    //public static final int MENU_PURGE = 2;
 
     private static final String DRAFT_CONTENT = "draft_content";
     private static final String DRAFT_TITLE = "draft_title";
@@ -38,9 +43,12 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
 
     private Channel preChannel, curChannel;
 
-    private LinearLayout channel;
-
-    private EditText title_et, content_et;
+    @BindView(R.id.channel)
+    LinearLayout channel;
+    @BindView(R.id.title)
+    EditText title_et;
+    @BindView(R.id.content)
+    EditText content_et;
 
     private final Context mContext = this;
 
@@ -52,14 +60,16 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
 
         setContentView(R.layout.post_action);
 
+        init();
+    }
+
+    private void init() {
+        ButterKnife.bind(this);
         configToolbar(R.string.post);
 
         sharedPreferences = getSharedPreferences(TAG, MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        title_et = (EditText) findViewById(R.id.title);
-        content_et = (EditText) findViewById(R.id.content);
-
-        channel = (LinearLayout)findViewById(R.id.channel);
         final String[] channelArr = {getString(R.string.channel_caff), getString(R.string.channel_maths), getString(R.string.channel_physics),
                 getString(R.string.channel_biology),getString(R.string.channel_tech), getString(R.string.channel_lang),
                 getString(R.string.channel_socsci)};
@@ -71,6 +81,38 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
 
         title_et.setText(title);
         content_et.setText(content);
+        title_et.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                editor.putString(DRAFT_TITLE, editable.toString()).apply();
+            }
+        });
+        content_et.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                editor.putString(DRAFT_CONTENT, editable.toString()).apply();
+            }
+        });
         channel.addView(new ChannelTextView(this, Channel.getChannel(mContext, channelText)));
         channel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,6 +125,7 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
                         ConversationUtils.setChannel(mContext, curChannel.getChannelId(), (ConversationUtils.SetChannelObserver) mContext);
                         channel.removeAllViews();
                         channel.addView(new ChannelTextView(mContext, Channel.getChannel(mContext, channelArr[which])));
+                        editor.putString(DRAFT_CHANNEL, curChannel.toString(mContext)).apply();
                     }
                 }).setCancelable(false).show();
             }
@@ -93,9 +136,9 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
     public boolean onCreateOptionsMenu(Menu menu)
     {
         super.onCreateOptionsMenu(menu);
-        menu.add(Menu.NONE, Menu.NONE, MENU_DRAFT, R.string.save_as_draft).setIcon(android.R.drawable.ic_menu_edit).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        //menu.add(Menu.NONE, Menu.NONE, MENU_DRAFT, R.string.save_as_draft).setIcon(android.R.drawable.ic_menu_edit).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menu.add(Menu.NONE, Menu.NONE, MENU_POST, R.string.post).setIcon(R.drawable.ic_cab_done_mtrl_alpha).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        menu.add(Menu.NONE, Menu.NONE, MENU_PURGE, R.string.purge).setIcon(android.R.drawable.ic_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        //menu.add(Menu.NONE, Menu.NONE, MENU_PURGE, R.string.purge).setIcon(android.R.drawable.ic_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         return true;
     }
 
@@ -103,13 +146,11 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
     public boolean onOptionsItemSelected(MenuItem item)
     {
         super.onOptionsItemSelected(item);
-        sharedPreferences = getSharedPreferences(TAG, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         String title = title_et.getText().toString();
         String content = content_et.getText().toString();
         switch (item.getOrder())
         {
-            case MENU_DRAFT:
+            /*case MENU_DRAFT:
                 editor.putString(DRAFT_TITLE, title);
                 editor.putString(DRAFT_CONTENT, content);
                 editor.putString(DRAFT_CHANNEL, curChannel.toString(mContext));
@@ -117,12 +158,15 @@ public class PostAction extends BaseActivity implements ConversationUtils.AddMem
                 Toast.makeText(this, R.string.save_as_draft, Toast.LENGTH_SHORT).show();
                 finish();
                 break;
+                */
             case MENU_POST:
                 ConversationUtils.postConversation(this, title, content, this);
                 break;
+            /*
             case MENU_PURGE:
                 editor.clear().apply();
                 break;
+                */
         }
         return true;
     }

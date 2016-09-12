@@ -145,4 +145,9 @@
     <string name="login_err_cookie_expire">Cookie 已過期。</string>
     <string name="navigation_drawer_close">關閉抽屜</string>
     <string name="length_of_username_should_be_between_4_and_21">用戶名長度要在4到21字符之間</string>
+    <string name="title">標題</string>
+    <string name="content">內容</string>
+    <string name="search_conversations">搜索主題帖</string>
+    <string name="search">搜索</string>
+    <string name="reply_hint">輸入妳的回復內容</string>
 </resources>

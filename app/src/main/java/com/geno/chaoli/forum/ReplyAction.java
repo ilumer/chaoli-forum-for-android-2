@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,9 +37,9 @@ public class ReplyAction extends AppCompatActivity
 	public SharedPreferences sp;
 	public SharedPreferences.Editor e;
 
-	public static final int menu_draft = 0;
+	//public static final int menu_draft = 0;
 	public static final int menu_reply = 1;
-	public static final int menu_purge = 2;
+	//public static final int menu_purge = 2;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -56,7 +58,7 @@ public class ReplyAction extends AppCompatActivity
 				onBackPressed();
 			}
 		});
-		sp = getSharedPreferences("draftList", MODE_PRIVATE);
+		sp = getSharedPreferences(TAG, MODE_PRIVATE);
 		e = sp.edit();
 		Bundle data = getIntent().getExtras();
 		flag = data.getInt("flag");
@@ -66,22 +68,36 @@ public class ReplyAction extends AppCompatActivity
 		replyMsg = data.getString("replyMsg", "");
 
 		replyText = (EditText) findViewById(R.id.replyText);
-        if (postId != -1) {
-            replyText.setText(String.format(Locale.ENGLISH, "[quote=%d:@%s]%s[/quote]\n", postId, replyTo, replyMsg));
-        }
+
+		String draft = sp.getString(String.valueOf(conversationId), "");
+		if (!"".equals(draft)) replyText.setText(draft);
+        if (postId != -1) replyText.setText(String.format(Locale.ENGLISH, "[quote=%d:@%s]%s[/quote]\n", postId, replyTo, replyMsg));
 		replyText.setSelection(replyText.getText().length());
-            /*replyMsg = data.getString("replyMsg", "");
-		replyText = (EditText) findViewById(R.id.replyText);
-		replyText.setText(String.format("%s", sp.getString("replyText", "") + replyMsg));*/
+		replyText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
+				e.putString(String.valueOf(conversationId), editable.toString()).apply();
+			}
+		});
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		super.onCreateOptionsMenu(menu);
-		menu.add(Menu.NONE, Menu.NONE, menu_draft, R.string.save_as_draft).setIcon(android.R.drawable.ic_menu_edit).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		//menu.add(Menu.NONE, Menu.NONE, menu_draft, R.string.save_as_draft).setIcon(android.R.drawable.ic_menu_edit).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		menu.add(Menu.NONE, Menu.NONE, menu_reply, R.string.reply).setIcon(R.drawable.ic_cab_done_mtrl_alpha).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		menu.add(Menu.NONE, Menu.NONE, menu_purge, R.string.purge).setIcon(android.R.drawable.ic_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		//menu.add(Menu.NONE, Menu.NONE, menu_purge, R.string.purge).setIcon(android.R.drawable.ic_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		return true;
 	}
 
@@ -91,13 +107,15 @@ public class ReplyAction extends AppCompatActivity
 		super.onOptionsItemSelected(item);
 		switch (item.getOrder())
 		{
-			case menu_draft:
-				e.putBoolean(conversationId + "", true).commit();
-				getSharedPreferences(conversationId + "", MODE_PRIVATE).edit()
-						.putString("replyText", replyText.getText().toString()).commit();
+			/*case menu_draft:
+				e.putString(String.valueOf(conversationId), replyText.getText().toString()).commit();
+				//e.putBoolean(conversationId + "", true).commit();
+				//getSharedPreferences(conversationId + "", MODE_PRIVATE).edit()
+				//		.putString("replyText", replyText.getText().toString()).commit();
 				Toast.makeText(ReplyAction.this, R.string.save_as_draft, Toast.LENGTH_SHORT).show();
 				finish();
 				break;
+				*/
 			case menu_reply:
 				switch (flag)
 				{
@@ -154,9 +172,10 @@ public class ReplyAction extends AppCompatActivity
 						});
 				}
 				break;
-			case menu_purge:
+			/*case menu_purge:
 				getSharedPreferences(conversationId + "", MODE_PRIVATE).edit().clear().apply();
 				break;
+				*/
 		}
 		return true;
 	}

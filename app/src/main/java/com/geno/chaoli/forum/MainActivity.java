@@ -2,6 +2,7 @@ package com.geno.chaoli.forum;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,12 +13,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +40,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -90,12 +97,18 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		actionBarDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mDrawerLayout.openDrawer(Gravity.LEFT);
+				mDrawerLayout.openDrawer(GravityCompat.START);
 			}
 		});
 		actionBarDrawerToggle.syncState();
 		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
 
+		List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+		if (fragmentList != null) {
+			for (Fragment fragment : fragmentList) {
+				getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+			}
+		}
 		notificationHanlder = new Handler(){
 			@Override
 			public void handleMessage(Message msg) {
@@ -243,6 +256,18 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 	}
 
+	/*@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = new MenuInflater(this);
+		menuInflater.inflate(R.menu.menu_search, menu);
+
+		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+		return true;
+	}*/
+
 	public void selectItem(int position) {
 		FragmentManager fm = getFragmentManager();
 		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
@@ -295,91 +320,6 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 			timer.schedule(task, 0, Constants.getNotificationInterval * 1000);
 		}
 	}
-
-	class ChannelAdapter extends BaseAdapter {
-		ChannelAdapter(Boolean loggedIn) {
-			if (loggedIn) {
-				channels = new String[]
-						{
-								getString(R.string.channel_all),
-								getString(R.string.channel_caff),
-								getString(R.string.channel_maths),
-								getString(R.string.channel_physics),
-								getString(R.string.channel_chem),
-								getString(R.string.channel_biology),
-								getString(R.string.channel_tech),
-								getString(R.string.channel_court),
-								getString(R.string.channel_announ),
-								getString(R.string.channel_others),
-								getString(R.string.channel_socsci),
-								getString(R.string.channel_lang),
-						};
-			} else {
-				channels = new String[]
-						{
-								getString(R.string.channel_all),
-								getString(R.string.channel_maths),
-								getString(R.string.channel_physics),
-								getString(R.string.channel_chem),
-								getString(R.string.channel_biology),
-								getString(R.string.channel_tech),
-								getString(R.string.channel_court),
-								getString(R.string.channel_announ),
-								getString(R.string.channel_others),
-								getString(R.string.channel_socsci),
-								getString(R.string.channel_lang),
-						};
-			}
-		}
-
-		String[] channels = new String[]
-				{
-						getString(R.string.channel_maths),
-						getString(R.string.channel_physics),
-						getString(R.string.channel_chem),
-						getString(R.string.channel_biology),
-						getString(R.string.channel_tech),
-						getString(R.string.channel_court),
-						getString(R.string.channel_announ),
-						getString(R.string.channel_others),
-						getString(R.string.channel_socsci),
-						getString(R.string.channel_lang),
-				};
-
-		@Override
-		public int getCount() {
-			return channels.length;
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return channels[position];
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				LayoutInflater inflater = LayoutInflater.from(mContext);
-				convertView = inflater.inflate(R.layout.channel_item, null);
-			}
-			TextView channel_tv = (TextView) convertView.findViewById(R.id.channel);
-			channel_tv.setText(channels[position]);
-			/*if(position == mCurrentSelectedPosition){
-                convertView.setBackgroundColor(getResources().getColor(R.color.black));
-                channel_tv.setTextColor(getResources().getColor(R.color.white));
-            }else{
-                convertView.setBackgroundColor(getResources().getColor(R.color.white));
-                channel_tv.setTextColor(getResources().getColor(R.color.black));
-            }*/
-			return convertView;
-		}
-	}
-
 
 	@Override
 	public void onStart() {

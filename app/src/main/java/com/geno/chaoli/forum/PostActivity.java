@@ -151,7 +151,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		return A.size();
 	}
 
-	private void getList(int page) {
+	private void getList(final int page) {
 		MyRetrofit.getService()
 				.listPosts(mConversationId, page)
 				.enqueue(new retrofit2.Callback<PostListResult>() {
@@ -166,6 +166,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 						//postListRv.smoothScrollToPosition(mPage * POST_NUM_PER_PAGE + 1);
 						swipyRefreshLayout.setRefreshing(false);
+						mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
+						postListRv.smoothScrollToPosition(page == 1 ? 0 : oldLen);
 					}
 
 					@Override
@@ -180,7 +182,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	private void loadMore() {
 		final List<Post> postList = mPostListAdapter.getPosts();
 		getList(postList.size() < mPage * POST_NUM_PER_PAGE ? mPage : mPage + 1);
-		mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
 	}
 
 	class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {

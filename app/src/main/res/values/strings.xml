@@ -147,5 +147,10 @@
 	<string name="navigation_drawer_clode">Close drawer</string>
 	<string name="comma" translatable="false">%s, %s</string>
 	<string name="length_of_username_should_be_between_4_and_21">The length of username should between 4 and 21</string>
+	<string name="title">Title</string>
+	<string name="content">Content</string>
+	<string name="search_conversations">Search conversations...</string>
+	<string name="search">Search</string>
+	<string name="reply_hint">Please enter your reply here.</string>
 
 </resources>

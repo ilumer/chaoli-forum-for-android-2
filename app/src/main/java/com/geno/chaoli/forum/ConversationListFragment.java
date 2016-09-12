@@ -83,6 +83,7 @@ public class ConversationListFragment extends Fragment
 				if (direction == SwipyRefreshLayoutDirection.TOP) {
 					refresh();
 				} else {
+					Log.d(TAG, "onRefresh: mPage = " + mPage);
 					getList(mPage += 1);
 				}
 			}
@@ -120,43 +121,13 @@ public class ConversationListFragment extends Fragment
 		return A.size();
 	}
 
-	/*public void loadMore(final int page) {
-		CookieUtils.saveCookie(client, mContext);
-        //try {
-		//	String query = "?search=%23第2页";
-		//String query = "?search=" + URLEncoder.encode("#第", "UTF-8") + "%202%20" + URLEncoder.encode("页", "UTF-8");
-			String query = "?page=" + page;
-		final String url = Constants.conversationListURL + channel + query;
-            client.get(mContext, url, new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    String response = new String(responseBody);
-                    ConversationListResult result = JSON.parseObject(response, ConversationListResult.class);
-                    List<Conversation> newConversationList = result.getResults();
-					List<Conversation> conversationList = mAdapter.getConversationList();
-					int index = expandUnique(conversationList, newConversationList);
-                    mAdapter.setConversationList(conversationList);
-					mAdapter.notifyItemRangeInserted(index, conversationList.size());
-                    //diffResult.dispatchUpdatesTo(mAdapter);
-                    //l.smoothScrollToPosition(0);
-                    swipyRefreshLayout.setRefreshing(false);
-                    mPage = page;
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Toast.makeText(getActivity(), R.string.network_err, Toast.LENGTH_SHORT).show();
-                    swipyRefreshLayout.setRefreshing(false);
-                }
-            });
-	}*/
 	private void getList(final int page)
 	{
-		Call<ConversationListResult> call = MyRetrofit.getService().listConversations(channel, page);
+		Call<ConversationListResult> call = MyRetrofit.getService().listConversations(channel, "#第 " + page + " 页");
 		call.enqueue(new Callback<ConversationListResult>() {
 			@Override
 			public void onResponse(Call<ConversationListResult> call, Response<ConversationListResult> response) {
-				Log.d(TAG, "onResponse() called with: " + "call = [" + call + "], response = [" + response + "]");
+				Log.d(TAG, "onResponse: call = " + call.request().url().toString());
 				List<Conversation> conversationList = mAdapter.getConversationList();
 				int oldLen = conversationList.size();
 				List<Conversation> newConversationList = response.body().getResults();

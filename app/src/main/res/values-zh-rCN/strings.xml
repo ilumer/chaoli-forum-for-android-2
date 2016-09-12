@@ -145,4 +145,9 @@
 	<string name="channel.all.detail">所有板块</string>
 	<string name="navigation_drawer_close">关闭抽屉</string>
 	<string name="length_of_username_should_be_between_4_and_21">用户名长度要在4到21字符之间 </string>
+	<string name="title">标题</string>
+	<string name="content">内容</string>
+	<string name="search_conversations">搜索主题帖</string>
+	<string name="search">搜索</string>
+	<string name="reply_hint">输入你的回复内容</string>
 </resources>

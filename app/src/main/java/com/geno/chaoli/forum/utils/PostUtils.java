@@ -155,6 +155,14 @@ public class PostUtils
 				});
 	}
 
+	public static Boolean canEdit(int postId) {
+		return false;
+	}
+
+	public static Boolean canDelete(int postId) {
+		return false;
+	}
+
 	public interface ReplyObserver
 	{
 		void onReplySuccess();

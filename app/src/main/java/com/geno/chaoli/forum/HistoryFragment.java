@@ -153,7 +153,6 @@ public class HistoryFragment extends HomepageListFragment {
                                                 matcher = pattern.matcher(responseStr);
                                                 if (matcher.find()) {
                                                     int intentToPage = Integer.parseInt(matcher.group(1)) / 20 + 1;
-                                                    Log.d(TAG, "page = " +  intentToPage);
                                                     intent.putExtra("page", intentToPage);
                                                 }
                                             }
@@ -202,94 +201,4 @@ public class HistoryFragment extends HomepageListFragment {
     public String getURL() {
         return Constants.GET_ACTIVITIES_URL + mUserId;
     }
-
-    /*private static class OuterActivity{
-        public List<MyActivity> getActivity() {
-            return activity;
-        }
-
-        public void setActivity(List<MyActivity> activity) {
-            this.activity = activity;
-        }
-
-        List<MyActivity> activity;
-    }
-    private static class MyActivity extends ListItem{
-        String start;
-        String postId;
-
-        public String getStart() {
-            return start;
-        }
-
-        public void setStart(String start) {
-            this.start = start;
-        }
-
-        public String getPostId() {
-            return postId;
-        }
-
-        public void setPostId(String postId) {
-            this.postId = postId;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public String getData() {
-            return data;
-        }
-
-        public void setData(String data) {
-            this.data = data;
-        }
-
-        String content;
-        String title;
-        String description;
-        String data;
-
-        private static class Data{
-            public String getNewStatus() {
-                return newStatus;
-            }
-
-            public void setNewStatus(String newStatus) {
-                this.newStatus = newStatus;
-            }
-
-            public String getNewSignature() {
-                return newSignature;
-            }
-
-            public void setNewSignature(String newSignature) {
-                this.newSignature = newSignature;
-            }
-
-            String newStatus;
-            String newSignature;
-        }
-    }*/
 }

@@ -22,4 +22,6 @@
 	<dimen name="text_greater_size">25sp</dimen>
 	<dimen name="normal_size">16sp</dimen>
 	<dimen name="common_margin">15dp</dimen>
+	<dimen name="text_field_vertical_padding">20dp</dimen>
+	<dimen name="text_field_horizontal_padding">15dp</dimen>
 </resources>

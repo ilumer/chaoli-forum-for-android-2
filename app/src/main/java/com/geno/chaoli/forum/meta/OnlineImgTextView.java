@@ -142,7 +142,6 @@ public class OnlineImgTextView extends TextView
 				start = m4.start();
 				end = m4.end();
 				content = m4.group(0);
-				Log.d(TAG, "getAllFormulas: ");
 				type = Formula.TYPE_4;
 			} else if (flag3) {
 				start = m3.start();
@@ -161,27 +160,23 @@ public class OnlineImgTextView extends TextView
 				type = Formula.TYPE_1;
 			}
 			Log.d(TAG, "getAllFormulas: " + content);
-			try {
-				if (!flagImg) content = URLEncoder.encode(content, "UTF-8");
-				String url = "";
-				if (flagImg) {
-					url = content;
-				} else if (flagAttachment) {
-					for (int i = mAttachmentList.size() - 1; i >= 0; i--) {
-						Post.Attachment attachment = mAttachmentList.get(i);
-						if (attachment.getAttachmentId().equals(content)) {
-							if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
-								url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
-							}
-						}
-					}
-				} else {
-					url = SITE + content;
-				}
-				formulaList.add(new Formula(start, end, content, url, type));
-			} catch (UnsupportedEncodingException e) {
-
-			}
+            //if (!flagImg) content = URLEncoder.encode(content, "UTF-8");
+            String url = "";
+            if (flagImg) {
+                url = content;
+            } else if (flagAttachment) {
+                for (int i = mAttachmentList.size() - 1; i >= 0; i--) {
+                    Post.Attachment attachment = mAttachmentList.get(i);
+                    if (attachment.getAttachmentId().equals(content)) {
+                        if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
+                            url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
+                        }
+                    }
+                }
+            } else {
+                url = SITE + content;
+            }
+            formulaList.add(new Formula(start, end, content, url, type));
 		}
 		removeOverlappingFormula(formulaList);
 		return formulaList;

@@ -315,6 +315,14 @@ public class ConversationUtils {
                 });
     }
 
+    public static Boolean canDelete(int conversationId) {
+        return false;
+    }
+
+    public static Boolean canEdit(int conversationId) {
+        return false;
+    }
+
     public interface SetChannelObserver {
         void onSetChannelSuccess();
         void onSetChannelFailure(int statusCode);
