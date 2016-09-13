@@ -126,6 +126,7 @@ public class ReplyAction extends AppCompatActivity
 							public void onReplySuccess()
 							{
 								Toast.makeText(ReplyAction.this, R.string.reply, Toast.LENGTH_SHORT).show();
+								e.putString(String.valueOf(conversationId), "").apply();
 								setResult(RESULT_OK);
 								finish();
 							}
