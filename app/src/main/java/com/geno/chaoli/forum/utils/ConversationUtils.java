@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyOkHttp.Callback;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
@@ -78,10 +78,9 @@ public class ConversationUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) observer.onSetChannelFailure(response.code());
                         else {
-                            String responseStr = response.body().string();
                             if (responseStr.startsWith("{\"allowedSummary\"")) {
                                 observer.onSetChannelSuccess();
                             } else {
@@ -112,10 +111,9 @@ public class ConversationUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) observer.onAddMemberFailure(response.code());
                         else {
-                            String responseStr = response.body().string();
                             //Log.i("addMember", response);
                             String idFormat = "data-id='(\\d+)'";
                             Pattern pattern = Pattern.compile(idFormat);
@@ -154,10 +152,9 @@ public class ConversationUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) observer.onRemoveMemberFailure(response.code());
                         else {
-                            String responseStr = response.body().string();
                             Log.i("removeMember", responseStr);
                             if (responseStr.startsWith("{\"allowedSummary\"")) {
                                 if (memberList.contains(Integer.valueOf(userId))) {
@@ -190,10 +187,9 @@ public class ConversationUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) observer.onPostConversationFailure(response.code());
                         else {
-                            String responseStr = response.body().string();
                             Log.d(TAG, "onResponse: " + responseStr);
                             if(responseStr.startsWith("{\"redirect\"")){
                                 String conIdFormat = "/(\\d+)";
@@ -227,10 +223,9 @@ public class ConversationUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) observer.onGetMembersAllowedFailure(response.code());
                         else {
-                            String responseStr = response.body().string();
                             Log.i("get", responseStr);
                             String idFormat = "data-id='(\\d+)'";           //按此格式从返回的数据中获取id
                             Pattern pattern = Pattern.compile(idFormat);
@@ -266,10 +261,9 @@ public class ConversationUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) observer.onIgnoreConversationFailure(response.code());
                         else {
-                            String responseStr = response.body().string();
                             if(responseStr.contains("\"ignored\":true")) {
                                 observer.onIgnoreConversationSuccess(true);
                             }else if(responseStr.contains("\"ignored\":false")){
@@ -299,10 +293,9 @@ public class ConversationUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) observer.onStarConversationFailure(response.code());
                         else {
-                            String responseStr = response.body().string();
                             if (responseStr.contains("\"starred\":true")) {
                                 observer.onStarConversationSuccess(true);
                             } else if (responseStr.contains("\"starred\":false")) {

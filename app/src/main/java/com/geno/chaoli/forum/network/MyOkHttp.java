@@ -7,10 +7,13 @@ import com.geno.chaoli.forum.app.ChaoliApplication;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.util.List;
 
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
+
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -29,14 +32,36 @@ public class MyOkHttp {
     private final static String TAG = "MyOkHttp";
     private static OkHttpClient okHttpClient;
     private static CookiesManager mCookiesManager;
-    //private static HashMap<String, List<Cookie>> mCookieStore = new HashMap<>();
     private static Context mContext = ChaoliApplication.getAppContext();
 
     public synchronized static OkHttpClient getClient(){
         if (okHttpClient == null) {
-            //mContext = context;
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            try {
+                // Create a trust manager that does not validate certificate chains
+                final X509TrustManager trustAllCert =
+                        new X509TrustManager() {
+                            @Override
+                            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @Override
+                            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                            }
+
+                            @Override
+                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                return new java.security.cert.X509Certificate[]{};
+                            }
+                        };
+                // Install the all-trusting trust manager
+                final SSLSocketFactory sslSocketFactory = new SSLSocketFactoryCompat(trustAllCert);
+                builder.sslSocketFactory(sslSocketFactory, trustAllCert);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             mCookiesManager = new CookiesManager();
-            okHttpClient = new OkHttpClient.Builder()
+            okHttpClient = builder
                     .cookieJar(mCookiesManager)
                     /*.cookieJar(new CookieJar() {
                         @Override
@@ -100,7 +125,7 @@ public class MyOkHttp {
         public void enqueue(final Context context, final Callback callback) {
             request = requestBuilder.build();
             Call call = getClient().newCall(request);
-            call.enqueue(new Callback() {
+            call.enqueue(new okhttp3.Callback() {
                 @Override
                 public void onFailure(final Call call, final IOException e) {
                     new Handler(context.getMainLooper()).post(new Runnable() {
@@ -113,11 +138,13 @@ public class MyOkHttp {
 
                 @Override
                 public void onResponse(final Call call, final Response response) throws IOException {
+                    final String responseStr = response.body().string();
+                    response.body().close();
                     new Handler(context.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                callback.onResponse(call, response);
+                                callback.onResponse(call, response, responseStr);
                             } catch (IOException e) {
                                 onFailure(call, e);
                             }
@@ -127,7 +154,10 @@ public class MyOkHttp {
             });
         }
     }
-
+    public static abstract class Callback {
+        public abstract void onFailure(Call call, IOException e);
+        public abstract void onResponse(Call call, Response response, String responseStr) throws IOException;
+    }
     /**
      * https://segmentfault.com/a/1190000004345545
      */

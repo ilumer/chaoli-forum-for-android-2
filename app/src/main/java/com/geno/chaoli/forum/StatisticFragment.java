@@ -13,13 +13,13 @@ import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyOkHttp.Callback;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 
@@ -75,8 +75,7 @@ public class StatisticFragment extends Fragment {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String responseStr = response.body().string();
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         response.body().close();
                         Log.d(TAG, responseStr);
                         Pattern pattern = Pattern.compile("<div>(\\\\n)?(.*?)<");

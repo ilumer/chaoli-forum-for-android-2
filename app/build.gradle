@@ -10,8 +10,8 @@ android {
         applicationId "com.geno.chaoli.forum"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 1
-        versionName "0.99.2-beta"
+        versionCode 4
+        versionName "0.99.4-beta"
     }
     buildTypes {
         release {

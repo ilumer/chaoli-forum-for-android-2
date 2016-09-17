@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyOkHttp.Callback;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -23,7 +24,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
@@ -114,8 +114,7 @@ abstract public class HomepageListFragment extends Fragment implements SwipyRefr
                         }
 
                         @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            String responseStr = response.body().string();
+                        public void onResponse(Call call, Response response, String responseStr) throws IOException {
                             Log.d(TAG, responseStr);
                             List<? extends ListItem> listItems = parseItems(responseStr);
 
@@ -152,8 +151,7 @@ abstract public class HomepageListFragment extends Fragment implements SwipyRefr
                         }
 
                         @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-                            String responseStr = response.body().string();
+                        public void onResponse(Call call, Response response, String responseStr) throws IOException {
                             Log.d(TAG, "onResponse: " + responseStr);
                             List<? extends ListItem> listItems = parseItems(responseStr);
 

@@ -88,15 +88,14 @@ public class SignUpUtils {
 
         myOkHttpClient.add("simplified", "1");
         myOkHttpClient.post(Constants.CONFIRM_ANSWER_URL)
-                .enqueue(context, new okhttp3.Callback() {
+                .enqueue(context, new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(okhttp3.Call call, IOException e) {
 
                     }
 
                     @Override
-                    public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
-                        String responseStr = response.body().string();
+                    public void onResponse(okhttp3.Call call, okhttp3.Response response, String responseStr) throws IOException {
                         Log.d(TAG, "onResponse: " + responseStr);
                         if ("failed".equals(responseStr)) {
                             observer.onFailure(ANSWERS_WRONG);

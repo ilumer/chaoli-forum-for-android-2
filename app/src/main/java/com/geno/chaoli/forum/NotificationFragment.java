@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.model.NotificationItem;
 import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyOkHttp.Callback;
+
 import com.google.gson.Gson;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -25,7 +27,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
@@ -97,8 +98,7 @@ public class NotificationFragment extends HomepageListFragment {
                                         }
 
                                         @Override
-                                        public void onResponse(Call call, Response response) throws IOException {
-                                            String responseStr = response.body().string();
+                                        public void onResponse(Call call, Response response, String responseStr) throws IOException {
                                             Intent intent = new Intent(mCallback, PostActivity.class);
 
                                             Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");

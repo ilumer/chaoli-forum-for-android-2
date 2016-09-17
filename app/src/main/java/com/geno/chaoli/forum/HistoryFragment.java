@@ -15,6 +15,7 @@ import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.model.HistoryItem;
 import com.geno.chaoli.forum.model.HistoryResult;
 import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyOkHttp.Callback;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
@@ -129,8 +129,7 @@ public class HistoryFragment extends HomepageListFragment {
                                         }
 
                                         @Override
-                                        public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                                            String responseStr = response.body().string();
+                                        public void onResponse(okhttp3.Call call, Response response, String responseStr) throws IOException {
                                             Intent intent = new Intent(mCallback, PostActivity.class);
 
                                             Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");

@@ -1,5 +1,6 @@
 package com.geno.chaoli.forum.network;
 
+import com.geno.chaoli.forum.meta.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -26,7 +27,7 @@ public class MyRetrofit {
         if (service == null) {
             Gson gson = new GsonBuilder().registerTypeAdapter(Integer.class, new IntegerTypeAdapter()).create();
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://www.chaoli.club/")
+                    .baseUrl(Constants.BASE_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                     .client(MyOkHttp.getClient())

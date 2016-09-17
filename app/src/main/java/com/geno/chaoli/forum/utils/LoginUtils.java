@@ -6,13 +6,13 @@ import android.util.Log;
 import com.geno.chaoli.forum.Me;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyOkHttp.Callback;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 public class LoginUtils {
@@ -177,8 +177,7 @@ public class LoginUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String responseStr = response.body().string();
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         String tokenFormat = "\"token\":\"([\\dabcdef]+)";
                         Pattern pattern = Pattern.compile(tokenFormat);
                         Matcher matcher = pattern.matcher(responseStr);
@@ -210,8 +209,7 @@ public class LoginUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String responseStr = response.body().string();
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         String tokenFormat = "\"userId\":(\\d+),\"token\":\"([\\dabcdef]+)";
                         Pattern pattern = Pattern.compile(tokenFormat);
                         Matcher matcher = pattern.matcher(responseStr);
@@ -249,8 +247,7 @@ public class LoginUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String responseStr = response.body().string();
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         Log.d(TAG, "onResponse: " + responseStr);
                         String tokenFormat = "\"userId\":(\\d+),\"token\":\"([\\dabcdef]+)";
                         Pattern pattern = Pattern.compile(tokenFormat);
@@ -291,7 +288,7 @@ public class LoginUtils {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         logoutObserver.onLogoutSuccess();
                     }
                 });

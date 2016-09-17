@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyOkHttp.Callback;
 import com.geno.chaoli.forum.utils.LoginUtils;
 
 import java.io.IOException;
@@ -24,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Response;
 
 /**
@@ -74,10 +74,9 @@ public class SignUpActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
                         else {
-                            String responseStr = response.body().string();
                             response.body().close();
                             String tokenFormat = "\"token\":\"([\\dabcdef]+)";
                             Pattern pattern = Pattern.compile(tokenFormat);
@@ -160,14 +159,13 @@ public class SignUpActivity extends BaseActivity {
                                     }
 
                                     @Override
-                                    public void onResponse(Call call, Response response) throws IOException {
+                                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                                         if (response.code() != 200){
                                             Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
                                             getAndShowCaptchaImage(captcha_iv);
                                             progressDialog.dismiss();
                                         }
                                         else {
-                                            String responseStr = response.body().string();
                                             response.body().close();
                                             if(responseStr.contains(USERNAME_HAS_BEEN_USED)){
                                                 usernameTIL.setError(getString(R.string.username_has_been_used));
@@ -235,7 +233,7 @@ public class SignUpActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
+                    public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         byte[] bytes = response.body().bytes();
                         captcha_iv.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
                     }

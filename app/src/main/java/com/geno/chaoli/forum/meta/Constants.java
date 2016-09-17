@@ -8,9 +8,10 @@ public class Constants
 	public static final int paddingBottom = 16;
 	public static final int getNotificationInterval = 15;
 
-	public static final String BASE_URL = "https://www.chaoli.club/index.php/";
+	public static final String BASE_BASE_URL = "https://www.chaoli.club/";
+	public static final String BASE_URL = BASE_BASE_URL + "index.php/";
 	public static final String LOGIN_URL = BASE_URL + "user/login?return=%2F";
-	public static final String HOMEPAGE_URL = BASE_URL + "/index.php";
+	public static final String HOMEPAGE_URL = BASE_URL;
 	public static final String LOGOUT_PRE_URL = BASE_URL + "user/logout?token=";
 	public static final String GET_CAPTCHA_URL = BASE_URL + "mscaptcha";
 	public static final String SIGN_UP_URL = BASE_URL + "user/join?invite=";

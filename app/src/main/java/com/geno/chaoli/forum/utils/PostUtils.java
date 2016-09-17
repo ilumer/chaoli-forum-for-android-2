@@ -26,14 +26,14 @@ public class PostUtils
 				.add("userId", String.valueOf(LoginUtils.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.replyURL + conversationId)
-				.enqueue(context, new Callback() {
+				.enqueue(context, new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onReplyFailure(-1);
 					}
 
 					@Override
-					public void onResponse(Call call, Response response) throws IOException {
+					public void onResponse(Call call, Response response, String responseStr) throws IOException {
 						if (response.code() != 200) observer.onReplyFailure(response.code());
 						else observer.onReplySuccess();
 					}
@@ -48,14 +48,14 @@ public class PostUtils
 				.add("userId", String.valueOf(LoginUtils.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.editURL + postId)
-				.enqueue(context, new Callback() {
+				.enqueue(context, new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onEditFailure(-1);
 					}
 
 					@Override
-					public void onResponse(Call call, Response response) throws IOException {
+					public void onResponse(Call call, Response response, String responseStr) throws IOException {
 						if (response.code() != 200) observer.onEditFailure(response.code());
 						else observer.onEditSuccess();
 					}
@@ -121,14 +121,14 @@ public class PostUtils
 				.add("userId", String.valueOf(LoginUtils.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.deleteURL + postId)		// Or get?
-				.enqueue(context, new Callback() {
+				.enqueue(context, new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onDeleteFailure(-1);
 					}
 
 					@Override
-					public void onResponse(Call call, Response response) throws IOException {
+					public void onResponse(Call call, Response response, String responseStr) throws IOException {
 						if (response.code() != 200) observer.onDeleteFailure(response.code());
 						else observer.onDeleteSuccess();
 					}
@@ -141,14 +141,14 @@ public class PostUtils
 				.add("userId", String.valueOf(LoginUtils.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.deleteURL + postId)		// Or get?
-				.enqueue(context, new Callback() {
+				.enqueue(context, new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onRestoreFailure(-1);
 					}
 
 					@Override
-					public void onResponse(Call call, Response response) throws IOException {
+					public void onResponse(Call call, Response response, String responseStr) throws IOException {
 						if (response.code() != 200) observer.onRestoreFailure(response.code());
 						else observer.onRestoreSuccess();
 					}

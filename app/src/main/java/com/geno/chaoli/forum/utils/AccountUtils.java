@@ -128,14 +128,14 @@ public class AccountUtils {
         if(starOnReply) myOkHttpClient.add("starOnReply", starOnReply.toString());
         if(privateAdd) myOkHttpClient.add("privateAdd", privateAdd.toString());
         myOkHttpClient.add("save", "保存更改");
-        myOkHttpClient.enqueue(context, new okhttp3.Callback() {
+        myOkHttpClient.enqueue(context, new MyOkHttp.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
                 observer.onModifySettingsFailure(-3);
             }
 
             @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+            public void onResponse(okhttp3.Call call, okhttp3.Response response, String responseStr) throws IOException {
                 Log.d(TAG, "onResponse: " + response.body().string());
                 observer.onModifySettingsSuccess();
             }
