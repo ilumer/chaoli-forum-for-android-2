@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.model.Post;
+import com.geno.chaoli.forum.utils.PostUtils;
 
 import java.util.List;
 
@@ -29,8 +30,6 @@ public class QuoteView extends LinearLayout {
     private static final String TAG = "QuoteView";
     private static final int BG_COLOR = Color.rgb(153, 255, 224);
     private static final int BUTTON_TEXT_SIZE = 10;
-    private static final String quoteRegex = "\\[quote(.*?)\\[/quote]";
-    //private static final Pattern quotePattern = Pattern.compile("\\[quote(.*?)\\[/quote]");
 
     public QuoteView(Context context, List<Post.Attachment> attachmentList) {
         super(context);
@@ -77,7 +76,7 @@ public class QuoteView extends LinearLayout {
         });
     }*/
     public void setText(String content) {
-        mTextView.setText(content.replaceAll(quoteRegex, ""));
+        mTextView.setText(PostUtils.removeQuote(content));
         mTextView.post(new Runnable() {
             @Override
             public void run() {

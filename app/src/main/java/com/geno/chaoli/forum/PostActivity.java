@@ -30,6 +30,7 @@ import com.geno.chaoli.forum.meta.PostContentView;
 import com.geno.chaoli.forum.model.Post;
 import com.geno.chaoli.forum.model.PostListResult;
 import com.geno.chaoli.forum.network.MyRetrofit;
+import com.geno.chaoli.forum.utils.PostUtils;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -262,7 +263,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 													toReply.putExtra("conversationId", mConversationId);
 													toReply.putExtra("postId", post.getPostId());
 													toReply.putExtra("replyTo", post.getUsername());
-													toReply.putExtra("replyMsg", post.getContent());
+													toReply.putExtra("replyMsg", PostUtils.removeQuote(post.getContent()));
+													Log.d(TAG, "onClick: content = " + post.getContent() + ", replyMsg = " + PostUtils.removeQuote(post.getContent()));
 													startActivityForResult(toReply, REPLY_CODE);
 													break;
 											}
@@ -274,32 +276,12 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 					});
 				}
 			}
-			/*holder.content.setOnLongClickListener(new View.OnLongClickListener() {
-				@Override
-				public boolean onLongClick(View view) {
-					Toast.makeText(mContext, "hh", Toast.LENGTH_SHORT).show();
-					return true;
-				}
-			});*/
-			//holder.content.setText(mContext, post.getContent());
 			for (int i = 0; i < ((LinearLayout) holder.itemView).getChildCount(); i++) {
 				View child = ((LinearLayout) holder.itemView).getChildAt(i);
 				if(child instanceof ImageView) {
 					((LinearLayout) holder.itemView).removeViewAt(i);
 				}
 			}
-			/*if (post.getAttachments() != null && post.getAttachments().size() > 0) {
-				for (Post.Attachment attachment : post.getAttachments()) {
-					if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
-						ImageView imageView = new ImageView(mContext);
-						Glide.with(mContext)
-								.load(Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret())
-								.into(imageView);
-						((LinearLayout)holder.itemView).addView(imageView);
-					}
-				}
-			}*/
-			//holder.content.setMovementMethod(LinkMovementMethod.getInstance());
 		}
 
 		class PostViewHolder extends RecyclerView.ViewHolder {
