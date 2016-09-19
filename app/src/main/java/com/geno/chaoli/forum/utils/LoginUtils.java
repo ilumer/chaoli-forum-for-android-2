@@ -3,7 +3,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.geno.chaoli.forum.Me;
+import com.geno.chaoli.forum.data.Me;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.geno.chaoli.forum.network.MyOkHttp.Callback;

@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,7 +17,7 @@ public class Splash extends Activity
 		super.onCreate(savedInstanceState);
 		//TODO Any splash screen here?
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		Toast.makeText(Splash.this, String.format(Locale.getDefault(), "%.2f%%", TODO.getStatus() * 100), Toast.LENGTH_SHORT).show();
+		//Toast.makeText(Splash.this, String.format(Locale.getDefault(), "%.2f%%", TODO.getStatus() * 100), Toast.LENGTH_SHORT).show();
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		Thread t = new Thread()
 		{
@@ -28,7 +28,7 @@ public class Splash extends Activity
 				try
 				{
 					sleep(0);
-					startActivity(new Intent(Splash.this, Class.forName("com.geno.chaoli.forum.MainActivity")));
+					startActivity(new Intent(Splash.this, Class.forName("com.geno.chaoli.forum.view.MainActivity")));
 				}
 				catch (Exception e)
 				{

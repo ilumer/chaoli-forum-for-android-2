@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.geno.chaoli.forum.network.MyOkHttp.Callback;

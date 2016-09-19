@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,10 +7,10 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextPaint;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.model.HistoryItem;
 import com.geno.chaoli.forum.model.HistoryResult;

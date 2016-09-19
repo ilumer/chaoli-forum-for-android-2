@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-import com.geno.chaoli.forum.MainActivity;
+import com.geno.chaoli.forum.view.MainActivity;
 
 public class SingleUtils
 {

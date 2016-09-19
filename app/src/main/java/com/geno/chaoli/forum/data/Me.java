@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;

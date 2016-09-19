@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.geno.chaoli.forum.network.MyOkHttp.Callback;

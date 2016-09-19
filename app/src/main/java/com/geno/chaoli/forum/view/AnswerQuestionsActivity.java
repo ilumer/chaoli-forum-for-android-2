@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.app.Activity;
 import android.support.v7.app.AlertDialog;
@@ -8,8 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -20,10 +18,10 @@ import android.widget.BaseAdapter;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.meta.OnlineImgCheckBox;
 import com.geno.chaoli.forum.meta.OnlineImgRadioButton;
 import com.geno.chaoli.forum.meta.OnlineImgTextView;

@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.meta.ChannelTextView;
 import com.geno.chaoli.forum.utils.ConversationUtils;

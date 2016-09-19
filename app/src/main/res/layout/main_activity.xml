@@ -5,7 +5,7 @@
 	android:fitsSystemWindows="true"
 	android:id="@+id/drawer_layout"
 	android:background="@color/light_gray"
-	tools:context="com.geno.chaoli.forum.MainActivity"
+	tools:context=".view.MainActivity"
 	android:layout_height="match_parent"
 	android:layout_width="match_parent">
 	<FrameLayout

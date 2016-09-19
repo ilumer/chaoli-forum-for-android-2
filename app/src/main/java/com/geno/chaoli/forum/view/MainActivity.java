@@ -1,8 +1,7 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,19 +16,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.geno.chaoli.forum.data.Me;
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.utils.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Channel;

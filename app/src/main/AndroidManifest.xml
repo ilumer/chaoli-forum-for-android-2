@@ -6,14 +6,14 @@
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
 	<application
-		android:name=".app.ChaoliApplication"
+		android:name=".ChaoliApplication"
 		android:allowBackup="true"
 		android:fullBackupContent="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
-		<activity android:name=".Splash"
+		<activity android:name=".view.Splash"
 			android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
@@ -21,32 +21,32 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".MainActivity"
+			android:name=".view.MainActivity"
 			android:screenOrientation="portrait"
 			android:label="@string/app_name"
 			android:theme="@style/MainActivityTheme">
 		</activity>
-		<activity android:name=".SettingsActivity"
+		<activity android:name=".view.SettingsActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".AnswerQuestionsActivity"
+		<activity android:name=".view.AnswerQuestionsActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".SignUpActivity"
+		<activity android:name=".view.SignUpActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".LoginActivity"
+		<activity android:name=".view.LoginActivity"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".PostActivity"
+			android:name=".view.PostActivity"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".ReplyAction"
+			android:name=".view.ReplyAction"
 			android:screenOrientation="portrait"/>
-		<activity android:name=".HomepageActivity"
+		<activity android:name=".view.HomepageActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".PostAction"
+		<activity android:name=".view.PostAction"
 			android:screenOrientation="portrait"/><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
 		<meta-data

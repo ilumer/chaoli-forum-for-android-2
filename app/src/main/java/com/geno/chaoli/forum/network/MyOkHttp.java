@@ -3,7 +3,7 @@ package com.geno.chaoli.forum.network;
 import android.content.Context;
 import android.os.Handler;
 
-import com.geno.chaoli.forum.app.ChaoliApplication;
+import com.geno.chaoli.forum.ChaoliApplication;
 
 import java.io.File;
 import java.io.IOException;

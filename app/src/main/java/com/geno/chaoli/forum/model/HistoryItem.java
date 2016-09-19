@@ -1,6 +1,6 @@
 package com.geno.chaoli.forum.model;
 
-import com.geno.chaoli.forum.HomepageListFragment;
+import com.geno.chaoli.forum.view.HomepageListFragment;
 
 /**
  * 存储个人主页中的历史活动的类

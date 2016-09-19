@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.utils.ConversationUtils;

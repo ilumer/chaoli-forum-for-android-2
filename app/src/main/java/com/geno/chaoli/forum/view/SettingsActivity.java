@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.data.Me;
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.utils.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
 

@@ -1,6 +1,6 @@
 package com.geno.chaoli.forum.model;
 
-import com.geno.chaoli.forum.HomepageListFragment;
+import com.geno.chaoli.forum.view.HomepageListFragment;
 import com.google.gson.annotations.SerializedName;
 
 /**

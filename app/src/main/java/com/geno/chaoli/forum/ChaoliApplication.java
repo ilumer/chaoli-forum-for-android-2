@@ -1,4 +1,4 @@
-package com.geno.chaoli.forum.app;
+package com.geno.chaoli.forum;
 
 import android.app.Application;
 import android.content.Context;

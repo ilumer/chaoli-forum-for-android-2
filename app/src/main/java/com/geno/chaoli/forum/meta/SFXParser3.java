@@ -20,7 +20,7 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 
-import com.geno.chaoli.forum.PostActivity;
+import com.geno.chaoli.forum.view.PostActivity;
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.model.Post;
 

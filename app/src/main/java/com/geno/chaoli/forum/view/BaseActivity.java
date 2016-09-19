@@ -1,10 +1,12 @@
-package com.geno.chaoli.forum;
+package com.geno.chaoli.forum.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+
+import com.geno.chaoli.forum.R;
 
 /**
  * Created by jianhao on 16-5-31.
