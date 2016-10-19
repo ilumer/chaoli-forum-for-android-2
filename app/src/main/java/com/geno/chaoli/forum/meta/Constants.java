@@ -77,4 +77,6 @@ public class Constants
 	public static final String loginBool = "logged";
 
 	public static final String NONE = "none";
+
+	public static final int POST_PER_PAGE = 20;
 }

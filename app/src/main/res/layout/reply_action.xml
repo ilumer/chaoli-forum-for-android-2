@@ -1,23 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:orientation="vertical">
-	<android.support.design.widget.AppBarLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
-		<include layout="@layout/custom_toolbar"/>
-	</android.support.design.widget.AppBarLayout>
-	<EditText
-		android:hint="@string/reply_hint"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+	<data>
+		<variable
+			name="viewModel"
+			type="com.geno.chaoli.forum.viewmodel.ReplyActionViewModel"/>
+	</data>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:paddingTop="@dimen/text_field_vertical_padding"
-		android:paddingBottom="@dimen/text_field_vertical_padding"
-		android:paddingLeft="@dimen/text_field_horizontal_padding"
-		android:paddingRight="@dimen/text_field_horizontal_padding"
-		android:id="@+id/replyText"
-		android:inputType="textLongMessage|textMultiLine"
-		android:gravity="top|start"
-		android:background="@null"/>
-</LinearLayout>
+		android:orientation="vertical">
+		<android.support.design.widget.AppBarLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			<include layout="@layout/custom_toolbar"/>
+		</android.support.design.widget.AppBarLayout>
+		<EditText
+			android:text="@={viewModel.content}"
+			app:selection="@{viewModel.selection}"
+			android:hint="@string/reply_hint"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:paddingTop="@dimen/text_field_vertical_padding"
+			android:paddingBottom="@dimen/text_field_vertical_padding"
+			android:paddingLeft="@dimen/text_field_horizontal_padding"
+			android:paddingRight="@dimen/text_field_horizontal_padding"
+			android:id="@+id/replyText"
+			android:inputType="textLongMessage|textMultiLine"
+			android:gravity="top|start"
+			android:background="@null"/>
+	</LinearLayout>
+</layout>

@@ -25,6 +25,7 @@ public class AvatarView extends RelativeLayout
 {
 	final String TAG = "AvatarView";
 
+	Context mContext;
 	String mImagePath, mUsername;
 	int mUserId;
 	Boolean firstLoad = true;
@@ -40,7 +41,7 @@ public class AvatarView extends RelativeLayout
 	public AvatarView(final Context context, final String imagePath, int userId, String username)
 	{
 		this(context, null);
-		update(context, imagePath, userId, username);
+		update(imagePath, userId, username);
 	}
 
 	// adjust the size
@@ -51,13 +52,13 @@ public class AvatarView extends RelativeLayout
 		layoutParams.width = lengthdp;
 		t.setTextSize((float)20 * lengthdp / 80); //这个80显示效果好一些,然而我不知道为什么
 	}
-	public void update(Context context, String imagePath, int userId, String username) {
+	public void update(String imagePath, int userId, String username) {
 		mImagePath = imagePath;
 		mUserId = userId;
 		mUsername = username;
-		if(firstLoad) {
+		/*if(firstLoad) {
 			init(context);
-		}
+		}*/
 
 		if (Constants.NONE.equals(imagePath) || imagePath == null)
 		{
@@ -67,7 +68,7 @@ public class AvatarView extends RelativeLayout
 		}
 		else
 		{
-			Glide.with(context).load(Constants.avatarURL + "avatar_" + userId + "." + imagePath).into(i);
+			Glide.with(mContext).load(Constants.avatarURL + "avatar_" + userId + "." + imagePath).into(i);
 			t.setVisibility(INVISIBLE);
 			i.setVisibility(VISIBLE);
 		}
@@ -78,6 +79,7 @@ public class AvatarView extends RelativeLayout
 		t = (TextView) v.findViewById(R.id.avatarTxt);
 		i = (ImageView) v.findViewById(R.id.avatarImg);
 		t.setTextSize(20);
+		mContext = context;
 		firstLoad = false;
 	}
 
@@ -96,6 +98,7 @@ public class AvatarView extends RelativeLayout
 	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr)
 	{
 		super(context, attrs, defStyleAttr);
+		init(context);
 	}
 
 	public String getImagePath() {
@@ -114,5 +117,6 @@ public class AvatarView extends RelativeLayout
 	public AvatarView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes)
 	{
 		super(context, attrs, defStyleAttr, defStyleRes);
+		init(context);
 	}
 }

@@ -1,95 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/custom_toolbar"/>
-    <ScrollView
-        android:scrollbars="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:orientation="vertical"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.geno.chaoli.forum.viewmodel.SignUpViewModel"/>
+    </data>
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include layout="@layout/custom_toolbar"/>
+        <ScrollView
+            android:scrollbars="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp">
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/usernameTIL"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/edtTxt_username"
-                    android:hint="@string/username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/emailTIL"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/edtTxt_email"
-                    android:inputType="textEmailAddress"
-                    android:hint="@string/email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/passwordTIL"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/edtTxt_password"
-                    android:inputType="textPassword"
-                    android:hint="@string/password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/retypePasswordTIL"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/edtTxt_retype_password"
-                    android:inputType="textPassword"
-                    android:hint="@string/retype_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
+            android:layout_height="wrap_content">
             <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <ImageView
-                    android:id="@+id/iv_captcha"
-                    android:layout_width="120dp"
-                    android:layout_height="50dp" />
-                <Button
-                    android:id="@+id/btn_refresh_captcha"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@string/refresh"/>
-            </LinearLayout>
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/captchaTIL"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/edtTxt_captcha"
-                    android:inputType="number"
-                    android:hint="@string/captcha"
+                android:layout_margin="20dp">
+                <android.support.design.widget.TextInputLayout
+                    app:error="@{viewModel.usernameError}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:hint="@string/username"
+                        android:text="@={viewModel.username}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputLayout
+                    app:error="@{viewModel.emailError}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:inputType="textEmailAddress"
+                        android:text="@={viewModel.email}"
+                        android:hint="@string/email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputLayout
+                    app:error="@{viewModel.passwordError}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:inputType="textPassword"
+                        android:hint="@string/password"
+                        android:text="@={viewModel.password}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+                <android.support.design.widget.TextInputLayout
+                    app:error="@{viewModel.confirmError}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:inputType="textPassword"
+                        android:hint="@string/retype_password"
+                        android:text="@={viewModel.confirm}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
-            <Button
-                android:id="@+id/btn_sign_up"
-                android:text="@string/submit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+                    android:orientation="vertical">
+                    <ImageView
+                        android:src="@{viewModel.captchaImg}"
+                        android:layout_width="120dp"
+                        android:layout_height="50dp" />
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:onClick="@{() -> viewModel.clickRefreshCaptcha()}"
+                        android:text="@string/refresh"/>
+                </LinearLayout>
+                <android.support.design.widget.TextInputLayout
+                    app:error="@{viewModel.captchaError}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputEditText
+                        android:inputType="number"
+                        android:hint="@string/captcha"
+                        android:text="@={viewModel.captcha}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+                <Button
+                    android:onClick="@{() -> viewModel.clickSignUp()}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</layout>

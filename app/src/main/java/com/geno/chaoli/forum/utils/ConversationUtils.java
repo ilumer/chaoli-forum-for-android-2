@@ -3,6 +3,7 @@ package com.geno.chaoli.forum.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.geno.chaoli.forum.network.MyOkHttp.Callback;
@@ -51,27 +52,26 @@ public class ConversationUtils {
 
     private static ArrayList<Integer> memberList = new ArrayList<>();
 
-    public static void setChannel(final Context context, int channel, SetChannelObserver Observer){
-        setChannel(context, channel, 0, Observer);
+    public static void setChannel(int channel, SetChannelObserver Observer){
+        setChannel(channel, 0, Observer);
     }
 
     /**
      * 设置主题的板块
      * conversationId为0时，会设置正在编辑、还未发出的conversation的板块
      * addMember, removeMember也是同样
-     * @param context context
      * @param channel 板块号
      * @param conversationId 主题id
      * @param observer observer
      */
-    public static void setChannel(final Context context, int channel, int conversationId, final SetChannelObserver observer){
+    public static void setChannel(int channel, int conversationId, final SetChannelObserver observer){
         String url = Constants.SET_CHANNEL_URL + String.valueOf(conversationId);
         new MyOkHttp.MyOkHttpClient()
                 .add("channel", String.valueOf(channel))
                 .add("userId", String.valueOf(LoginUtils.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(url)
-                .enqueue(context, new Callback() {
+                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         observer.onSetChannelFailure(-3);
@@ -93,18 +93,18 @@ public class ConversationUtils {
     }
 
     /*  添加可见用户（默认任何人均可见）    */
-    public static void addMember(final Context context, String member, AddMemberObserver Observer){
-        addMember(context, member, 0, Observer);
+    public static void addMember(String member, AddMemberObserver Observer){
+        addMember(member, 0, Observer);
     }
 
-    public static void addMember(final Context context, String member, int conversationId, final AddMemberObserver observer){
+    public static void addMember(String member, int conversationId, final AddMemberObserver observer){
         String url = Constants.ADD_MEMBER_URL + String.valueOf(conversationId);
         new MyOkHttp.MyOkHttpClient()
                 .add("member", member)
                 .add("userId", String.valueOf(LoginUtils.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(url)
-                .enqueue(context, new Callback() {
+                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         observer.onAddMemberFailure(-3);
@@ -172,7 +172,7 @@ public class ConversationUtils {
     }
 
     /*  发表主题    */
-    public static void postConversation(Context context, String title, String content,
+    public static void postConversation(String title, String content,
                                         final PostConversationObserver observer){
         new MyOkHttp.MyOkHttpClient()
                 .add("title", title)
@@ -180,7 +180,7 @@ public class ConversationUtils {
                 .add("userId", String.valueOf(LoginUtils.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(Constants.POST_CONVERSATION_URL)
-                .enqueue(context, new Callback() {
+                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         observer.onPostConversationFailure(-3);

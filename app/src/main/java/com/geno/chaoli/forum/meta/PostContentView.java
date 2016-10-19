@@ -49,6 +49,7 @@ public class PostContentView extends LinearLayout {
     }
 
     public void setPost(Post post) {
+        removeAllViews();
         mPost = post;
         mAttachmentList = post.getAttachments();
         List<Post.Attachment> attachmentList = new ArrayList<>(post.getAttachments());

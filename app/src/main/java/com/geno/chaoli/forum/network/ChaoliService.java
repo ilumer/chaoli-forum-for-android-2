@@ -24,7 +24,7 @@ public interface ChaoliService {
     @GET("index.php/conversation/index.json/{conversationId}/p{page}")
     Call<PostListResult> listPosts(@Path("conversationId") int conversationId, @Path("page") int page);
     @GET("index.php/conversations/index.json/{channel}")
-    Call<ConversationListResult> listConversations(@Path("channel") String channel, @Query("search") String search);
+    Observable<ConversationListResult> listConversations(@Path("channel") String channel, @Query("search") String search);
     @GET("index.php/user/login?return=%2F")
     Observable<String> getToken();
     @POST("index.php/user/login?return=%2F")

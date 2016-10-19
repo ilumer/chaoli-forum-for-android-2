@@ -1,78 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingLeft="@dimen/conversation_view_horizontal_margin"
-				android:paddingRight="@dimen/conversation_view_horizontal_margin"
-				android:paddingTop="@dimen/conversation_view_vertical_margin"
-				android:paddingBottom="@dimen/conversation_view_vertical_margin">
-	<LinearLayout
-		android:id="@+id/ll_user"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+	<data>
+		<variable
+			name="item"
+			type="com.geno.chaoli.forum.model.Conversation"/>
+		<variable
+			name="handler"
+			type="com.geno.chaoli.forum.viewmodel.MainActivityViewModel"/>
+	</data>
+	<RelativeLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:gravity="center_vertical"
-		android:orientation="horizontal">
-		<com.geno.chaoli.forum.meta.AvatarView
-			android:id="@+id/avatar"
+		android:clickable="true"
+		android:onClick="@{() -> handler.onClickConversation(item)}"
+		android:background="?attr/selectableItemBackground"
+		android:paddingLeft="@dimen/conversation_view_horizontal_margin"
+		android:paddingRight="@dimen/conversation_view_horizontal_margin"
+		android:paddingTop="@dimen/conversation_view_vertical_margin"
+		android:paddingBottom="@dimen/conversation_view_vertical_margin">
+		<LinearLayout
+			android:id="@+id/ll_user"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginRight="10dp"
-			android:layout_marginEnd="10dp">
-		</com.geno.chaoli.forum.meta.AvatarView>
-		<TextView
-			android:id="@+id/username"
-			android:textSize="16sp"
-			android:maxLines="1"
+			android:gravity="center_vertical"
+			android:orientation="horizontal">
+			<com.geno.chaoli.forum.meta.AvatarView
+				android:id="@+id/avatar"
+				app:username="@{item.startMember}"
+				app:userId="@{Integer.parseInt(item.startMemberId)}"
+				app:imageSuffix="@{item.startMemberAvatarSuffix}"
+				app:length="@{20}"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginRight="10dp"
+				android:layout_marginEnd="10dp">
+			</com.geno.chaoli.forum.meta.AvatarView>
+			<TextView
+				android:id="@+id/username"
+				android:text="@{item.startMember}"
+				android:textSize="16sp"
+				android:maxLines="1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+		</LinearLayout>
+
+		<com.geno.chaoli.forum.meta.ChannelTextView
+			android:id="@+id/channel"
+			app:channelId="@{item.channelId}"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-	</LinearLayout>
-
-	<LinearLayout
-		android:id="@+id/channel"
-		android:orientation="horizontal"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_alignParentRight="true">
-
-	</LinearLayout>
-	<RelativeLayout
-		android:id="@+id/title_and_replies"
-		android:layout_below="@id/ll_user"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"/>
+		<RelativeLayout
+			android:id="@+id/title_and_replies"
+			android:layout_below="@id/ll_user"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			<TextView
+				android:id="@+id/title"
+				android:text="@{item.title}"
+				android:layout_centerVertical="true"
+				android:textSize="20sp"
+				android:textColor="#000000"
+				android:layout_marginTop="5dp"
+				android:layout_marginRight="30dp"
+				android:layout_marginEnd="30dp"
+				android:maxLines="1"
+				android:ellipsize="end"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+			<TextView
+				android:id="@+id/reply_num"
+				android:text="@{String.valueOf(item.replies)}"
+				android:layout_centerVertical="true"
+				android:layout_alignParentRight="true"
+				android:layout_alignParentEnd="true"
+				android:paddingRight="3dp"
+				android:paddingLeft="3dp"
+				android:textSize="20sp"
+				android:textColor="#9e9e9e"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+		</RelativeLayout>
 		<TextView
-			android:id="@+id/title"
-			android:layout_centerVertical="true"
-			android:textSize="20sp"
-			android:textColor="#000000"
-			android:layout_marginTop="5dp"
-			android:layout_marginRight="30dp"
-			android:layout_marginEnd="30dp"
-			android:maxLines="1"
+			android:id="@+id/excerpt"
+			android:text="@{item.firstPost}"
+			android:layout_below="@id/title_and_replies"
 			android:ellipsize="end"
+			android:textSize="16sp"
+			android:textColor="#9e9e9e"
+			android:minLines="2"
+			android:maxLines="2"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content" />
-		<TextView
-			android:id="@+id/reply_num"
-			android:layout_centerVertical="true"
-			android:layout_alignParentRight="true"
-			android:layout_alignParentEnd="true"
-			android:paddingRight="3dp"
-			android:paddingLeft="3dp"
-			android:textSize="20sp"
-			android:textColor="#9e9e9e"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-	</RelativeLayout>
-	<TextView
-		android:id="@+id/excerpt"
-		android:layout_below="@id/title_and_replies"
-		android:ellipsize="end"
-		android:textSize="16sp"
-		android:textColor="#9e9e9e"
-		android:minLines="2"
-		android:maxLines="2"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content" />
 
-</RelativeLayout>
+	</RelativeLayout>
+</layout>

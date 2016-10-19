@@ -1,8 +1,9 @@
 package com.geno.chaoli.forum.view;
 
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,12 +14,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
+import com.geno.chaoli.forum.databinding.ReplyActionBinding;
 import com.geno.chaoli.forum.utils.PostUtils;
+import com.geno.chaoli.forum.viewmodel.BaseViewModel;
+import com.geno.chaoli.forum.viewmodel.ReplyActionViewModel;
 
 import java.util.Locale;
 
 
-public class ReplyAction extends AppCompatActivity
+public class ReplyAction extends BaseActivity
 {
 	public static final String TAG = "ReplyAction";
 
@@ -26,27 +30,28 @@ public class ReplyAction extends AppCompatActivity
 	public static final int FLAG_REPLY = 1;
 	public static final int FLAG_EDIT = 2;
 
-	public int flag;
-
-	public int conversationId, postId;
-	public String replyTo;
-
-	public String replyMsg;
-
-	public EditText replyText;
-
-	public SharedPreferences sp;
-	public SharedPreferences.Editor e;
-
-	//public static final int menu_draft = 0;
 	public static final int menu_reply = 1;
-	//public static final int menu_purge = 2;
+
+	ReplyActionViewModel viewModel;
+	ReplyActionBinding binding;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.reply_action);
+		int flag;
+		int conversationId, postId;
+		String replyTo;
+		String replyMsg;
+		Bundle data = getIntent().getExtras();
+		flag = data.getInt("flag");
+		conversationId = data.getInt("conversationId");
+		postId = data.getInt("postId", -1);
+		replyTo = data.getString("replyTo", "");
+		replyMsg = data.getString("replyMsg", "");
+
+		//setContentView(R.layout.reply_action);
+		setViewModel(new ReplyActionViewModel(flag, conversationId, postId, replyTo, replyMsg));
 		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
 		toolbar.setTitle(R.string.reply);
 		toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -59,22 +64,8 @@ public class ReplyAction extends AppCompatActivity
 				onBackPressed();
 			}
 		});
-		sp = getSharedPreferences(TAG, MODE_PRIVATE);
-		e = sp.edit();
-		Bundle data = getIntent().getExtras();
-		flag = data.getInt("flag");
-		conversationId = data.getInt("conversationId");
-		postId = data.getInt("postId", -1);
-		replyTo = data.getString("replyTo", "");
-		replyMsg = data.getString("replyMsg", "");
 
-		replyText = (EditText) findViewById(R.id.replyText);
-
-		String draft = sp.getString(String.valueOf(conversationId), "");
-		if (!"".equals(draft)) replyText.setText(draft);
-        if (postId != -1) replyText.setText(String.format(Locale.ENGLISH, "[quote=%d:@%s]%s[/quote]\n", postId, replyTo, replyMsg));
-		replyText.setSelection(replyText.getText().length());
-		replyText.addTextChangedListener(new TextWatcher() {
+		binding.replyText.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -87,7 +78,29 @@ public class ReplyAction extends AppCompatActivity
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				e.putString(String.valueOf(conversationId), editable.toString()).apply();
+				viewModel.saveReply();
+			}
+		});
+
+		viewModel.replyComplete.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				setResult(RESULT_OK);
+				finish();
+			}
+		});
+
+		viewModel.editComplete.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				finish();
+			}
+		});
+
+		viewModel.showToast.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showToast(viewModel.toastContent.get());
 			}
 		});
 	}
@@ -96,9 +109,7 @@ public class ReplyAction extends AppCompatActivity
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		super.onCreateOptionsMenu(menu);
-		//menu.add(Menu.NONE, Menu.NONE, menu_draft, R.string.save_as_draft).setIcon(android.R.drawable.ic_menu_edit).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		menu.add(Menu.NONE, Menu.NONE, menu_reply, R.string.reply).setIcon(R.drawable.ic_cab_done_mtrl_alpha).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		//menu.add(Menu.NONE, Menu.NONE, menu_purge, R.string.purge).setIcon(android.R.drawable.ic_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		return true;
 	}
 
@@ -108,77 +119,25 @@ public class ReplyAction extends AppCompatActivity
 		super.onOptionsItemSelected(item);
 		switch (item.getOrder())
 		{
-			/*case menu_draft:
-				e.putString(String.valueOf(conversationId), replyText.getText().toString()).commit();
-				//e.putBoolean(conversationId + "", true).commit();
-				//getSharedPreferences(conversationId + "", MODE_PRIVATE).edit()
-				//		.putString("replyText", replyText.getText().toString()).commit();
-				Toast.makeText(ReplyAction.this, R.string.save_as_draft, Toast.LENGTH_SHORT).show();
-				finish();
-				break;
-				*/
 			case menu_reply:
-				switch (flag)
+				switch (viewModel.flag.get())
 				{
 					case FLAG_NORMAL:
-						PostUtils.reply(ReplyAction.this, conversationId, replyText.getText().toString(), new PostUtils.ReplyObserver()
-						{
-							@Override
-							public void onReplySuccess()
-							{
-								Toast.makeText(ReplyAction.this, R.string.reply, Toast.LENGTH_SHORT).show();
-								e.putString(String.valueOf(conversationId), "").apply();
-								setResult(RESULT_OK);
-								finish();
-							}
-
-							@Override
-							public void onReplyFailure(int statusCode)
-							{
-								Toast.makeText(ReplyAction.this, "Fail: " + statusCode, Toast.LENGTH_SHORT).show();
-							}
-						});
+						viewModel.reply();
 						break;
-					/*case FLAG_REPLY:
-						PostUtils.quote(ReplyAction.this, mConversationId, replyText.getText().toString(), new PostUtils.QuoteObserver()
-						{
-							@Override
-							public void onQuoteSuccess()
-							{
-								finish();
-							}
-
-							@Override
-							public void onQuoteFailure(int statusCode)
-							{
-
-							}
-						});
-						break;
-						*/
 					case FLAG_EDIT:
-						PostUtils.edit(ReplyAction.this, postId, replyText.getText().toString(), new PostUtils.EditObserver()
-						{
-							@Override
-							public void onEditSuccess()
-							{
-								Toast.makeText(ReplyAction.this, "Post", Toast.LENGTH_SHORT).show();
-								finish();
-							}
-
-							@Override
-							public void onEditFailure(int statusCode)
-							{
-								Toast.makeText(ReplyAction.this, "Fail: " + statusCode, Toast.LENGTH_SHORT).show();
-							}
-						});
+						viewModel.edit();
+						break;
 				}
 				break;
-			/*case menu_purge:
-				getSharedPreferences(conversationId + "", MODE_PRIVATE).edit().clear().apply();
-				break;
-				*/
 		}
 		return true;
+	}
+
+	@Override
+	public void setViewModel(BaseViewModel viewModel) {
+		this.viewModel = (ReplyActionViewModel) viewModel;
+		ReplyActionBinding binding = DataBindingUtil.setContentView(this, R.layout.reply_action);
+		binding.setViewModel(this.viewModel);
 	}
 }

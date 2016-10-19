@@ -1,12 +1,19 @@
 package com.geno.chaoli.forum.model;
 
-import com.geno.chaoli.forum.view.HomepageListFragment;
+import com.geno.chaoli.forum.ChaoliApplication;
+import com.geno.chaoli.forum.R;
+import com.geno.chaoli.forum.data.Me;
+import com.geno.chaoli.forum.viewmodel.HistoryFragmentVM;
 
 /**
  * 存储个人主页中的历史活动的类
  * Created by jianhao on 16-9-3.
  */
-public class HistoryItem extends HomepageListFragment.ListItem {
+public class HistoryItem extends HistoryFragmentVM.ListItem {
+    public static final String POST_ACTIVITY  = "postActivity";
+    public static final String STATUS         = "status";
+    public static final String JOIN           = "join";
+
     String start;
     String postId;
 
@@ -82,5 +89,58 @@ public class HistoryItem extends HomepageListFragment.ListItem {
 
         String newStatus;
         String newSignature;
+    }
+
+    @Override
+    public String getAvatarUsername() {
+        return Me.getMyUsername();
+    }
+
+    @Override
+    public int getConversationId() {
+        return 0;
+    }
+
+    @Override
+    public int getAvatarUserId() {
+        return Me.getMyUserId();
+    }
+
+    @Override
+    public String getAvatarSuffix() {
+        return Me.getMyAvatarSuffix();
+    }
+
+    @Override
+    public int getShowingPostId() {
+        return getPostId() != null ? Integer.valueOf(getPostId()) : 0;
+    }
+
+    @Override
+    public String getShowingTitle() {
+        switch (getType()) {
+            case POST_ACTIVITY:
+                if ("1".equals(getStart())) return ChaoliApplication.getAppContext().getString(R.string.opened_a_conversation);
+                else return ChaoliApplication.getAppContext().getString(R.string.updated, getTitle());
+            case STATUS:
+                return ChaoliApplication.getAppContext().getString(R.string.modified_his_or_her_information);
+            case JOIN:
+                return ChaoliApplication.getAppContext().getString(R.string.join_the_forum);
+        }
+        return "";
+    }
+
+    @Override
+    public String getShowingContent() {
+        switch (getType()) {
+            case POST_ACTIVITY:
+                return "1".equals(getStart()) ? getTitle() : getContent();
+            case STATUS:
+                if (data != null && data.getNewStatus() != null) return data.getNewStatus();
+                return "";
+            case JOIN:
+                return "";
+        }
+        return "";
     }
 }

@@ -2,11 +2,11 @@ package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
 
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.R;
 
 public enum Channel
 {
-	// TODO: 2016/2/4 0230 Use R.string to get instead of hardcode.
 	caff(R.string.channel_caff, 1, false, 0xFFA0A0A0),
 	ad(R.string.channel_ad, 3, false, 0xFF999999),
 	maths(R.string.channel_maths, 4, true, 0xFF673AB7),
@@ -62,9 +62,10 @@ public enum Channel
 	@Override
 	public String toString()
 	{
-		return this.name();
+		return ChaoliApplication.getAppContext().getString(this.name);
 	}
 
+	@Deprecated
 	public String toString(Context context)
 	{
 		return context.getString(this.name);
@@ -78,10 +79,10 @@ public enum Channel
 		return null;
 	}
 
-	public static final Channel getChannel(Context context, String channelName)
+	public static final Channel getChannel(String channelName)
 	{
 		for (Channel c : Channel.values())
-			if (c.toString(context).equals(channelName)) return c;
+			if (c.toString().equals(channelName)) return c;
 		return null;
 	}
 }

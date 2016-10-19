@@ -1,91 +1,212 @@
 package com.geno.chaoli.forum.view;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
+import android.databinding.ObservableInt;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.FragmentManager;
-import android.os.Handler;
-import android.os.Message;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.geno.chaoli.forum.data.Me;
 import com.geno.chaoli.forum.R;
-import com.geno.chaoli.forum.utils.AccountUtils;
-import com.geno.chaoli.forum.meta.AvatarView;
-import com.geno.chaoli.forum.meta.Channel;
+import com.geno.chaoli.forum.databinding.MainActivityBinding;
+import com.geno.chaoli.forum.databinding.NavigationHeaderBinding;
+import com.geno.chaoli.forum.meta.DividerItemDecoration;
+import com.geno.chaoli.forum.model.Conversation;
 import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.utils.LoginUtils;
-import com.geno.chaoli.forum.model.NotificationList;
+import com.geno.chaoli.forum.viewmodel.BaseViewModel;
+import com.geno.chaoli.forum.viewmodel.MainActivityViewModel;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-public class MainActivity extends BaseActivity// implements NavigationDrawerFragment.NavigationDrawerCallbacks
+public class MainActivity extends BaseActivity
 {
 	public static final String TAG = "MainActivity";
 
 	public Toolbar toolbar;
-	//public NavigationDrawerFragment fragment;
-	public ConversationListFragment mConversationListFragment;
 	public DrawerLayout mDrawerLayout;
-
-	public CharSequence title;
 
 	public SharedPreferences sp;
 	public SharedPreferences.Editor e;
 
-	public boolean loggedIn = false;
-
-	//private Boolean delayShowConversations;
-
 	private Context mContext = this;
 
-	Timer timer;
-	TimerTask task;
-	Handler notificationHanlder;
+	private ProgressDialog loginProgressDialog;
+
 	/**
 	 * ATTENTION: This was auto-generated to implement the App Indexing API.
 	 * See https://g.co/AppIndexing/AndroidStudio for more information.
 	 */
 	private GoogleApiClient client;
 
+	@BindView(R.id.conversationList)
+	RecyclerView l;
+
+	@BindView(R.id.conversationListRefreshLayout)
+	public SwipyRefreshLayout swipyRefreshLayout;
+
+	ActionBarDrawerToggle actionBarDrawerToggle;
+
+	MainActivityViewModel viewModel;
+	MainActivityBinding binding;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_activity);
 
-		//if (getActionBar() != null)
-		//getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.avatar_32));
+		viewModel = new MainActivityViewModel();
+		setViewModel(viewModel);
+		ButterKnife.bind(this);
 
-		/*Bundle bundle = getIntent().getExtras();
-		if (bundle != null) {
-			delayShowConversations = bundle.getBoolean("delayShowConversations", false);
-		}*/
+		initUI();
 
+
+		final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+			@Override
+			public boolean onNavigationItemSelected(MenuItem item) {
+				selectItem(item.getOrder());
+				item.setChecked(true);
+				return true;
+			}
+		});
+
+		viewModel.goToLogin.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) {
+					goToLogin();
+				}
+			}
+		});
+
+		viewModel.goToHomepage.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) {
+					goToMyHomePage();
+				}
+			}
+		});
+
+		viewModel.goToConversation.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) {
+					goToConversation(viewModel.clickedConversation);
+				}
+			}
+		});
+
+		viewModel.listPosition.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				smoothScrollToPosition(((ObservableInt) observable).get());
+			}
+		});
+
+		viewModel.notificationsNum.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableInt) observable).get() > 0) {
+					setCircleIndicator();
+				} else {
+					setNormalIndicator();
+				}
+			}
+		});
+
+		viewModel.showLoginProcessDialog.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) {
+					showLoginProcessDialog();
+				} else {
+					dismissLoginProcessDialog();
+				}
+			}
+		});
+
+		viewModel.selectedItem.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				selectItem(((ObservableInt) observable).get());
+			}
+		});
+
+		viewModel.goToPost.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) {
+					goToPostAction();
+				}
+			}
+		});
+
+		/**
+		 * 根据登录状态更改侧栏菜单
+		 */
+		viewModel.hasLoggedIn.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				binding.navigationView.inflateMenu(viewModel.hasLoggedIn.get() ? R.menu.menu_navigation : R.menu.menu_navigation_no_login);
+			}
+		});
+
+		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
+		viewModel.setChannel("all");
+		viewModel.login();
+
+		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
+		{
+			@Override
+			public void onRefresh(SwipyRefreshLayoutDirection direction)
+			{
+				if (direction == SwipyRefreshLayoutDirection.TOP) {
+					viewModel.refresh();
+				} else {
+					viewModel.loadMore();
+				}
+			}
+		});
+		// ATTENTION: This was auto-generated to implement the App Indexing API.
+		// See https://g.co/AppIndexing/AndroidStudio for more information.
+		client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+	}
+
+	public void selectItem(int position) {
+		viewModel.setChannel(viewModel.getChannelByPosition(position));
+		viewModel.refresh();
+		mDrawerLayout.closeDrawers();
+	}
+
+	public void initUI() {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
 		configToolbar(R.string.app_name);
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-		final ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
+		actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name, R.string.app_name);
 		actionBarDrawerToggle.setDrawerIndicatorEnabled(false);
 		actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 		actionBarDrawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
@@ -97,222 +218,21 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		actionBarDrawerToggle.syncState();
 		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
 
-		List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
-		if (fragmentList != null) {
-			for (Fragment fragment : fragmentList) {
-				getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-			}
-		}
-		notificationHanlder = new Handler(){
-			@Override
-			public void handleMessage(Message msg) {
-				super.handleMessage(msg);
-				if(!Me.isEmpty()) {
-					AccountUtils.checkNotification(mContext, new AccountUtils.MessageObserver() {
-						@Override
-						public void onGetUpdateSuccess(Boolean hasUpdate) {
+		l.setLayoutManager(new LinearLayoutManager(mContext));
+		l.addItemDecoration(new DividerItemDecoration(mContext));
 
-						}
-
-						@Override
-						public void onGetUpdateFailure(int statusCode) {
-
-						}
-
-						@Override
-						public void onCheckNotificationSuccess(NotificationList notificationList) {
-							if (notificationList.count > 0){
-								actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_with_a_circle_24dp);
-								actionBarDrawerToggle.syncState();
-							}else{
-								actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-								actionBarDrawerToggle.syncState();
-							}
-						}
-
-						@Override
-						public void onCheckNotificationFailure(int statusCode) {
-
-						}
-					});
-				}
-			}
-		};
-		timer = new Timer();
-		task = new TimerTask() {
-			@Override
-			public void run() {
-				notificationHanlder.sendEmptyMessage(0);
-			}
-		};
-		FloatingActionButton postBtn = (FloatingActionButton) findViewById(R.id.postBtn);
-		if (postBtn == null)
-			throw new NullPointerException();
-		postBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(mContext, PostAction.class);
-				startActivity(intent);
-				//startActivityForResult(intent, 1);
-			}
-		});
-
-		title = getTitle();
-
-		final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-		if (navigationView == null)
-			throw new NullPointerException();
-		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-			@Override
-			public boolean onNavigationItemSelected(MenuItem item) {
-				Log.d(TAG, String.valueOf(item.getOrder()));
-				selectItem(item.getOrder());
-				item.setChecked(true);
-				return true;
-			}
-		});
-		final AvatarView avatar = (AvatarView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
-		final TextView signatureTxt = (TextView) navigationView.getHeaderView(0).findViewById(R.id.signature_txt);
-
-		avatar.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				if(loggedIn){
-					if(!Me.isEmpty()) {
-						Intent intent = new Intent(mContext, HomepageActivity.class);
-						Bundle bundle = new Bundle();
-						bundle.putString("username", Me.getUsername());
-						bundle.putInt("userId", Me.getUserId());
-						bundle.putString("signature", Me.getPreferences().getSignature());
-						bundle.putString("avatarSuffix", Me.getAvatarSuffix() == null ? Constants.NONE : Me.getAvatarSuffix());
-						bundle.putBoolean("isSelf", true);
-						intent.putExtras(bundle);
-						startActivity(intent);
-					}
-				}else {
-					startActivity(new Intent(mContext, LoginActivity.class));
-				}
-			}
-		});
-
-		final ProgressDialog progressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.logging_in));
-		LoginUtils.begin_login(this, new LoginUtils.LoginObserver() {
-			@Override
-			public void onLoginSuccess(int userId, String token) {
-				progressDialog.dismiss();
-				loggedIn = true;
-				navigationView.getMenu().clear();
-				navigationView.inflateMenu(R.menu.menu_navigation);
-				String username = getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "");
-				((TextView) ((Activity) mContext).findViewById(R.id.loginHWndUsername)).setText(username);
-				Me.setInstanceFromSharedPreference(mContext, username);
-				if (!Me.isEmpty()) {
-					//Log.d(TAG, "AvatarSuffix: " + User.getMyAvatarSuffix());
-					avatar.update(mContext, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
-					signatureTxt.setText(Me.getMySignature());
-				}
-				AccountUtils.getProfile(mContext, new AccountUtils.GetProfileObserver() {
-					@Override
-					public void onGetProfileSuccess() {
-						//Log.d(TAG, "AvatarSuffix: " + User.getMyAvatarSuffix());
-						avatar.update(mContext, Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
-						signatureTxt.setText(Me.getMySignature());
-					}
-
-					@Override
-					public void onGetProfileFailure() {
-
-					}
-				});
-
-				try {
-					timer.schedule(task, Constants.getNotificationInterval * 1000, Constants.getNotificationInterval * 1000);
-				} catch (Exception e) {
-
-				}
-				selectItem(0);
-			}
-
-			@Override
-			public void onLoginFailure(int statusCode) {
-				progressDialog.dismiss();
-				navigationView.getMenu().clear();
-				navigationView.inflateMenu(R.menu.menu_navigation_no_login);
-				avatar.setLoginImage(mContext);
-				selectItem(0);
-				Log.d(TAG, "onLoginFailure: " + statusCode);
-			}
-		});
-		// ATTENTION: This was auto-generated to implement the App Indexing API.
-		// See https://g.co/AppIndexing/AndroidStudio for more information.
-		client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 	}
-
-	/*@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater menuInflater = new MenuInflater(this);
-		menuInflater.inflate(R.menu.menu_search, menu);
-
-		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-		SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-		searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
-		return true;
-	}*/
-
-	public void selectItem(int position) {
-		FragmentManager fm = getFragmentManager();
-		ConversationListFragment c = new ConversationListFragment().setChannel(getChannel(position, loggedIn));
-		mConversationListFragment = c;
-		fm.beginTransaction().replace(R.id.main_view, c).commit();
-		mDrawerLayout.closeDrawers();
-	}
-
-	public String getChannel(int position, boolean loggedIn) {
-		String[] channel =
-				new String[]
-						{
-								"",
-								loggedIn ? Channel.caff.toString() : null,
-								Channel.maths.toString(),
-								Channel.physics.toString(),
-								Channel.chem.toString(),
-								Channel.biology.toString(),
-								Channel.tech.toString(),
-								Channel.court.toString(),
-								Channel.announ.toString(),
-								Channel.others.toString(),
-								Channel.socsci.toString(),
-								Channel.lang.toString(),
-						};
-		return channel[position];
-	}
-
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		timer.cancel();
+		viewModel.destory();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d(TAG, "resume");
-		if(!Me.isEmpty()) {
-			//timer.cancel();
-			task.cancel();
-			task = new TimerTask() {
-				@Override
-				public void run() {
-					notificationHanlder.sendEmptyMessage(0);
-				}
-			};
-			//timer = new Timer();
-			timer.schedule(task, 0, Constants.getNotificationInterval * 1000);
-		}
+		viewModel.resume();
 	}
 
 	@Override
@@ -353,5 +273,69 @@ public class MainActivity extends BaseActivity// implements NavigationDrawerFrag
 		);
 		AppIndex.AppIndexApi.end(client, viewAction);
 		client.disconnect();
+	}
+
+	public void goToConversation(Conversation conversation) {
+		Intent jmp = new Intent();
+		jmp.putExtra("conversationId", conversation.getConversationId());
+		jmp.putExtra("conversationTitle", conversation.getTitle());
+		jmp.setClass(this, PostActivity.class);
+		startActivity(jmp);
+	}
+
+	public void goToMyHomePage() {
+		if(viewModel.hasLoggedIn.get()){
+			if(!Me.isEmpty()) {
+				Intent intent = new Intent(this, HomepageActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putString("username", Me.getUsername());
+				bundle.putInt("userId", Me.getUserId());
+				bundle.putString("signature", Me.getPreferences().getSignature());
+				bundle.putString("avatarSuffix", Me.getAvatarSuffix() == null ? Constants.NONE : Me.getAvatarSuffix());
+				bundle.putBoolean("isSelf",  true);
+				intent.putExtras(bundle);
+				startActivity(intent);
+			}
+		}
+	}
+
+	public void goToLogin() {
+		startActivity(new Intent(this, LoginActivity.class));
+	}
+
+	public void goToPostAction() {
+		Intent intent = new Intent(this, PostAction.class);
+		startActivity(intent);
+	}
+
+	public void setCircleIndicator() {
+		actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_with_a_circle_24dp);
+		actionBarDrawerToggle.syncState();
+	}
+
+	public void setNormalIndicator() {
+		actionBarDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+		actionBarDrawerToggle.syncState();
+	}
+
+	public void showLoginProcessDialog() {
+		loginProgressDialog = ProgressDialog.show(this, "", getResources().getString(R.string.logging_in));
+	}
+
+	public void dismissLoginProcessDialog() {
+		loginProgressDialog.dismiss();
+	}
+
+	public void smoothScrollToPosition(int pos) {
+		l.smoothScrollToPosition(pos);
+	}
+
+	@Override
+	public void setViewModel(BaseViewModel viewModel) {
+		this.viewModel = (MainActivityViewModel) viewModel;
+		binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
+		binding.setViewModel(this.viewModel);
+		NavigationHeaderBinding navigationHeaderBinding = NavigationHeaderBinding.bind(binding.navigationView.getHeaderView(0));
+		navigationHeaderBinding.setViewModel(this.viewModel);
 	}
 }

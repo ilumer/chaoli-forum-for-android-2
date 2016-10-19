@@ -114,7 +114,7 @@ public class MyOkHttp {
 
         public MyOkHttpClient add(String key, String type, File file) {
             if (builder == null) builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-            builder.addFormDataPart(key, file.getName(), RequestBody.create(MediaType.parse(type), file));
+            if (file != null) builder.addFormDataPart(key, file.getName(), RequestBody.create(MediaType.parse(type), file));
             return this;
         }
         /*public MyOkHttpClient url(String url) {
@@ -128,7 +128,7 @@ public class MyOkHttp {
             call.enqueue(new okhttp3.Callback() {
                 @Override
                 public void onFailure(final Call call, final IOException e) {
-                    new Handler(context.getMainLooper()).post(new Runnable() {
+                    new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
                             callback.onFailure(call, e);
@@ -139,12 +139,42 @@ public class MyOkHttp {
                 @Override
                 public void onResponse(final Call call, final Response response) throws IOException {
                     final String responseStr = response.body().string();
-                    response.body().close();
-                    new Handler(context.getMainLooper()).post(new Runnable() {
+                    new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 callback.onResponse(call, response, responseStr);
+                            } catch (IOException e) {
+                                onFailure(call, e);
+                            }
+                        }
+                    });
+                    response.body().close();
+                }
+            });
+        }
+
+        public void enqueue(final Context context, final Callback1 callback) {
+            request = requestBuilder.build();
+            Call call = getClient().newCall(request);
+            call.enqueue(new okhttp3.Callback() {
+                @Override
+                public void onFailure(final Call call, final IOException e) {
+                    new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onFailure(call, e);
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(final Call call, final Response response) throws IOException {
+                    new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                callback.onResponse(call, response);
                             } catch (IOException e) {
                                 onFailure(call, e);
                             }
@@ -157,6 +187,11 @@ public class MyOkHttp {
     public static abstract class Callback {
         public abstract void onFailure(Call call, IOException e);
         public abstract void onResponse(Call call, Response response, String responseStr) throws IOException;
+    }
+
+    public static abstract class Callback1 {
+        public abstract void onFailure(Call call, IOException e);
+        public abstract void onResponse(Call call, Response response) throws IOException;
     }
     /**
      * https://segmentfault.com/a/1190000004345545

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="item"
+            type="com.geno.chaoli.forum.model.Post"/>
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FF808080">
+        <TextView
+            android:id="@+id/floor"
+            android:text="@{String.valueOf(item.floor)}"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:textSize="18sp"
+            android:textColor="@color/contentColor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:id="@+id/firstLineInPost"
+            android:layout_width="match_parent"
+            android:layout_marginRight="@dimen/right_margin_in_post_view"
+            android:layout_marginEnd="@dimen/right_margin_in_post_view"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/usernameAndSignature"
+                android:text="@{item.signature == null ? item.username : @string/comma(item.username, item.signature)}"
+                android:ellipsize="end"
+                android:textSize="16sp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"/>
+        </LinearLayout>
+    </RelativeLayout>
+</layout>

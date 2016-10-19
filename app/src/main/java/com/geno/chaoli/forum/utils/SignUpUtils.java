@@ -3,7 +3,9 @@ package com.geno.chaoli.forum.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.meta.Constants;
+import com.geno.chaoli.forum.model.BusinessQuestion;
 import com.geno.chaoli.forum.model.Question;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.geno.chaoli.forum.network.MyRetrofit;
@@ -35,13 +37,13 @@ public class SignUpUtils {
 
     public static int ANSWERS_WRONG = -1;
 
-    public static void getQuestionObjList(Context context, final SubmitObserver observer, String subject){
+    public static void getQuestionObjList(final GetQuestionObserver observer, String subject){
         MyRetrofit.getService()
                 .getQuestion(subject)
                 .enqueue(new Callback<ArrayList<Question>>() {
                     @Override
                     public void onResponse(Call<ArrayList<Question>> call, Response<ArrayList<Question>> response) {
-                        observer.onGetQuestionObjList(response.body());
+                        observer.onGetQuestionObjList(BusinessQuestion.fromList(response.body()));
                     }
 
                     @Override
@@ -71,27 +73,31 @@ public class SignUpUtils {
         //ArrayList<Question> questionList = (ArrayList<Question>) JSONArray.parseArray(jsonStr, Question.class);
     }
 
-    public static void submitAnswers(Context context, List<Question> questionList, final SubmitObserver observer){
-        MyOkHttp.MyOkHttpClient myOkHttpClient = new MyOkHttp.MyOkHttpClient().add("questions", new Gson().toJson(questionList));
+    public static void submitAnswers(List<BusinessQuestion> questionList, final SubmitObserver observer){
+        MyOkHttp.MyOkHttpClient myOkHttpClient = new MyOkHttp.MyOkHttpClient().add("questions", new Gson().toJson(Question.fromList(questionList)));
 
         //String str = JSON.toJSONString(questionList);
         //RequestParams params = new RequestParams();
         //params.put("questions", str);
 
-        for (Question i: questionList) {
-            if("true".equals(i.getChoice()))
-                for (String answer : i.answers)
-                    myOkHttpClient.add(i._id.$id + "_opt[]", answer);
-            else if("false".equals(i.getChoice()))
-                myOkHttpClient.add(i._id.$id + "_ans", i.answers.get(0));
+        for (BusinessQuestion i: questionList) {
+            if (i.choice)
+                for (int j = 0; j < i.isChecked.size(); j++) {
+                    if (i.isChecked.get(j)) {
+                        myOkHttpClient.add(i.id + "_opt[]", String.valueOf(j));
+                        Log.d(TAG, "submitAnswers:  id = " + i.id + ", item value = " + j);
+                    }
+                }
+            else
+                myOkHttpClient.add(i.id + "_ans", i.answer.get());
         }
 
         myOkHttpClient.add("simplified", "1");
         myOkHttpClient.post(Constants.CONFIRM_ANSWER_URL)
-                .enqueue(context, new MyOkHttp.Callback() {
+                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(okhttp3.Call call, IOException e) {
-
+                        observer.onFailure(-1);
                     }
 
                     @Override
@@ -123,8 +129,10 @@ public class SignUpUtils {
         });*/
     }
 
-    public interface SubmitObserver{
-        void onGetQuestionObjList(ArrayList<Question> questionList);
+    public interface GetQuestionObserver{
+        void onGetQuestionObjList(ArrayList<BusinessQuestion> questionList);
+    }
+    public interface SubmitObserver {
         void onAnswersPass(String code);
         void onFailure(int statusCode);
     }

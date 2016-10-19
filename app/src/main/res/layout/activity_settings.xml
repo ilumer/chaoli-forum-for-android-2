@@ -1,122 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-    <include layout="@layout/custom_toolbar"/>
-    <ScrollView
+<layout>
+    <data>
+        <variable
+            name="viewModel"
+            type="com.geno.chaoli.forum.viewmodel.SettingsVM"/>
+    </data>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <LinearLayout
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <include layout="@layout/custom_toolbar"/>
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical"
-            android:focusable="true"
-            android:focusableInTouchMode="true" >
-
-            <TextView style="@style/TitleInSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/avatar"/>
+            android:layout_height="wrap_content">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <com.geno.chaoli.forum.meta.AvatarView
-                    android:id="@+id/iv_avatar"
-                    android:layout_marginLeft="10dp"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"/>
-                <Button
-                    android:id="@+id/btn_change_avatar"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:focusable="true"
+                android:focusableInTouchMode="true" >
+
+                <TextView style="@style/TitleInSettings"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/change_avatar"/>
-                <ImageView
-                    android:id="@+id/iv_new_avatar"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:scaleType="fitXY"/>
+                    android:text="@string/avatar"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <com.geno.chaoli.forum.meta.AvatarView
+                        android:id="@+id/iv_avatar"
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"/>
+                    <Button
+                        android:id="@+id/btn_change_avatar"
+                        android:onClick="@{() -> viewModel.clickChangeAvatar()}"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/change_avatar"/>
+                    <ImageView
+                        android:id="@+id/iv_new_avatar"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"/>
+                </LinearLayout>
+
+                <View style="@style/Divider"/>
+                <TextView style="@style/TitleInSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notification"/>
+                <CheckBox
+                    android:id="@+id/chk_private_add"
+                    android:checked="@={viewModel.privateAdd}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notify_me_when_receiving_personal_conversation"/>
+                <CheckBox
+                    android:id="@+id/chk_star_on_reply"
+                    android:checked="@={viewModel.starOnReply}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/star_conversations_i_post_automatically"/>
+                <CheckBox
+                    android:id="@+id/chk_star_private"
+                    android:checked="@={viewModel.starPrivate}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/star_personal_conversations_i_joined_automatically"/>
+
+                <View style="@style/Divider"/>
+                <TextView style="@style/TitleInSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/privacy"/>
+                <CheckBox
+                    android:id="@+id/chk_hide_online"
+                    android:checked="@={viewModel.hideOnline}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hide_online"/>
+
+                <View style="@style/Divider"/>
+                <TextView style="@style/TitleInSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/signature"/>
+                <EditText
+                    android:id="@+id/edtTxt_signature"
+                    android:text="@={viewModel.signature}"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <View style="@style/Divider"/>
+                <TextView style="@style/TitleInSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/user_status"/>
+                <EditText
+                    android:id="@+id/edtTxt_user_status"
+                    android:text="@={viewModel.userStatus}"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <View style="@style/Divider"
+                    android:layout_marginTop="20dp"/>
+                <Button
+                    android:id="@+id/btn_save"
+                    android:onClick="@{() -> viewModel.save()}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/save_settings"
+                    android:layout_gravity="center"/>
             </LinearLayout>
-
-            <!--
-            <View style="@style/Divider"/>
-            <TextView style="@style/TitleInSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/language"/>
-            <Spinner
-                android:id="@+id/spn_language"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </Spinner>
-            -->
-
-            <View style="@style/Divider"/>
-            <TextView style="@style/TitleInSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/notification"/>
-            <CheckBox
-                android:id="@+id/chk_private_add"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/notify_me_when_receiving_personal_conversation"/>
-            <CheckBox
-                android:id="@+id/chk_star_on_reply"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/star_conversations_i_post_automatically"/>
-            <CheckBox
-                android:id="@+id/chk_star_private"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/star_personal_conversations_i_joined_automatically"/>
-
-            <View style="@style/Divider"/>
-            <TextView style="@style/TitleInSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/privacy"/>
-            <CheckBox
-                android:id="@+id/chk_hide_online"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/hide_online"/>
-
-            <View style="@style/Divider"/>
-            <TextView style="@style/TitleInSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/signature"/>
-            <EditText
-                android:id="@+id/edtTxt_signature"
-                android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <View style="@style/Divider"/>
-            <TextView style="@style/TitleInSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/user_status"/>
-            <EditText
-                android:id="@+id/edtTxt_user_status"
-                android:layout_marginRight="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <View style="@style/Divider"
-                android:layout_marginTop="20dp"/>
-            <Button
-                android:id="@+id/btn_save"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/save_settings"
-                android:layout_gravity="center"/>
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</layout>

@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    style="@style/QuestionItem">
-    <com.geno.chaoli.forum.meta.OnlineImgTextView
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:id="@+id/answer_et"
-        android:layout_width="match_parent"
+<layout>
+    <data>
+        <variable
+            name="item"
+            type="com.geno.chaoli.forum.model.BusinessQuestion"/>
+    </data>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"/>
-</LinearLayout>
+        style="@style/QuestionItem">
+        <com.geno.chaoli.forum.meta.OnlineImgTextView
+            android:id="@+id/content"
+            android:text="@={item.question}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/answer_et"
+            android:text="@={item.answer}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"/>
+    </LinearLayout>
+</layout>

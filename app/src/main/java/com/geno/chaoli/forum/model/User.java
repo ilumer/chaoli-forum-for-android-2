@@ -1,15 +1,18 @@
 package com.geno.chaoli.forum.model;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.geno.chaoli.forum.BR;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by daquexian on 16-4-8.
  * 保存用户账户信息的类
  */
-public class User implements Parcelable {
+public class User extends BaseObservable implements Parcelable {
     private static final String TAG = "User";
     private boolean isEmpty = true;
     private int userId;
@@ -64,7 +67,7 @@ public class User implements Parcelable {
     };
 
 
-    public static class Preferences{
+    public class Preferences extends BaseObservable {
         private String signature;
         @SerializedName("email.privateAdd")
         private Boolean privateAdd;
@@ -72,44 +75,54 @@ public class User implements Parcelable {
         private Boolean starPrivate;
         private Boolean hideOnline;
 
+        @Bindable
         public String getSignature() {
             return signature;
         }
 
         public void setSignature(String signature) {
             this.signature = signature;
+            notifyPropertyChanged(BR.signature);
         }
 
+        @Bindable
         public Boolean getPrivateAdd() {
             return privateAdd;
         }
 
         public void setPrivateAdd(Boolean privateAdd) {
             this.privateAdd = privateAdd;
+            notifyPropertyChanged(BR.privateAdd);
         }
 
+        @Bindable
         public Boolean getStarOnReply() {
             return starOnReply;
         }
 
         public void setStarOnReply(Boolean starOnReply) {
             this.starOnReply = starOnReply;
+            notifyPropertyChanged(BR.starOnReply);
         }
 
+        @Bindable
         public Boolean getStarPrivate() {
             return starPrivate;
         }
 
         public void setStarPrivate(Boolean starPrivate) {
             this.starPrivate = starPrivate;
+            notifyPropertyChanged(BR.starPrivate);
         }
 
+        @Bindable
         public Boolean getHideOnline() {
             return hideOnline;
         }
 
         public void setHideOnline(Boolean hideOnline) {
             this.hideOnline = hideOnline;
+            notifyPropertyChanged(BR.hideOnline);
         }
     }
 
@@ -121,43 +134,53 @@ public class User implements Parcelable {
         isEmpty = empty;
     }
 
+    @Bindable
     public int getUserId() {
         return userId;
     }
 
     public void setUserId(int userId) {
         this.userId = userId;
+        notifyPropertyChanged(BR.userId);
     }
 
+    @Bindable
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+        notifyPropertyChanged(BR.username);
     }
 
+    @Bindable
     public String getAvatarSuffix() {
         return avatarSuffix;
     }
 
     public void setAvatarSuffix(String avatarSuffix) {
         this.avatarSuffix = avatarSuffix;
+        notifyPropertyChanged(BR.avatarSuffix);
     }
 
+    @Bindable
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+        notifyPropertyChanged(BR.status);
     }
 
+    @Bindable
     public Preferences getPreferences() {
         return preferences;
     }
 
     public void setPreferences(Preferences preferences) {
         this.preferences = preferences;
+        notifyPropertyChanged(BR.preferences);
     }
 }

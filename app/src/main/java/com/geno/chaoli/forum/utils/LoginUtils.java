@@ -3,6 +3,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.data.Me;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
@@ -53,21 +54,21 @@ public class LoginUtils {
 
     private static SharedPreferences sharedPreferences;
 
-    public static void begin_login(final Context context, final String username, final String password, final LoginObserver loginObserver){
-        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
+    public static void begin_login(final String username, final String password, final LoginObserver loginObserver){
+        sharedPreferences = ChaoliApplication.getAppContext().getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
 
         if( !sharedPreferences.getBoolean(IS_LOGGED_IN, false)){
             LoginUtils.username = username;
             LoginUtils.password = password;
-            pre_login(context, loginObserver);
+            pre_login(ChaoliApplication.getAppContext(), loginObserver);
         }else{
             //如果已经登录，先注销
-            logout(context, new LogoutObserver() {
+            logout(new LogoutObserver() {
                 @Override
                 public void onLogoutSuccess() {
                     LoginUtils.username = username;
                     LoginUtils.password = password;
-                    pre_login(context, loginObserver);
+                    pre_login(ChaoliApplication.getAppContext(), loginObserver);
                 }
 
                 @Override
@@ -78,9 +79,9 @@ public class LoginUtils {
         }
     }
 
-    public static void begin_login(final Context context, LoginObserver loginObserver){
+    public static void begin_login(LoginObserver loginObserver){
 
-        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = ChaoliApplication.getAppContext().getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
         Boolean is_logged_in = sharedPreferences.getBoolean(IS_LOGGED_IN, false);
 
         //if(CookieUtils.getCookie(context).size() != 0){
@@ -89,7 +90,7 @@ public class LoginUtils {
         password = sharedPreferences.getString(SP_PASSWORD_KEY, "");
 
         if(is_logged_in){
-            getNewToken(context, loginObserver);
+            getNewToken(ChaoliApplication.getAppContext(), loginObserver);
             //username = password = COOKIE_UN_AND_PW;
             return;
         }
@@ -101,7 +102,7 @@ public class LoginUtils {
 
         Log.d("login", username + ", " + password);
 
-        begin_login(context, username, password, loginObserver);
+        begin_login(username, password, loginObserver);
     }
 
     /*public static void myLogin(final Context context, final String username, final String password, final LoginObserver loginObserver) {
@@ -243,17 +244,15 @@ public class LoginUtils {
                     public void onFailure(Call call, IOException e) {
                         e.printStackTrace();
                         setSPIsLoggedIn(false);
-                        begin_login(context, loginObserver);
+                        begin_login(loginObserver);
                     }
 
                     @Override
                     public void onResponse(Call call, Response response, String responseStr) throws IOException {
-                        Log.d(TAG, "onResponse: " + responseStr);
                         String tokenFormat = "\"userId\":(\\d+),\"token\":\"([\\dabcdef]+)";
                         Pattern pattern = Pattern.compile(tokenFormat);
                         Matcher matcher = pattern.matcher(responseStr);
                         if (matcher.find()) {
-                            Log.d(TAG, "onResponse: found");
                             int userId = Integer.parseInt(matcher.group(1));
                             setUserId(userId);
                             Me.setUserId(userId);
@@ -266,23 +265,22 @@ public class LoginUtils {
                             Me.setUsername(username);
                             loginObserver.onLoginSuccess(getUserId(), getToken());
                         } else {
-                            Log.d(TAG, "onResponse: not found");
                             setSPIsLoggedIn(false);
                             //loginObserver.onLoginFailure(COOKIE_EXPIRED);
-                            begin_login(context, loginObserver);
+                            begin_login(loginObserver);
                             //Log.e("regex_error", "regex_error");
                         }
                     }
                 });
     }
 
-    public static void logout(final Context context, final LogoutObserver logoutObserver){
+    public static void logout(final LogoutObserver logoutObserver){
         String logoutURL = Constants.LOGOUT_PRE_URL + getToken();
-        clear(context);
+        clear(ChaoliApplication.getAppContext());
         Me.clear();
         new MyOkHttp.MyOkHttpClient()
                 .get(logoutURL)
-                .enqueue(context, new Callback() {
+                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                     }
@@ -328,8 +326,18 @@ public class LoginUtils {
         return sharedPreferences.getBoolean(IS_LOGGED_IN, false);
     }
 
+    @Deprecated
     public static void saveUsernameAndPassword(Context context, String username, String password){
-        sharedPreferences = context.getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = ChaoliApplication.getAppContext().getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(SP_USERNAME_KEY, username);
+        // TODO: 16-3-11 1915 Encrypt saved password
+        editor.putString(SP_PASSWORD_KEY, password);
+        editor.apply();
+    }
+
+    public static void saveUsernameAndPassword(String username, String password) {
+        sharedPreferences = ChaoliApplication.getAppContext().getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(SP_USERNAME_KEY, username);
         // TODO: 16-3-11 1915 Encrypt saved password

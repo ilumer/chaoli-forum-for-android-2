@@ -61,12 +61,16 @@ public class SFXParser3 {
 		Pattern cPattern = Pattern.compile("(?i)\\[c=(.*?)](.*?)\\[/c]");
 		Matcher c = cPattern.matcher(spannable);
 		while (c.find()) {
-			int color = Color.parseColor(c.group(1));
-			spannable.setSpan(new ForegroundColorSpan(color), c.start(), c.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+			try {
+				int color = Color.parseColor(c.group(1));
+				spannable.setSpan(new ForegroundColorSpan(color), c.start(), c.end(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-			spannable.replace(c.end(2), c.end(), "");
-			spannable.replace(c.start(), c.start(2), "");
-			c = cPattern.matcher(spannable);
+				spannable.replace(c.end(2), c.end(), "");
+				spannable.replace(c.start(), c.start(2), "");
+				c = cPattern.matcher(spannable);
+			} catch (IllegalArgumentException e) {
+				//避免不支持的颜色引起crash
+			}
 		}
 
 		Pattern urlPattern = Pattern.compile("(?i)\\[url=(.*?)](.*?)\\[/url]");

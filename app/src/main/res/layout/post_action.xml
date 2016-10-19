@@ -1,64 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:divider="@drawable/divider"
-    android:showDividers="middle"
-    android:orientation="vertical"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <include layout="@layout/custom_toolbar"/>
-    </android.support.design.widget.AppBarLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/title"
-            android:background="@null"
-            android:hint="@string/title"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.geno.chaoli.forum.viewmodel.PostActionViewModel"/>
+    </data>
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@drawable/divider"
+        android:showDividers="middle"
+        android:orientation="vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginRight="70dp"
-            android:layout_marginEnd="70dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:maxLines="1"/>
-        <LinearLayout
-            android:id="@+id/channel"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_width="55dp"
             android:layout_height="wrap_content">
-
-        </LinearLayout>
-    </RelativeLayout>
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#AAA" />
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <EditText
-            android:id="@+id/content"
-            android:background="@null"
-            android:hint="@string/content"
+            <include layout="@layout/custom_toolbar"/>
+        </android.support.design.widget.AppBarLayout>
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/text_field_horizontal_padding"
-            android:paddingRight="@dimen/text_field_horizontal_padding"
-            android:paddingTop="@dimen/text_field_vertical_padding"
-            android:paddingBottom="@dimen/text_field_vertical_padding"
-            android:inputType="textLongMessage|textMultiLine"
-            android:gravity="top|start"/>
-    </ScrollView>
-</LinearLayout>
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/title"
+                android:text="@={viewModel.title}"
+                android:background="@null"
+                android:hint="@string/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginRight="70dp"
+                android:layout_marginEnd="70dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:maxLines="1"/>
+            <com.geno.chaoli.forum.meta.ChannelTextView
+                android:id="@+id/channel"
+                app:channelId="@{viewModel.channelId}"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <!--<LinearLayout
+                android:id="@+id/channel"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content">
+
+            </LinearLayout>-->
+        </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AAA" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <EditText
+                android:id="@+id/content"
+                android:text="@={viewModel.content}"
+                android:background="@null"
+                android:hint="@string/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/text_field_horizontal_padding"
+                android:paddingRight="@dimen/text_field_horizontal_padding"
+                android:paddingTop="@dimen/text_field_vertical_padding"
+                android:paddingBottom="@dimen/text_field_vertical_padding"
+                android:inputType="textLongMessage|textMultiLine"
+                android:gravity="top|start"/>
+        </ScrollView>
+    </LinearLayout>
+</layout>

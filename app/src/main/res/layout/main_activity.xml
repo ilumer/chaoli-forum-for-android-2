@@ -1,53 +1,78 @@
-<android.support.v4.widget.DrawerLayout
+<layout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:fitsSystemWindows="true"
-	android:id="@+id/drawer_layout"
-	android:background="@color/light_gray"
-	tools:context=".view.MainActivity"
-	android:layout_height="match_parent"
-	android:layout_width="match_parent">
-	<FrameLayout
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
-		<android.support.design.widget.CoordinatorLayout
+	xmlns:tools="http://schemas.android.com/tools">
+
+	<data>
+		<variable
+			name="viewModel"
+			type="com.geno.chaoli.forum.viewmodel.MainActivityViewModel"/>
+	</data>
+
+	<android.support.v4.widget.DrawerLayout
+		android:fitsSystemWindows="true"
+		android:id="@+id/drawer_layout"
+		android:background="@color/light_gray"
+		tools:context=".view.MainActivity"
+		android:layout_height="match_parent"
+		android:layout_width="match_parent">
+		<FrameLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent">
-			<android.support.design.widget.AppBarLayout
+			<android.support.design.widget.CoordinatorLayout
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content">
-
-				<android.support.v7.widget.Toolbar
-					android:id="@+id/tl_custom"
+				android:layout_height="match_parent">
+				<android.support.design.widget.AppBarLayout
 					android:layout_width="match_parent"
-					android:layout_height="?attr/actionBarSize"
-					android:background="?attr/colorPrimary"
-					app:layout_scrollFlags="scroll|enterAlways" />
-			</android.support.design.widget.AppBarLayout>
-			<FrameLayout
-				android:id="@+id/main_view"
-				app:layout_behavior="@string/appbar_scrolling_view_behavior"
-				android:background="@color/white"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"/>
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/postBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end|bottom"
-                android:layout_margin="@dimen/fab_margin"
-                android:src="@drawable/ic_menu_notifications"
-                app:layout_behavior="com.geno.chaoli.forum.meta.ScrollFABBehavior"
-                app:borderWidth="0dp" />
-        </android.support.design.widget.CoordinatorLayout>
-</FrameLayout>
+					android:layout_height="wrap_content">
 
-	<android.support.design.widget.NavigationView
-		android:id="@+id/navigation_view"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:layout_gravity="start"
-		app:headerLayout="@layout/navigation_header"
-		app:menu="@menu/menu_navigation"/>
-</android.support.v4.widget.DrawerLayout>
+					<android.support.v7.widget.Toolbar
+						android:id="@+id/tl_custom"
+						android:layout_width="match_parent"
+						android:layout_height="?attr/actionBarSize"
+						android:background="?attr/colorPrimary"
+						app:layout_scrollFlags="scroll|enterAlways" />
+				</android.support.design.widget.AppBarLayout>
+				<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+					android:background="@color/white"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					app:isRefreshing="@{viewModel.isRefreshing}"
+					app:layout_behavior="@string/appbar_scrolling_view_behavior"
+					android:id="@+id/conversationListRefreshLayout">
+					<android.support.v7.widget.RecyclerView
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:orientation="vertical"
+						android:id="@+id/conversationList"
+						app:handler="@{viewModel}"
+						app:itemList="@{viewModel.conversationList}"
+						app:itemRes="@{@layout/conversation_view}"
+						android:dividerHeight="0dp"
+						android:layout_marginLeft="@dimen/conversationListMargin"
+						android:layout_marginStart="@dimen/conversationListMargin"
+						android:layout_marginRight="@dimen/conversationListMargin"
+						android:layout_marginEnd="@dimen/conversationListMargin"/>
+				</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+				<android.support.design.widget.FloatingActionButton
+					android:id="@+id/postBtn"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="end|bottom"
+					android:layout_margin="@dimen/fab_margin"
+					android:src="@drawable/ic_menu_notifications"
+					android:onClick="@{viewModel.onClickPostFab}"
+					app:layout_behavior="com.geno.chaoli.forum.meta.ScrollFABBehavior"
+					app:borderWidth="0dp" />
+			</android.support.design.widget.CoordinatorLayout>
+		</FrameLayout>
+
+		<android.support.design.widget.NavigationView
+			android:id="@+id/navigation_view"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_gravity="start"
+			app:headerLayout="@layout/navigation_header"
+			app:menu="@menu/menu_navigation_no_login"/>
+	</android.support.v4.widget.DrawerLayout>
+</layout>

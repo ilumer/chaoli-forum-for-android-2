@@ -1,57 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	xmlns:auto="http://schemas.android.com/apk/res-auto"
-	android:orientation="vertical"
-	android:layout_margin="@dimen/middle_margin">
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
-
-		<TextView
-			android:id="@+id/floor"
-			android:layout_alignParentEnd="true"
-			android:layout_alignParentRight="true"
-			android:textSize="18sp"
-			android:textColor="@color/contentColor"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-		<LinearLayout
-			android:id="@+id/firstLineInPost"
-			android:layout_width="match_parent"
-			android:layout_marginRight="@dimen/right_margin_in_post_view"
-			android:layout_marginEnd="@dimen/right_margin_in_post_view"
-			android:layout_height="wrap_content"
-			android:gravity="center_vertical">
-			<com.geno.chaoli.forum.meta.AvatarView
-				android:id="@+id/avatar"
-				android:clickable="true"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content">
-			</com.geno.chaoli.forum.meta.AvatarView>
-			<TextView
-				android:id="@+id/usernameAndSignature"
-				android:ellipsize="end"
-				android:textSize="16sp"
-				android:layout_marginLeft="15dp"
-				android:layout_marginStart="15dp"
-				android:textColor="@color/black"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:maxLines="1"/>
-		</LinearLayout>
-	</RelativeLayout>
-
-    <com.geno.chaoli.forum.meta.PostContentView
-		android:id="@+id/content"
-		android:orientation="vertical"
-		android:layout_marginTop="5dp"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+	<data>
+		<variable
+			name="item"
+			type="com.geno.chaoli.forum.model.Post"/>
+		<variable
+			name="handler"
+			type="com.geno.chaoli.forum.viewmodel.PostActivityViewModel"/>
+	</data>
+	<LinearLayout
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_marginLeft="@dimen/left_margin_in_post_view"
-		android:layout_marginStart="@dimen/left_margin_in_post_view"
-		android:layout_marginRight="@dimen/right_margin_in_post_view"
-		android:layout_marginEnd="@dimen/right_margin_in_post_view" />
+		android:orientation="vertical"
+		android:layout_margin="@dimen/middle_margin">
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
 
-</LinearLayout>
+			<TextView
+				android:id="@+id/floor"
+				android:text="@{String.valueOf(item.floor)}"
+				android:layout_alignParentEnd="true"
+				android:layout_alignParentRight="true"
+				android:textSize="18sp"
+				android:textColor="@color/contentColor"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content" />
+			<LinearLayout
+				android:id="@+id/firstLineInPost"
+				android:layout_width="match_parent"
+				android:layout_marginRight="@dimen/right_margin_in_post_view"
+				android:layout_marginEnd="@dimen/right_margin_in_post_view"
+				android:layout_height="wrap_content"
+				android:gravity="center_vertical">
+				<com.geno.chaoli.forum.meta.AvatarView
+					android:id="@+id/avatar"
+					android:clickable="true"
+					android:onClick="@{() -> handler.clickAvatar(item)}"
+					app:username="@{item.username}"
+					app:userId="@{item.memberId}"
+					app:imageSuffix="@{item.avatarFormat}"
+					app:length="@{20}"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"/>
+				<TextView
+					android:id="@+id/usernameAndSignature"
+					android:text="@{item.signature == null ? item.username : @string/comma(item.username, item.signature)}"
+					android:ellipsize="end"
+					android:textSize="16sp"
+					android:layout_marginLeft="15dp"
+					android:layout_marginStart="15dp"
+					android:textColor="@color/black"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:maxLines="1"/>
+			</LinearLayout>
+		</RelativeLayout>
+
+		<com.geno.chaoli.forum.meta.PostContentView
+			android:id="@+id/content"
+			app:post="@{item}"
+			android:orientation="vertical"
+			android:layout_marginTop="5dp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="@dimen/left_margin_in_post_view"
+			android:layout_marginStart="@dimen/left_margin_in_post_view"
+			android:layout_marginRight="@dimen/right_margin_in_post_view"
+			android:layout_marginEnd="@dimen/right_margin_in_post_view" />
+
+	</LinearLayout>
+</layout>

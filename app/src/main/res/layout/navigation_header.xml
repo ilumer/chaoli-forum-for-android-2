@@ -1,41 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:orientation="vertical"
-    android:paddingLeft="@dimen/avatar_marginLeft"
-    android:paddingStart="@dimen/avatar_marginLeft"
-    android:paddingTop="@dimen/avatar_marginTop"
-    android:background="@drawable/header"
-    android:id="@+id/loginHWnd">
-    <com.geno.chaoli.forum.meta.AvatarView
-        android:layout_width="@dimen/avatar_diameter"
-        android:layout_height="@dimen/avatar_diameter"
-        android:clickable="true"
-        android:id="@+id/avatar"/>
-    <RelativeLayout
-        android:orientation="vertical"
-        android:layout_marginTop="10dp"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.geno.chaoli.forum.viewmodel.MainActivityViewModel"/>
+    </data>
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp">
-        <TextView
-            android:layout_marginTop="7dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/loginHWndUsername"
-            android:text="@string/click_login"
-            android:textSize="14sp"
-            android:textColor="#FFFFFF"/>
-        <TextView
-            android:id="@+id/signature_txt"
-            android:ellipsize="end"
-            android:layout_marginBottom="7dp"
-            android:layout_alignParentBottom="true"
+        android:layout_height="180dp"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/avatar_marginLeft"
+        android:paddingStart="@dimen/avatar_marginLeft"
+        android:paddingTop="@dimen/avatar_marginTop"
+        android:background="@drawable/header"
+        android:id="@+id/loginHWnd">
+        <com.geno.chaoli.forum.meta.AvatarView
+            android:layout_width="@dimen/avatar_diameter"
+            android:layout_height="@dimen/avatar_diameter"
+            app:length="@{72}"
+            app:imageSuffix="@{viewModel.myAvatarSuffix}"
+            app:userId="@{viewModel.myUserId}"
+            app:username="@{viewModel.myUsername}"
+            app:login="@{viewModel.hasLoggedIn}"
+            android:clickable="true"
+            android:onClick="@{viewModel.onClickAvatar}"
+            android:id="@+id/avatar"/>
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="#FFFFFF"/>
-    </RelativeLayout>
-</LinearLayout>
+            android:layout_height="56dp">
+            <TextView
+                android:layout_marginTop="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/loginHWndUsername"
+                android:text="@{viewModel.hasLoggedIn ? viewModel.myUsername : @string/click_login}"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"/>
+            <TextView
+                android:id="@+id/signature_txt"
+                android:ellipsize="end"
+                android:layout_marginBottom="7dp"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="@{viewModel.mySignature}"
+                android:textColor="#FFFFFF"/>
+        </RelativeLayout>
+    </LinearLayout>
+</layout>

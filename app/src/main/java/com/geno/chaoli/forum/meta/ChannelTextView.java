@@ -11,7 +11,7 @@ public class ChannelTextView extends TextView
 {
 	private Channel channel;
 
-	public static final String TAG = "ChannelTextView";
+	private static final String TAG = "ChannelTextView";
 
 	public ChannelTextView(Context context, Channel channel)
 	{
@@ -22,17 +22,17 @@ public class ChannelTextView extends TextView
 		this.setTextColor(channel.getColor());
 	}
 
-	ChannelTextView(Context context)
+	public ChannelTextView(Context context)
 	{
 		this(context, (AttributeSet) null);
 	}
 
-	ChannelTextView(Context context, AttributeSet attrs)
+	public ChannelTextView(Context context, AttributeSet attrs)
 	{
 		this(context, attrs, 0);
 	}
 
-	ChannelTextView(Context context, AttributeSet attrs, int defStyleAttr)
+	public ChannelTextView(Context context, AttributeSet attrs, int defStyleAttr)
 	{
 		super(context, attrs, defStyleAttr);
 	}
@@ -57,5 +57,9 @@ public class ChannelTextView extends TextView
 	public void setChannel(Channel channel)
 	{
 		this.channel = channel;
+		this.setPadding(5, 5, 5, 5);
+		this.setText(channel.toString());
+		this.setTextColor(channel.getColor());
+		//invalidate();
 	}
 }

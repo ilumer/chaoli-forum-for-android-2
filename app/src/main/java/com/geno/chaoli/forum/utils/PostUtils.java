@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.network.MyOkHttp;
 import com.geno.chaoli.forum.utils.LoginUtils;
@@ -19,7 +20,7 @@ public class PostUtils
 	public static final String TAG = "PostUtils";
 	private static final String quoteRegex = "\\[quote((.|\n)*?)\\[/quote]";
 
-	public static void reply(final Context context, int conversationId, String content, final ReplyObserver observer)
+	public static void reply(int conversationId, String content, final ReplyObserver observer)
 	{
 		new MyOkHttp.MyOkHttpClient()
 				.add("conversationId", String.valueOf(conversationId))
@@ -27,7 +28,7 @@ public class PostUtils
 				.add("userId", String.valueOf(LoginUtils.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.replyURL + conversationId)
-				.enqueue(context, new MyOkHttp.Callback() {
+				.enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onReplyFailure(-1);
@@ -41,7 +42,7 @@ public class PostUtils
 				});
 	}
 
-	public static void edit(final Context context, int postId, String content, final EditObserver observer)
+	public static void edit(int postId, String content, final EditObserver observer)
 	{
 		new MyOkHttp.MyOkHttpClient()
 				.add("content", content)
@@ -49,7 +50,7 @@ public class PostUtils
 				.add("userId", String.valueOf(LoginUtils.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.editURL + postId)
-				.enqueue(context, new MyOkHttp.Callback() {
+				.enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onEditFailure(-1);

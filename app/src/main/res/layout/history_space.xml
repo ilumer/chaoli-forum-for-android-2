@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Space xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="8dp">
-
-</Space>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="item"
+            type="com.geno.chaoli.forum.model.BusinessHomepageListItem"/>
+    </data>
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="8dp">
+    </Space>
+</layout>

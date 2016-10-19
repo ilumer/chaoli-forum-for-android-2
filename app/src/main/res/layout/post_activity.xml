@@ -1,42 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_height="match_parent"
-	android:layout_width="match_parent"
-	android:background="@color/light_gray">
-	<android.support.design.widget.AppBarLayout
+	xmlns:tools="http://schemas.android.com/tools">
+	<data>
+		<variable
+			name="viewModel"
+			type="com.geno.chaoli.forum.viewmodel.PostActivityViewModel"/>
+	</data>
+	<android.support.design.widget.CoordinatorLayout
+		android:layout_height="match_parent"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+		android:background="@color/light_gray">
+		<android.support.design.widget.AppBarLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
 
-		<android.support.v7.widget.Toolbar
-			android:id="@+id/tl_custom"
+			<android.support.v7.widget.Toolbar
+				android:id="@+id/tl_custom"
+				android:layout_width="match_parent"
+				android:layout_height="?attr/actionBarSize"
+				android:background="?attr/colorPrimary"
+				app:layout_scrollFlags="scroll|enterAlways" />
+		</android.support.design.widget.AppBarLayout>
+		<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+			android:id="@+id/swipyRefreshLayout"
+			app:layout_behavior="@string/appbar_scrolling_view_behavior"
+			app:isRefreshing="@{viewModel.isRefreshing}"
 			android:layout_width="match_parent"
-			android:layout_height="?attr/actionBarSize"
-			android:background="?attr/colorPrimary"
-			app:layout_scrollFlags="scroll|enterAlways" />
-	</android.support.design.widget.AppBarLayout>
-	<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-		android:id="@+id/swipyRefreshLayout"
-		app:layout_behavior="@string/appbar_scrolling_view_behavior"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
-		<android.support.v7.widget.RecyclerView
-			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			<android.support.v7.widget.RecyclerView
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				app:itemList="@{viewModel.postList}"
+				app:selector="@{viewModel.layoutSelector}"
+				app:handler="@{viewModel}"
+				android:background="@color/white"
+				android:id="@+id/postList"/>
+		</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+		<android.support.design.widget.FloatingActionButton
+			app:layout_behavior="com.geno.chaoli.forum.meta.ScrollFABBehavior"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:background="@color/white"
-			android:id="@+id/postList"/>
-	</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
-	<android.support.design.widget.FloatingActionButton
-		app:layout_behavior="com.geno.chaoli.forum.meta.ScrollFABBehavior"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/reply"
-		android:src="@drawable/ic_menu_notifications"
-		android:layout_alignParentEnd="true"
-		android:layout_alignParentBottom="true"
-		android:layout_alignParentRight="true"
-		app:borderWidth="0dp"
-		android:layout_gravity="end|bottom"
-		android:layout_margin="@dimen/fab_margin"/>
-</android.support.design.widget.CoordinatorLayout>
+			android:id="@+id/reply"
+			android:src="@drawable/ic_menu_notifications"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentBottom="true"
+			android:layout_alignParentRight="true"
+			android:onClick="@{() -> viewModel.clickFab()}"
+			app:borderWidth="0dp"
+			android:layout_gravity="end|bottom"
+			android:layout_margin="@dimen/fab_margin"/>
+	</android.support.design.widget.CoordinatorLayout>
+</layout>
+

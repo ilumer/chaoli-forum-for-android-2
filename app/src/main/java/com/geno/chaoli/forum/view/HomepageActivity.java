@@ -1,5 +1,6 @@
 package com.geno.chaoli.forum.view;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,20 +21,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
-import com.geno.chaoli.forum.meta.AvatarView;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.utils.LoginUtils;
+import com.geno.chaoli.forum.viewmodel.BaseViewModel;
+import com.geno.chaoli.forum.viewmodel.HistoryFragmentVM;
+import com.geno.chaoli.forum.viewmodel.HomepageViewModel;
 
 /**
  * Created by daquexian on 16-4-14.
  */
 
 public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener{
-    String mUsername, mSignature, mAvatarSuffix;
-    int mUserId;
-    Boolean isSelf;
-
-
     final String TAG = "HomePageActivity";
     final Context mContext = this;
 
@@ -44,9 +42,14 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
     ViewPager mViewPager;
     TabLayout mTabLayout;
 
+    ProgressDialog progressDialog;
+
     HistoryFragment mHistoryFragment;
     StatisticFragment mStatisticFragment;
-    NotificationFragment mNotificationFragment;
+    //NotificationFragment mNotificationFragment;
+    HistoryFragment mNotificationFragment;
+
+    HomepageViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,19 +64,15 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
             return;
         }
 
-        mUsername = bundle.getString("username", "");
-        mSignature = bundle.getString("signature", "");
-        mUserId = bundle.getInt("userId", -1);
-        //avatarURL = bundle.getString("avatarURL", "");
-        mAvatarSuffix = bundle.getString("avatarSuffix", Constants.NONE);
-        isSelf = bundle.getBoolean("isSelf", false);
-        if("".equals(mUsername) || mUserId == -1){
+        viewModel = new HomepageViewModel(bundle.getString("username", ""), bundle.getString("signature", null), bundle.getString("avatarSuffix", Constants.NONE), bundle.getInt("userId", -1),
+                bundle.getBoolean("isSelf", false));
+        /*if("".equals(mUsername) || mUserId == -1){
             this.finish();
             return;
-        }
+        }*/
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle(mUsername);
+        collapsingToolbarLayout.setTitle(viewModel.username.get());
         collapsingToolbarLayout.setExpandedTitleGravity(0x01 | 0x50);
         Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
         setSupportActionBar(toolbar);
@@ -91,16 +90,11 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
 
-        AvatarView avatarView = (AvatarView) findViewById(R.id.ivAvatar);
-        avatarView.update(this, mAvatarSuffix, mUserId, mUsername);
-        TextView tvSignature = (TextView) findViewById(R.id.tvSignature);
-        tvSignature.setText("".equals(mSignature) ? getString(R.string.this_user_has_not_set_signature) : mSignature);
-
         mViewPager.setAdapter(new MyViewPagerAdapter(getSupportFragmentManager()));
         mViewPager.setOffscreenPageLimit(2);
-        mTabLayout.addTab(mTabLayout.newTab().setText(isSelf ? R.string.notification : R.string.activity));
-        mTabLayout.addTab(mTabLayout.newTab().setText(isSelf ? R.string.activity : R.string.statistics));
-        if(isSelf) mTabLayout.addTab(mTabLayout.newTab().setText(R.string.statistics));
+        mTabLayout.addTab(mTabLayout.newTab().setText(viewModel.isSelf.get() ? R.string.notification : R.string.activity));
+        mTabLayout.addTab(mTabLayout.newTab().setText(viewModel.isSelf.get() ? R.string.activity : R.string.statistics));
+        if(viewModel.isSelf.get()) mTabLayout.addTab(mTabLayout.newTab().setText(R.string.statistics));
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -134,54 +128,59 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    if(isSelf) {
-                        mNotificationFragment = new NotificationFragment();
-                        return mNotificationFragment;
+                    if(viewModel.isSelf.get()) {
+                        return addNotificationFragment();
                     }else {
-                        mHistoryFragment = new HistoryFragment();
-                        Bundle args0 = new Bundle();
-                        args0.putInt("userId", mUserId);
-                        args0.putString("username", mUsername);
-                        args0.putString("avatarSuffix", mAvatarSuffix);
-                        mHistoryFragment.setArguments(args0);
-                        return mHistoryFragment;
+                        return addHistoryFragment();
                     }
                 case 1:
-                    if(isSelf) {
-                        mHistoryFragment = new HistoryFragment();
-                        Bundle args0 = new Bundle();
-                        args0.putInt("userId", mUserId);
-                        args0.putString("username", mUsername);
-                        args0.putString("avatarSuffix", mAvatarSuffix);
-                        mHistoryFragment.setArguments(args0);
-                        return mHistoryFragment;
+                    if(viewModel.isSelf.get()) {
+                        return addHistoryFragment();
                     }else {
-                        mStatisticFragment = new StatisticFragment();
-                        Bundle args1 = new Bundle();
-                        args1.putInt("userId", mUserId);
-                        mStatisticFragment.setArguments(args1);
-                        return mStatisticFragment;
+                        return addStatisticFragment();
                     }
                 case 2:
-                    mStatisticFragment = new StatisticFragment();
-                    Bundle args1 = new Bundle();
-                    args1.putInt("userId", mUserId);
-                    mStatisticFragment.setArguments(args1);
-                    return mStatisticFragment;
+                    return addStatisticFragment();
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            return isSelf ? 3 : 2;
+            return viewModel.isSelf.get() ? 3 : 2;
+        }
+
+        private Fragment addNotificationFragment() {
+            mNotificationFragment = new HistoryFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("type", HistoryFragmentVM.TYPE_NOTIFICATION);
+            mNotificationFragment.setArguments(bundle);
+            return mNotificationFragment;
+        }
+        private Fragment addHistoryFragment() {
+            mHistoryFragment = new HistoryFragment();
+            Bundle args0 = new Bundle();
+            args0.putInt("type", HistoryFragmentVM.TYPE_ACTIVITY);
+            args0.putInt("userId", viewModel.userId.get());
+            args0.putString("username", viewModel.username.get());
+            args0.putString("avatarSuffix", viewModel.avatarSuffix.get());
+            mHistoryFragment.setArguments(args0);
+            return mHistoryFragment;
+        }
+
+        private Fragment addStatisticFragment() {
+            mStatisticFragment = new StatisticFragment();
+            Bundle args1 = new Bundle();
+            args1.putInt("userId", viewModel.userId.get());
+            mStatisticFragment.setArguments(args1);
+            return mStatisticFragment;
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        if(isSelf) {
+        if(viewModel.isSelf.get()) {
             menu.add(Menu.NONE, Menu.NONE, MENU_SETTING, R.string.config).setIcon(R.drawable.ic_account_settings_variant).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             menu.add(Menu.NONE, Menu.NONE, MENU_LOGOUT, R.string.logout).setIcon(R.drawable.ic_logout).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         }
@@ -196,7 +195,7 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
                 startActivity(new Intent(HomepageActivity.this, SettingsActivity.class));
                 break;
             case MENU_LOGOUT:
-                LoginUtils.logout(this, new LoginUtils.LogoutObserver() {
+                LoginUtils.logout(new LoginUtils.LogoutObserver() {
                     @Override
                     public void onLogoutSuccess() {
                     }
@@ -217,10 +216,19 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
-        Log.d(TAG, String.valueOf(i));
         //The Refresh must be only active when the offset is zero :
         mHistoryFragment.setRefreshEnabled(i == 0);
-        if(mNotificationFragment != null) mNotificationFragment.setRefreshEnabled(i == 0);
+        //if(mNotificationFragment != null) mNotificationFragment.setRefreshEnabled(i == 0);
+    }
+
+    public void showProcessDialog(String str) {
+        progressDialog = ProgressDialog.show(this, "", str);
+    }
+
+    public void dismissProcessDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
@@ -233,5 +241,10 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
     protected void onPause() {
         super.onPause();
         mAppBarLayout.removeOnOffsetChangedListener(this);
+    }
+
+    @Override
+    public void setViewModel(BaseViewModel viewModel) {
+        this.viewModel = (HomepageViewModel) viewModel;
     }
 }

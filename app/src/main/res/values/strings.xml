@@ -152,5 +152,7 @@
 	<string name="search_conversations">Search conversations...</string>
 	<string name="search">Search</string>
 	<string name="reply_hint">Please enter your reply here.</string>
+	<string name="modified_successfully">Modified successfully</string>
+	<string name="fail_on_modifying">Fail on modifying, please try again later.</string>
 
 </resources>

@@ -3,94 +3,140 @@ package com.geno.chaoli.forum.view;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.TextPaint;
+import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
 
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.R;
-import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.model.HistoryItem;
-import com.geno.chaoli.forum.model.HistoryResult;
-import com.geno.chaoli.forum.network.MyOkHttp;
-import com.geno.chaoli.forum.network.MyOkHttp.Callback;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import okhttp3.Response;
+import com.geno.chaoli.forum.data.Me;
+import com.geno.chaoli.forum.databinding.HomepageHistoryBinding;
+import com.geno.chaoli.forum.viewmodel.BaseViewModel;
+import com.geno.chaoli.forum.viewmodel.HistoryFragmentVM;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 /**
  * Created by jianhao on 16-6-5.
  */
 
-public class HistoryFragment extends HomepageListFragment {
-    String mUsername, mAvatarSuffix;
-    int mUserId;
+public class HistoryFragment extends Fragment implements IView, SwipyRefreshLayout.OnRefreshListener {
+    //String mUsername, mAvatarSuffix;
+    //int mUserId;
+    SwipyRefreshLayout mSwipyRefreshLayout;
+    Boolean bottom;
+    Context activityContext;
 
-    public static final String TAG = "HistoryFragment";
+    private static final String TAG = "HistoryFragment";
+    private HistoryFragmentVM viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserId = getArguments().getInt("userId");
-        mUsername = getArguments().getString("username");
-        mAvatarSuffix = getArguments().getString("avatarSuffix");
+        Bundle arguments = getArguments();
+        //mUserId = arguments.getInt("userId");
+        //mUsername = arguments.getString("username");
+        //mAvatarSuffix = arguments.getString("avatarSuffix");
+        if (arguments.getInt("type") == HistoryFragmentVM.TYPE_ACTIVITY) {
+            viewModel = new HistoryFragmentVM(arguments.getInt("type"),
+                    arguments.getInt("userId"),
+                    arguments.getString("username"),
+                    arguments.getString("avatarSuffix"));
+        } else if (arguments.getInt("type") == HistoryFragmentVM.TYPE_NOTIFICATION) {
+            viewModel = new HistoryFragmentVM(arguments.getInt("type"), Me.getMyUserId(), Me.getMyUsername(), Me.getMyAvatarSuffix());
+        } else {
+            throw new RuntimeException("type can only be 0 or 1");
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mSwipyRefreshLayout = (SwipyRefreshLayout) inflater.inflate(R.layout.homepage_history, container, false);
+
+        mSwipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
+        mSwipyRefreshLayout.setOnRefreshListener(this);
+
+        setViewModel(viewModel);
+
+        onRefresh(SwipyRefreshLayoutDirection.TOP);
+
+        RecyclerView rvHistory = (RecyclerView) mSwipyRefreshLayout.findViewById(R.id.rvHomepageItems);
+        rvHistory.setLayoutManager(new LinearLayoutManager(activityContext));
+        //rvHistory.setAdapter(myAdapter);
+
+        rvHistory.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                //得到当前显示的最后一个item的view
+                View lastChildView = recyclerView.getLayoutManager().getChildAt(recyclerView.getLayoutManager().getChildCount()-1);
+                //得到lastChildView的bottom坐标值
+                int lastChildBottom = lastChildView.getBottom();
+                //得到Recyclerview的底部坐标减去底部padding值，也就是显示内容最底部的坐标
+                int recyclerBottom =  recyclerView.getBottom()-recyclerView.getPaddingBottom();
+                //通过这个lastChildView得到这个view当前的position值
+                int lastPosition  = recyclerView.getLayoutManager().getPosition(lastChildView);
+
+                //判断lastChildView的bottom值跟recyclerBottom
+                //判断lastPosition是不是最后一个position
+                //如果两个条件都满足则说明是真正的滑动到了底部
+                if(lastChildBottom == recyclerBottom && lastPosition == recyclerView.getLayoutManager().getItemCount()-1 ){
+                    bottom = true;
+                    mSwipyRefreshLayout.setEnabled(true);
+                }else{
+                    bottom = false;
+                }
+            }
+        });
+
+        viewModel.showProgressDialog.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (((ObservableBoolean) observable).get()) {
+                    ((HomepageActivity) activityContext).showProcessDialog(ChaoliApplication.getAppContext().getString(R.string.just_a_sec));
+                } else {
+                    ((HomepageActivity) activityContext).dismissProcessDialog();
+                }
+            }
+        });
+
+        viewModel.goToPost.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                Intent intent = new Intent(activityContext, PostActivity.class);
+                intent.putExtra("conversationId", viewModel.intendedConversationId.get());
+                intent.putExtra("conversationTitle", viewModel.intendedConversationTitle.get());
+                if (viewModel.intendedConversationPage.get() != -1) intent.putExtra("page", viewModel.intendedConversationPage.get());
+                startActivity(intent);
+            }
+        });
+
+        return mSwipyRefreshLayout;
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activityContext = context;
+    }
+
+    /*@Override
     public List<? extends ListItem> parseItems(String JSONString) {
         Gson gson = new GsonBuilder().registerTypeAdapterFactory(new HistoryAdapterFactory()).create();
         HistoryResult historyResult = gson.fromJson(JSONString, HistoryResult.class);
         return historyResult.activity;
-    }
+    }*/
 
-    private static class HistoryAdapterFactory implements TypeAdapterFactory {
-        @Override
-        @SuppressWarnings("unchecked")
-        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-            if (type.getRawType() != HistoryItem.Data.class) return null;
-
-            TypeAdapter<HistoryItem.Data> defaultAdapter = (TypeAdapter<HistoryItem.Data>) gson.getDelegateAdapter(this, type);
-            return (TypeAdapter<T>) new DataAdapter(defaultAdapter);
-
-        }
-
-        public class DataAdapter extends TypeAdapter<HistoryItem.Data> {
-            TypeAdapter<HistoryItem.Data> defaultAdapter;
-
-            DataAdapter(TypeAdapter<HistoryItem.Data> defaultAdapter) {
-                this.defaultAdapter = defaultAdapter;
-            }
-            @Override
-            public void write(JsonWriter out, HistoryItem.Data value) throws IOException {
-                defaultAdapter.write(out, value);
-            }
-
-            @Override
-            public HistoryItem.Data read(JsonReader in) throws IOException {
-                if (in.peek() == JsonToken.BOOLEAN) {
-                    in.skipValue();
-                    return null;
-                }
-                return defaultAdapter.read(in);
-            }
-        }
-    }
-
-    @Override
+    /*@Override
     public void bindItemViewHolder(final Context context, MyAdapter adapter, final MyAdapter.MyViewHolder holder, ListItem listItem, int position) {
         final int ITEM_TYPE     = 0;
         final int DIVIDER_TYPE  = 1;
@@ -99,23 +145,26 @@ public class HistoryFragment extends HomepageListFragment {
         final String POST_ACTIVITY  = "postActivity";
         final String STATUS         = "status";
         final String JOIN           = "join";
+        final String TYPE_MENTION        = "mention";
+        final String TYPE_POST           = "post";
+        final String TYPE_PRIVATE_ADD    = "privateAdd";
 
         if(adapter.getItemViewType(position) == ITEM_TYPE) {
             HistoryItem historyItem = (HistoryItem) listItem;
             Resources res = getResources();
-            holder.avatarView.update(context, mAvatarSuffix, mUserId, mUsername);
+            holder.avatarView.update(mAvatarSuffix, mUserId, mUsername);
             holder.avatarView.scale(20);
             switch (historyItem.getType()) {
                 case POST_ACTIVITY:
-                    holder.content_tv.setHint(historyItem.getPostId());
+                    /*holder.content_tv.setHint(historyItem.getPostId());
                     if ("1".equals(historyItem.getStart())) {
-                        holder.description_tv.setText(R.string.opened_a_conversation);
-                        holder.content_tv.setText(historyItem.getTitle());
+                        //holder.description_tv.setText(R.string.opened_a_conversation);
+                        //holder.content_tv.setText(historyItem.getTitle());
                     } else {
-                        holder.description_tv.setText(res.getString(R.string.updated, historyItem.getTitle()));
-                        holder.content_tv.setText(historyItem.getContent());
+                        //holder.description_tv.setText(res.getString(R.string.updated, historyItem.getTitle()));
+                        //holder.content_tv.setText(historyItem.getContent());
                     }
-                    holder.description_tv.setHint(historyItem.getPostId());
+                    //holder.description_tv.setHint(historyItem.getPostId());
                     View.OnClickListener onClickListener = new View.OnClickListener() {
                         @Override
                         public void onClick(final View v) {
@@ -130,7 +179,7 @@ public class HistoryFragment extends HomepageListFragment {
 
                                         @Override
                                         public void onResponse(okhttp3.Call call, Response response, String responseStr) throws IOException {
-                                            Intent intent = new Intent(mCallback, PostActivity.class);
+                                            Intent intent = new Intent(activityContext, PostActivity.class);
 
                                             Pattern pattern = Pattern.compile("\"conversationId\":(\\d+)");
                                             Matcher matcher = pattern.matcher(responseStr);
@@ -162,23 +211,24 @@ public class HistoryFragment extends HomepageListFragment {
                                     });
                         }
                     };
-                    holder.content_tv.setOnClickListener(onClickListener);
-                    break;
+                    holder.content_tv.setOnClickListener(onClickListener);*/
+            /*        break;
                 case STATUS:
-                    holder.description_tv.setText(R.string.modified_his_or_her_information);
-                    holder.content_tv.setText("");
-                    HistoryItem.Data data = historyItem.getData();
-                    if (data != null && data.getNewStatus() != null) {
-                        holder.content_tv.setText(data.getNewStatus());
-                    }
+                    //holder.description_tv.setText(R.string.modified_his_or_her_information);
+                    //holder.content_tv.setText("");
                     break;
                 case JOIN:
-                    holder.description_tv.setText(R.string.join_the_forum);
-                    holder.content_tv.setText("");
+                    break;
+                case TYPE_MENTION:
+                    //holder.description_tv.setText(getString(R.string.mention_you, thisItem.getFromMemberName()));
+                    break;
+                case TYPE_POST:
+                    //holder.description_tv.setText(getString(R.string.someone_update, thisItem.getFromMemberName()));
+                    break;
+                case TYPE_PRIVATE_ADD:
+                    //holder.description_tv.setText(getString(R.string.send_you_a_private_post, thisItem.getFromMemberName()));
                     break;
             }
-            TextPaint tp = holder.description_tv.getPaint();
-            tp.setFakeBoldText(true);
         }else if(adapter.getItemViewType(position) == DIVIDER_TYPE){
             if(position == 1)
                 holder.divider.setVisibility(View.INVISIBLE);
@@ -189,7 +239,7 @@ public class HistoryFragment extends HomepageListFragment {
                 holder.time_tv.setText(getString(R.string.days_ago, timeDiff));
             }
         }
-    }
+    }*/
 
     /*@Override
     public Call<HistoryResult> getCall(int page){
@@ -197,7 +247,27 @@ public class HistoryFragment extends HomepageListFragment {
     }*/
 
     @Override
-    public String getURL() {
-        return Constants.GET_ACTIVITIES_URL + mUserId;
+    public void onRefresh(SwipyRefreshLayoutDirection direction) {
+        if (direction == SwipyRefreshLayoutDirection.TOP) {
+            viewModel.refresh();
+        } else {
+            viewModel.loadMore();
+        }
+    }
+
+    public void setRefreshEnabled(Boolean enabled){
+        mSwipyRefreshLayout.setEnabled(enabled || bottom);
+    }
+
+    public void setDirection(SwipyRefreshLayoutDirection direction){
+        mSwipyRefreshLayout.setDirection(direction);
+    }
+
+    @Override
+    public void setViewModel(BaseViewModel viewModel) {
+        this.viewModel = (HistoryFragmentVM) viewModel;
+        //this.viewModel.setUrl(Constants.GET_ACTIVITIES_URL + mUserId);
+        HomepageHistoryBinding binding = DataBindingUtil.bind(mSwipyRefreshLayout);
+        binding.setViewModel(this.viewModel);
     }
 }

@@ -5,39 +5,26 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
-import com.geno.chaoli.forum.meta.AvatarView;
+import com.geno.chaoli.forum.databinding.PostActivityBinding;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.utils.ConversationUtils;
 import com.geno.chaoli.forum.meta.DividerItemDecoration;
-import com.geno.chaoli.forum.meta.OnlineImgTextView;
-import com.geno.chaoli.forum.meta.PostContentView;
-import com.geno.chaoli.forum.model.Post;
-import com.geno.chaoli.forum.model.PostListResult;
-import com.geno.chaoli.forum.network.MyRetrofit;
-import com.geno.chaoli.forum.utils.PostUtils;
+import com.geno.chaoli.forum.viewmodel.BaseViewModel;
+import com.geno.chaoli.forum.viewmodel.PostActivityViewModel;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,15 +33,9 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 {
 	public static final String TAG = "PostActivity";
 
-	private static final int REPLY_CODE = 1;
 	private static final int POST_NUM_PER_PAGE = 20;
 
 	private final Context mContext = this;
-
-	public static final int menu_settings = 0;
-	public static final int menu_share = 1;
-	public static final int menu_author_only = 2;
-	public static final int menu_star = 3;
 
 	@BindView(R.id.reply)
 	public FloatingActionButton reply;
@@ -67,30 +48,37 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	String mTitle;
 	int mPage;
 
-	boolean isAuthorOnly;
-
 	@BindView(R.id.postList)
 	RecyclerView postListRv;
 	@BindView(R.id.swipyRefreshLayout)
 	SwipyRefreshLayout swipyRefreshLayout;
 
-	PostListAdapter mPostListAdapter;
 	LinearLayoutManager mLinearLayoutManager;
+
+	PostActivityViewModel viewModel;
+
+	public static final int menu_settings = 0;
+	public static final int menu_share = 1;
+	public static final int menu_author_only = 2;
+	public static final int menu_star = 3;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.post_activity);
 
+		setViewModel(new PostActivityViewModel());
 		ButterKnife.bind(this);
 
 		Bundle data = getIntent().getExtras();
 		mConversationId = data.getInt("conversationId");
-		mTitle = data.getString("title", "");
+		viewModel.setConversationId(mConversationId);
+		mTitle = data.getString("conversationTitle", "");
 		setTitle(mTitle);
+		viewModel.setTitle(mTitle);
 		mPage = data.getInt("page", 1);
-		isAuthorOnly = data.getBoolean("isAuthorOnly", false);
+		viewModel.setPage(mPage);
+		viewModel.setAuthorOnly(data.getBoolean("isAuthorOnly", false));
 		sp = getSharedPreferences(Constants.postSP + mConversationId, MODE_PRIVATE);
 
 		configToolbar(mTitle);
@@ -99,94 +87,39 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh(SwipyRefreshLayoutDirection direction) {
-				loadMore();
-			}
-		});
-
-		reply.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				Intent toReply = new Intent(PostActivity.this, ReplyAction.class);
-				toReply.putExtra("conversationId", mConversationId);
-				startActivityForResult(toReply, REPLY_CODE);
+				viewModel.loadMore();
 			}
 		});
 
 		mLinearLayoutManager = new LinearLayoutManager(mContext);
-		mPostListAdapter = new PostListAdapter(mContext, new ArrayList<Post>());
         postListRv.setLayoutManager(mLinearLayoutManager);
-		postListRv.setAdapter(mPostListAdapter);
 		postListRv.addItemDecoration(new DividerItemDecoration(mContext));
 
+		viewModel.getList(0);
 
-		//final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.loading_posts));
-
-		//trigger the circle to animate
-		swipyRefreshLayout.post(new Runnable() {
+		viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
-			public void run() {
-				swipyRefreshLayout.setRefreshing(true);
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) {
+					Intent toReply = new Intent(mContext, ReplyAction.class);
+					toReply.putExtra("conversationId", viewModel.conversationId);
+					startActivityForResult(toReply, viewModel.REPLY_CODE);
+				}
 			}
 		});
-		getList(0);
+
+		viewModel.showToast.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) {
+					showToast(viewModel.toastContent.get());
+				}
+			}
+		});
+
 	}
 
-	/**
-	 * 针对帖子读取到最后的情况，只往帖子列表中增加多出来的帖子
-	 * @param A 已有的帖子列表
-	 * @param B 获取到的一页帖子列表
-     * @return 新帖子列表的长度
-     */
-	private int expandUnique(List<Post> A, List<Post> B) {
-		int lenA = A.size();
-		if (lenA == 0) {
-			A.addAll(B);
-		} else {
-			int i;
-			for (i = 0; i < B.size(); i++)
-				if (B.get(i).getTime() > A.get(lenA - 1).getTime())
-					break;
-			A.addAll(B.subList(i, B.size()));
-		}
-		return A.size();
-	}
-
-	private void getList(final int page) {
-		MyRetrofit.getService()
-				.listPosts(mConversationId, page)
-				.enqueue(new retrofit2.Callback<PostListResult>() {
-					@Override
-					public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
-						List<Post> newPostList = response.body().getPosts();
-						List<Post> postList = mPostListAdapter.getPosts();
-						int oldLen = postList.size();
-						expandUnique(postList, newPostList);
-						mPostListAdapter.setPosts(postList);
-						mPostListAdapter.notifyItemRangeInserted(oldLen, postList.size() - oldLen);
-
-						//postListRv.smoothScrollToPosition(mPage * POST_NUM_PER_PAGE + 1);
-						swipyRefreshLayout.setRefreshing(false);
-						mPage = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
-						postListRv.smoothScrollToPosition(page == 1 ? 0 : oldLen);
-					}
-
-					@Override
-					public void onFailure(retrofit2.Call<PostListResult> call, Throwable t) {
-						swipyRefreshLayout.setRefreshing(false);
-						Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
-						t.printStackTrace();
-					}
-				});
-	}
-
-	private void loadMore() {
-		final List<Post> postList = mPostListAdapter.getPosts();
-		getList(postList.size() < mPage * POST_NUM_PER_PAGE ? mPage : mPage + 1);
-	}
-
-	class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {
+	/*class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {
 		List<Post> mPosts;
 		Context mContext;
 		public PostListAdapter(Context context, List<Post> posts) {
@@ -214,7 +147,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		@Override
 		public void onBindViewHolder(final PostViewHolder holder, final int position) {
 			final Post post = mPosts.get(position);
-			holder.avatar.update(mContext, post.getAvatarFormat(), post.getMemberId(), post.getUsername());
+			holder.avatar.update(post.getAvatarFormat(), post.getMemberId(), post.getUsername());
 			holder.avatar.scale(35);
 			holder.usernameAndSignature.setText(post.signature == null ? post.username : getString(R.string.comma, post.username, post.signature));
 			holder.floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
@@ -262,7 +195,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 												case 0:
 													Intent toReply = new Intent(PostActivity.this, ReplyAction.class);
 													toReply.putExtra("conversationId", mConversationId);
-													toReply.putExtra("postId", post.getPostId());
+													toReply.putExtra("postId", post.getShowingPostId());
 													toReply.putExtra("replyTo", post.getUsername());
 													toReply.putExtra("replyMsg", PostUtils.removeQuote(post.getContent()));
 													Log.d(TAG, "onClick: content = " + post.getContent() + ", replyMsg = " + PostUtils.removeQuote(post.getContent()));
@@ -301,16 +234,12 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			
 		}
 	}
+	*/
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == REPLY_CODE) {
-			if (resultCode == RESULT_OK) {
-				swipyRefreshLayout.setRefreshing(true);
-				loadMore();
-			}
-		}
+		viewModel.replyComplete(requestCode, resultCode, data);
 	}
 
 	@Override
@@ -319,7 +248,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		super.onCreateOptionsMenu(menu);
 		menu.add(Menu.NONE, Menu.NONE, menu_settings, R.string.settings).setIcon(android.R.drawable.ic_menu_manage);
 		menu.add(Menu.NONE, Menu.NONE, menu_share, R.string.share).setIcon(android.R.drawable.ic_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add(Menu.NONE, Menu.NONE, menu_author_only, isAuthorOnly ? R.string.cancel_author_only : R.string.author_only).setIcon(android.R.drawable.ic_menu_view);
+		menu.add(Menu.NONE, Menu.NONE, menu_author_only, viewModel.isAuthorOnly() ? R.string.cancel_author_only : R.string.author_only).setIcon(android.R.drawable.ic_menu_view);
 		menu.add(Menu.NONE, Menu.NONE, menu_star, R.string.star).setIcon(R.drawable.ic_menu_star).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		return true;
 	}
@@ -343,10 +272,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 								switch (which)
 								{
 									case 0:
-										ConversationUtils.ignoreConversation(PostActivity.this, mConversationId, PostActivity.this);
+										ConversationUtils.ignoreConversation(mContext, viewModel.conversationId, (PostActivity) mContext);
 										break;
 									case 1:
-										Toast.makeText(PostActivity.this, R.string.mark_as_unread, Toast.LENGTH_SHORT).show();
+										showToast(R.string.mark_as_unread);
 										break;
 								}
 							}
@@ -354,26 +283,23 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				ab.show();
 				break;
 			case menu_share:
-				Intent share = new Intent();
-				share.setAction(Intent.ACTION_SEND);
-				share.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + mConversationId);
-				share.setType("text/plain");
-				startActivity(Intent.createChooser(share, getString(R.string.share)));
+				share();
 				break;
 			case menu_author_only:
-				finish();
-				Intent author_only = new Intent(PostActivity.this, PostActivity.class);
-				author_only.putExtra("conversationId", mConversationId);
-				author_only.putExtra("page", isAuthorOnly ? "" : "?author=lz");
-				author_only.putExtra("title", mTitle);
+				/*finish();
+				Intent author_only = new Intent(this, PostActivity.class);
+				author_only.putExtra("conversationId", viewModel.conversationId);
+				author_only.putExtra("page", viewModel.isAuthorOnly ? "" : "?author=lz");
+				author_only.putExtra("title", viewModel.title);
 				author_only.putExtra("isAuthorOnly", !isAuthorOnly);
-				startActivity(author_only);
+				startActivity(author_only);*/
 				break;
 			case menu_star:
 				// TODO: 16-3-28 2201 Star light
-				ConversationUtils.starConversation(PostActivity.this, mConversationId, PostActivity.this);
+				ConversationUtils.starConversation(this, viewModel.conversationId, this);
 				break;
 		}
+
 		return true;
 	}
 
@@ -401,4 +327,17 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		Toast.makeText(PostActivity.this, getString(R.string.failed, statusCode), Toast.LENGTH_SHORT).show();
 	}
 
+	private void share() {
+		Intent shareIntent = new Intent();
+		shareIntent.setAction(Intent.ACTION_SEND);
+		shareIntent.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + viewModel.conversationId);
+		shareIntent.setType("text/plain");
+		startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
+	}
+	@Override
+	public void setViewModel(BaseViewModel viewModel) {
+		this.viewModel = (PostActivityViewModel) viewModel;
+		PostActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.post_activity);
+		binding.setViewModel(this.viewModel);
+	}
 }

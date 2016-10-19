@@ -3,7 +3,9 @@ package com.geno.chaoli.forum.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.data.Me;
+import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.model.NotificationList;
 import com.geno.chaoli.forum.model.User;
 import com.geno.chaoli.forum.network.MyOkHttp;
@@ -26,14 +28,12 @@ public class AccountUtils {
     public static int RETURN_ERROR = -1;
     public static int FILE_DOSENT_EXIST = -2;
 
-    public static void getProfile(final Context context, final GetProfileObserver observer){
+    public static void getProfile(final GetProfileObserver observer){
         MyRetrofit.getService().getProfile()
                 .enqueue(new Callback<User>() {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
-                        Log.d(TAG, "onResponse: " + response.body().getAvatarSuffix());
-                        Log.d(TAG, "onResponse: " + response.body().getPreferences().getHideOnline());
-                        Me.setProfile(context, response.body());
+                        Me.setProfile(ChaoliApplication.getAppContext(), response.body());
                     }
 
                     @Override
@@ -57,7 +57,7 @@ public class AccountUtils {
         });*/
     }
 
-    public static void checkNotification(Context context, final MessageObserver observer){
+    public static void checkNotification(final MessageObserver observer){
         MyRetrofit.getService().checkNotification()
                 .enqueue(new Callback<NotificationList>() {
                     @Override
@@ -114,7 +114,7 @@ public class AccountUtils {
         });*/
     }
 
-    public static void modifySettings(Context context, File avatar, String language, Boolean privateAdd, Boolean starOnReply, Boolean starPrivate, Boolean hideOnline,
+    public static void modifySettings(File avatar, String language, Boolean privateAdd, Boolean starOnReply, Boolean starPrivate, Boolean hideOnline,
                                       final String signature, String userStatus, final ModifySettingsObserver observer){
         MyOkHttp.MyOkHttpClient myOkHttpClient = new MyOkHttp.MyOkHttpClient()
                 .add("token", LoginUtils.getToken())
@@ -127,18 +127,19 @@ public class AccountUtils {
         if(starOnReply) myOkHttpClient.add("starOnReply", starOnReply.toString());
         if(privateAdd) myOkHttpClient.add("privateAdd", privateAdd.toString());
         myOkHttpClient.add("save", "保存更改");
-        myOkHttpClient.enqueue(context, new MyOkHttp.Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                observer.onModifySettingsFailure(-3);
-            }
+        myOkHttpClient
+                .post(Constants.MODIFY_SETTINGS_URL)
+                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+                    @Override
+                    public void onFailure(okhttp3.Call call, IOException e) {
+                        observer.onModifySettingsFailure(-3);
+                    }
 
-            @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response, String responseStr) throws IOException {
-                Log.d(TAG, "onResponse: " + response.body().string());
-                observer.onModifySettingsSuccess();
-            }
-        });
+                    @Override
+                    public void onResponse(okhttp3.Call call, okhttp3.Response response, String responseStr) throws IOException {
+                        observer.onModifySettingsSuccess();
+                    }
+                });
         /*CookieUtils.saveCookie(client, context);
         client.setTimeout(60000);
         Log.i("begin", "b");
@@ -185,7 +186,7 @@ public class AccountUtils {
     private static String intJoin(int[] aArr, String sSep) {
         StringBuilder sbStr = new StringBuilder();
         for (int i:
-             aArr) {
+                aArr) {
             sbStr.append(i);
             sbStr.append(sSep);
         }
@@ -196,7 +197,7 @@ public class AccountUtils {
         void onModifySettingsSuccess();
         void onModifySettingsFailure(int statusCode);
     }
-    
+
     public interface MessageObserver {
         void onGetUpdateSuccess(Boolean hasUpdate);
         void onGetUpdateFailure(int statusCode);

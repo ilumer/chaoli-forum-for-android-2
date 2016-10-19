@@ -1,37 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/middle_margin">
-    <com.geno.chaoli.forum.meta.AvatarView
-        android:id="@+id/avatar"
-        android:layout_marginRight="@dimen/middle_margin"
-        android:layout_marginEnd="@dimen/middle_margin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="item"
+            type="com.geno.chaoli.forum.model.BusinessHomepageListItem"/>
+        <variable
+            name="handler"
+            type="com.geno.chaoli.forum.viewmodel.HistoryFragmentVM"/>
+    </data>
+    <RelativeLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:onClick="@{() -> handler.clickItem(item)}"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/middle_margin">
+        <com.geno.chaoli.forum.meta.AvatarView
+            android:id="@+id/avatar"
+            android:layout_marginRight="@dimen/middle_margin"
+            android:layout_marginEnd="@dimen/middle_margin"
+            app:length="@{20}"
+            app:userId="@{item.avatarUserId}"
+            app:username="@{item.avatarUsername}"
+            app:imageSuffix="@{item.avatarSuffix}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-    </com.geno.chaoli.forum.meta.AvatarView>
-    <TextView
-        android:id="@+id/tv_description"
-        android:layout_toRightOf="@id/avatar"
-        android:layout_toEndOf="@id/avatar"
-        android:textSize="15sp"
-        android:textColor="@color/black"
-        android:singleLine="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/tv_post_content"
-        android:layout_toRightOf="@id/avatar"
-        android:layout_toEndOf="@id/avatar"
-        android:layout_marginTop="5dp"
-        android:layout_below="@id/tv_description"
-        android:maxLines="4"
-        android:minLines="3"
-        android:ellipsize="end"
-        android:textColor="@color/black"
-        android:layout_marginLeft="5dp"
-        android:layout_marginStart="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</RelativeLayout>
+        </com.geno.chaoli.forum.meta.AvatarView>
+        <TextView
+            android:id="@+id/tv_description"
+            android:text="@{item.title}"
+            android:layout_toRightOf="@id/avatar"
+            android:layout_toEndOf="@id/avatar"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            android:maxLines="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_post_content"
+            android:text="@{item.content}"
+            android:layout_toRightOf="@id/avatar"
+            android:layout_toEndOf="@id/avatar"
+            android:layout_marginTop="5dp"
+            android:layout_below="@id/tv_description"
+            android:maxLines="4"
+            android:minLines="3"
+            android:ellipsize="end"
+            android:textColor="@color/black"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+</layout>

@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/srl_activities"
-    android:paddingLeft="4dp"
-    android:paddingRight="4dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvHomepageItems"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.geno.chaoli.forum.viewmodel.HistoryFragmentVM"/>
+    </data>
+    <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/srl_activities"
+        app:isRefreshing="@{viewModel.isRefreshing}"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </android.support.v7.widget.RecyclerView>
-</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvHomepageItems"
+            app:itemList="@{viewModel.showingItemList}"
+            app:selector="@{viewModel.layoutSelector}"
+            app:handler="@{viewModel}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+    </com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+</layout>

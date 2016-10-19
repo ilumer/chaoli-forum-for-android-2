@@ -33,4 +33,26 @@ public class Question {
 
     public List<String> options = new ArrayList<>();
     public List<String> answers = new ArrayList<>();
+
+    public Question() {}
+    public Question(BusinessQuestion businessQuestion) {
+        _id = new id();
+        _id.$id = businessQuestion.id;
+        choice = String.valueOf(businessQuestion.choice);
+        multi_answer = String.valueOf(businessQuestion.multiAnswer);
+        if (businessQuestion.choice.equals("false")) answers.add(businessQuestion.answer.get());
+        else {
+            for (int i = 0; i < businessQuestion.isChecked.size(); i++) {
+                if (businessQuestion.isChecked.get(i)) answers.add(String.valueOf(i));
+            }
+        }
+    }
+
+    public static ArrayList<Question> fromList(List<BusinessQuestion> list) {
+        ArrayList<Question> questionList = new ArrayList<>();
+        for (BusinessQuestion businessQuestion : list) {
+            questionList.add(new Question(businessQuestion));
+        }
+        return questionList;
+    }
 }

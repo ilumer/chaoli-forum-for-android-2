@@ -1,12 +1,16 @@
 package com.geno.chaoli.forum.view;
 
 import android.app.Activity;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
+import android.databinding.ViewDataBinding;
 import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -22,12 +26,16 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
+import com.geno.chaoli.forum.databinding.ActivityAnswerQuestionsBinding;
 import com.geno.chaoli.forum.meta.OnlineImgCheckBox;
 import com.geno.chaoli.forum.meta.OnlineImgRadioButton;
 import com.geno.chaoli.forum.meta.OnlineImgTextView;
+import com.geno.chaoli.forum.model.BusinessQuestion;
 import com.geno.chaoli.forum.utils.SignUpUtils;
 
 import com.geno.chaoli.forum.model.Question;
+import com.geno.chaoli.forum.viewmodel.AnswerQuestionsViewModel;
+import com.geno.chaoli.forum.viewmodel.BaseViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,28 +44,37 @@ import java.util.List;
  * 注册时显示问题、回答问题的Activity
  * Created by jianhao on 16-3-28.
  */
-public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils.SubmitObserver {
+public class AnswerQuestionsActivity extends BaseActivity {
     Context mContext;
     Boolean isFirst = true;
+
+    AnswerQuestionsViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
-        setContentView(R.layout.activity_answer_questions);
-        configToolbar(R.string.answer_quesiton);
-
         init();
+
+        configToolbar(R.string.answer_quesiton);
     }
 
     private void init(){
+        setViewModel(new AnswerQuestionsViewModel());
+        ActivityAnswerQuestionsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_answer_questions);
+        binding.setViewModel(this.viewModel);
+
+        binding.questionRv.setLayoutManager(new LinearLayoutManager(mContext));
+        binding.questionRv.setNestedScrollingEnabled(false);
+
         final String[] subjectTagsArr = SignUpUtils.subjectTags.keySet().toArray(new String[SignUpUtils.subjectTags.keySet().size()]);
         new AlertDialog.Builder(this).setTitle("请选择科目，综合类测试为6道题，至少需答对4道，分科测试为8道题，至少需答对6道。加油！")
                 .setItems(subjectTagsArr, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.i("click", String.valueOf(which));
-                        Log.i("click", SignUpUtils.subjectTags.get(subjectTagsArr[which]));
-                        SignUpUtils.getQuestionObjList(mContext, (SignUpUtils.SubmitObserver) mContext, SignUpUtils.subjectTags.get(subjectTagsArr[which]));
+                        //SignUpUtils.getQuestionObjList((SignUpUtils.SubmitObserver) mContext, SignUpUtils.subjectTags.get(subjectTagsArr[which]));
+                        String subject = SignUpUtils.subjectTags.get(subjectTagsArr[which]);
+                        viewModel.getQuestions(subject);
                     }
                 })
                 .setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -67,9 +84,46 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
                     }
                 })
                 .show();
+
+        viewModel.pass.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                Toast.makeText(getApplicationContext(), "恭喜,答题通过", Toast.LENGTH_SHORT).show();
+                Bundle bundle = new Bundle();
+                bundle.putString("inviteCode", viewModel.code);
+                Intent intent = new Intent();
+                intent.putExtras(bundle);
+                intent.setClass(AnswerQuestionsActivity.this, SignUpActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        viewModel.fail.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if(Integer.valueOf(viewModel.code) == SignUpUtils.ANSWERS_WRONG){
+                    Dialog dialog = new AlertDialog.Builder(mContext).setMessage(R.string.you_dont_answer_enough_quesitions_correctly)
+                            .setPositiveButton(R.string.try_again, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    isFirst = false;
+                                    init();
+                                }
+                            }).setNegativeButton(R.string.dont_try_again, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ((Activity)mContext).finish();
+                                }
+                            }).create();
+                    dialog.show();
+                }else{
+                    Log.e("error", viewModel.code);
+                }
+            }
+        });
     }
 
-    public class QuestionAdapter extends BaseAdapter{
+    /*public class QuestionAdapter extends BaseAdapter{
         Context mContext;
         List<Question> mQuestions;
 
@@ -89,6 +143,7 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
+            //ViewDataBinding
             final Question questionObj = (Question) getItem(position);
             final List<String> answers = questionObj.answers;
             final int[] LAYOUT_IDS = {R.layout.question_item_cb, R.layout.question_item_rb, R.layout.question_item_et};
@@ -194,12 +249,11 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
         public int getViewTypeCount() {
             return 3;
         }
-    }
+    }*/
 
-    @Override
-    public void onGetQuestionObjList(final ArrayList<Question> questionObjList) {
+    /*@Override
+    public void onGetQuestionObjList(final ArrayList<BusinessQuestion> questionObjList) {
         if(questionObjList != null && questionObjList.size() != 0) {
-            Log.i("size", String.valueOf(questionObjList.size()));
             ListView listView = (ListView) findViewById(R.id.questions_list);
             View button = getLayoutInflater().inflate(R.layout.button_on_the_bottom_of_questions_list, null);
             if(isFirst)
@@ -221,34 +275,14 @@ public class AnswerQuestionsActivity extends BaseActivity implements SignUpUtils
 
     @Override
     public void onAnswersPass(String code) {
-        Toast.makeText(getApplicationContext(), "恭喜,答题通过", Toast.LENGTH_SHORT).show();
-        Bundle bundle = new Bundle();
-        bundle.putString("inviteCode", code);
-        Intent intent = new Intent();
-        intent.putExtras(bundle);
-        intent.setClass(AnswerQuestionsActivity.this, SignUpActivity.class);
-        startActivity(intent);
     }
 
     @Override
     public void onFailure(int statusCode) {
-        if(statusCode == SignUpUtils.ANSWERS_WRONG){
-            Dialog dialog = new AlertDialog.Builder(this).setMessage(R.string.you_dont_answer_enough_quesitions_correctly)
-                    .setPositiveButton(R.string.try_again, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    isFirst = false;
-                    init();
-                }
-            }).setNegativeButton(R.string.dont_try_again, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    ((Activity)mContext).finish();
-                }
-            }).create();
-            dialog.show();
-        }else{
-            Log.e("error", String.valueOf(statusCode));
-        }
+    }*/
+
+    @Override
+    public void setViewModel(BaseViewModel viewModel) {
+        this.viewModel = (AnswerQuestionsViewModel) viewModel;
     }
 }

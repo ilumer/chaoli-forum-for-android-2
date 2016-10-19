@@ -5,6 +5,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,13 +23,15 @@ import android.widget.Toast;
 
 import com.geno.chaoli.forum.data.Me;
 import com.geno.chaoli.forum.R;
+import com.geno.chaoli.forum.databinding.ActivitySettingsBinding;
 import com.geno.chaoli.forum.utils.AccountUtils;
 import com.geno.chaoli.forum.meta.AvatarView;
 
 import java.io.File;
 
 import com.bumptech.glide.*;
-
+import com.geno.chaoli.forum.viewmodel.BaseViewModel;
+import com.geno.chaoli.forum.viewmodel.SettingsVM;
 
 /**
  * Created by jianhao on 16-3-12.
@@ -36,26 +41,27 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
     EditText username_txt, password_txt;
     TextView user_id_txt;
 
+    SettingsVM viewModel;
+
+    ProgressDialog progressDialog;
+
     Context mContext;
     File mAvatarFile;
     Toast mToast;
     AvatarView avatar;
-    Button change_avatar_btn;
-    //Spinner language_spn;
-    CheckBox private_add_chk;
-    CheckBox star_on_reply_chk;
-    CheckBox star_private_chk;
-    CheckBox hide_online_chk;
-    EditText signature_edtTxt;
-    EditText user_status_edtTxt;
-    Button save_btn;
+    //Button change_avatar_btn;
+    ////Spinner language_spn;
+    //CheckBox private_add_chk;
+    //CheckBox star_on_reply_chk;
+    //CheckBox star_private_chk;
+    //CheckBox hide_online_chk;
+    //EditText signature_edtTxt;
+    //EditText user_status_edtTxt;
+    //Button save_btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-        configToolbar(R.string.settings);
-
-        Button change_avatar_btn = (Button)findViewById(R.id.btn_change_avatar);
+        /*Button change_avatar_btn = (Button)findViewById(R.id.btn_change_avatar);
         //Spinner language_spn = (Spinner)findViewById(R.id.spn_language);
         private_add_chk = (CheckBox)findViewById(R.id.chk_private_add);
         star_on_reply_chk = (CheckBox)findViewById(R.id.chk_star_on_reply);
@@ -63,68 +69,34 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
         hide_online_chk = (CheckBox)findViewById(R.id.chk_hide_online);
         signature_edtTxt = (EditText)findViewById(R.id.edtTxt_signature);
         user_status_edtTxt = (EditText)findViewById(R.id.edtTxt_user_status);
-        save_btn = (Button)findViewById(R.id.btn_save);
+        save_btn = (Button)findViewById(R.id.btn_save);*/
 
-        mContext = this;
-        avatar = (AvatarView)findViewById(R.id.iv_avatar);
+        init();
 
-        updateViews();
-
-        View.OnClickListener onClickListener = new View.OnClickListener() {
+        viewModel.showProcessDialog.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
-            public void onClick(View v) {
-                switch (v.getId()){
-                    case R.id.btn_change_avatar:
-                        Intent getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
-                        getAlbum.setType(IMAGE_TYPE);
-                        startActivityForResult(getAlbum, IMAGE_CODE);
-                        break;
-                    case R.id.btn_save:
-                        String signature = signature_edtTxt.getText().toString();
-                        String user_status = user_status_edtTxt.getText().toString();
-                        Boolean privateAdd = private_add_chk.isChecked();
-                        Boolean starOnReply = star_on_reply_chk.isChecked();
-                        Boolean starPrivate = star_private_chk.isChecked();
-                        Boolean hideOnline = hide_online_chk.isChecked();
-                        final ProgressDialog progressDialog = ProgressDialog.show(mContext, "", getResources().getString(R.string.just_a_sec));
-                        progressDialog.show();
-                        AccountUtils.modifySettings(mContext, mAvatarFile, "Chinese", privateAdd, starOnReply,
-                                starPrivate, hideOnline, signature, user_status, new AccountUtils.ModifySettingsObserver() {
-                                    @Override
-                                    public void onModifySettingsSuccess() {
-                                        AccountUtils.getProfile(mContext, new AccountUtils.GetProfileObserver() {
-                                            @Override
-                                            public void onGetProfileSuccess() {
-                                                progressDialog.dismiss();
-                                                Toast.makeText(mContext, "修改成功", Toast.LENGTH_SHORT).show();
-                                            }
-
-                                            @Override
-                                            public void onGetProfileFailure() {
-                                                progressDialog.dismiss();
-                                                Toast.makeText(mContext, R.string.network_err, Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onModifySettingsFailure(int statusCode) {
-                                        progressDialog.dismiss();
-                                        mToast = Toast.makeText(mContext, "修改失败，请稍后重试", Toast.LENGTH_SHORT);
-                                        mToast.show();
-                                    }
-                                });
-                        break;
-                    default:
-                        break;
+            public void onPropertyChanged(Observable observable, int i) {
+                if (((ObservableBoolean) observable).get()) {
+                    progressDialog = ProgressDialog.show(mContext, "", getString(R.string.just_a_sec));
+                } else {
+                    if (progressDialog != null) progressDialog.dismiss();
                 }
             }
-        };
-        change_avatar_btn.setOnClickListener(onClickListener);
+        });
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, android.R.layout.simple_spinner_dropdown_item);
-        //language_spn.setAdapter(adapter);
-        save_btn.setOnClickListener(onClickListener);
+        viewModel.showToast.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                showToast(viewModel.toastContent.get());
+            }
+        });
+
+        viewModel.goToAlbum.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                goToAlbum();
+            }
+        });
     }
 
     private final String IMAGE_TYPE = "image/*";
@@ -168,9 +140,8 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
             Log.d(TAG, "onActivityResult: " + selectedImageUri.toString());
             String selectedImagePath = getPath(selectedImageUri);
             Log.d(TAG, "onActivityResult: " + selectedImagePath);
-            mAvatarFile = new File(selectedImagePath);
-            Glide.with(this).load(mAvatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
-            Log.i("name", mAvatarFile.getName());
+            viewModel.avatarFile = new File(selectedImagePath);
+            Glide.with(this).load(viewModel.avatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
         }
     }
 
@@ -184,14 +155,24 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
 
     }
 
+    private void init() {
+        setViewModel(new SettingsVM(Me.getMySignature(), Me.getMyStatus(), Me.getMyPrivateAdd(), Me.getMyStarOnReply(), Me.getMyStarPrivate(), Me.getMyHideOnline()));
+        configToolbar(R.string.settings);
+
+        mContext = this;
+        avatar = (AvatarView)findViewById(R.id.iv_avatar);
+
+        updateViews();
+    }
+
     public void updateViews(){
-        avatar.update(this, Me.getAvatarSuffix(), Me.getMyUserId(), Me.getUsername());
-        private_add_chk.setChecked(Me.getPreferences().getPrivateAdd());
-        star_on_reply_chk.setChecked(Me.getPreferences().getStarOnReply());
-        star_private_chk.setChecked(Me.getPreferences().getStarPrivate());
-        hide_online_chk.setChecked(Me.getPreferences().getHideOnline());
-        signature_edtTxt.setText(Me.getPreferences().getSignature());
-        user_status_edtTxt.setText(Me.getStatus());
+        avatar.update(Me.getAvatarSuffix(), Me.getMyUserId(), Me.getUsername());
+        //private_add_chk.setChecked(Me.getPreferences().getPrivateAdd());
+        //star_on_reply_chk.setChecked(Me.getPreferences().getStarOnReply());
+        //star_private_chk.setChecked(Me.getPreferences().getStarPrivate());
+        //hide_online_chk.setChecked(Me.getPreferences().getHideOnline());
+        //signature_edtTxt.setText(Me.getPreferences().getSignature());
+        //user_status_edtTxt.setText(Me.getStatus());
     }
 
     /**
@@ -227,5 +208,18 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
         }
         cursor.close();
         return res;
+    }
+
+    public void goToAlbum() {
+        Intent getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
+        getAlbum.setType(IMAGE_TYPE);
+        startActivityForResult(getAlbum, IMAGE_CODE);
+    }
+
+    @Override
+    public void setViewModel(BaseViewModel viewModel) {
+        this.viewModel = (SettingsVM) viewModel;
+        ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
+        binding.setViewModel(this.viewModel);
     }
 }
