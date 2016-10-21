@@ -4,16 +4,11 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 
-import com.geno.chaoli.forum.view.HomepageActivity;
-import com.geno.chaoli.forum.view.IView;
-
 /**
  * Created by jianhao on 16-9-21.
  */
 
 public class HomepageViewModel extends BaseViewModel {
-    HomepageActivity view;
-
     public ObservableField<String> username = new ObservableField<>();
     public ObservableField<String> signature = new ObservableField<>();
     public ObservableField<String> avatarSuffix = new ObservableField<>();

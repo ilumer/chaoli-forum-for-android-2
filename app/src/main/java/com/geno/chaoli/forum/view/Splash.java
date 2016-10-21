@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
+@Deprecated
 public class Splash extends Activity
 {
 	@Override

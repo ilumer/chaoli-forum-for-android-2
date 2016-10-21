@@ -232,9 +232,6 @@ public class MainActivityViewModel extends BaseViewModel {
             @Override
             public void onLoginFailure(int statusCode) {
                 showLoginProcessDialog.set(false);
-                /*navigationView.getMenu().clear();
-                navigationView.inflateMenu(R.menu.menu_navigation_no_login);*/
-                navigationMenu.set(R.menu.menu_navigation_no_login);
                 selectedItem.set(0);
                 Log.d(TAG, "onLoginFailure: " + statusCode);
             }

@@ -122,7 +122,7 @@ public class MyOkHttp {
             return this;
         }*/
 
-        public void enqueue(final Context context, final Callback callback) {
+        public void enqueue(final Callback callback) {
             request = requestBuilder.build();
             Call call = getClient().newCall(request);
             call.enqueue(new okhttp3.Callback() {
@@ -153,35 +153,30 @@ public class MyOkHttp {
                 }
             });
         }
+        @Deprecated
+        public void enqueue(final Context context, final Callback callback) {
+            enqueue(callback);
+        }
 
-        public void enqueue(final Context context, final Callback1 callback) {
+        public void enqueue(final Callback1 callback) {
             request = requestBuilder.build();
             Call call = getClient().newCall(request);
             call.enqueue(new okhttp3.Callback() {
                 @Override
                 public void onFailure(final Call call, final IOException e) {
-                    new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
                             callback.onFailure(call, e);
-                        }
-                    });
                 }
 
                 @Override
                 public void onResponse(final Call call, final Response response) throws IOException {
-                    new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
                                 callback.onResponse(call, response);
-                            } catch (IOException e) {
-                                onFailure(call, e);
-                            }
-                        }
-                    });
                 }
             });
+        }
+
+        @Deprecated
+        public void enqueue(final Context context, final Callback1 callback) {
+            enqueue(callback);
         }
     }
     public static abstract class Callback {

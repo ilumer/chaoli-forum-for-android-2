@@ -169,7 +169,8 @@ public class MainActivity extends BaseActivity
 		viewModel.hasLoggedIn.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				binding.navigationView.inflateMenu(viewModel.hasLoggedIn.get() ? R.menu.menu_navigation : R.menu.menu_navigation_no_login);
+				binding.navigationView.getMenu().clear();
+				binding.navigationView.inflateMenu(viewModel.hasLoggedIn.get() ? R.menu.menu_navigation_no_login : R.menu.menu_navigation_no_login);
 			}
 		});
 

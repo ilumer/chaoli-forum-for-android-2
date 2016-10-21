@@ -2,7 +2,9 @@ package com.geno.chaoli.forum.meta;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.v4.util.Pair;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -14,8 +16,13 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.model.Post;
+import com.geno.chaoli.forum.network.MyOkHttp;
+import com.geno.chaoli.forum.network.MyRetrofit;
+import com.google.common.net.UrlEscapers;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -24,6 +31,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okhttp3.Call;
+import okhttp3.Response;
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Action1;
 
 /**
  * 需要在线获取的图片交给它来显示
@@ -41,7 +54,7 @@ public class OnlineImgTextView extends TextView
 
 
 
-	public static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{" + 440 / 2 + "}";
+	public static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{220}";
 	//public static final Pattern PATTERN1 = Pattern.compile("(?i)(?<=\\$)(.+?)(?=\\$)");
 
 	//public static final Pattern PATTERN2 = Pattern.compile("(?i)(?<=\\\\\\()(.+?)(?=\\\\\\))");
@@ -174,8 +187,23 @@ public class OnlineImgTextView extends TextView
                     }
                 }
             } else {
-                url = SITE + content;
-            }
+				/*try {
+					url = SITE + URLEncoder.encode(content, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+
+				}*/
+				/*String a = "";
+				try {
+					for (String s : content.split(" ")) {
+						a += URLEncoder.encode(s, "UTF-8");
+						a += "%20";
+					}
+				} catch (UnsupportedEncodingException e) {
+
+				}
+				url = SITE + a;*/
+				url = SITE + content;//UrlEscapers.urlFragmentEscaper().escape(content);
+			}
             formulaList.add(new Formula(start, end, content, url, type));
 		}
 		removeOverlappingFormula(formulaList);
@@ -196,10 +224,37 @@ public class OnlineImgTextView extends TextView
 			return;
 		}
 		Formula formula = mFormulaList.get(i);
-		Log.d(TAG, "retrieveFormulaOnlineImg: " + formula.content);
+		Log.d(TAG, "retrieveFormulaOnlineImg: " + formula.url);
 		final int finalType = formula.type;
         final int finalStart = formula.start;
         final int finalEnd = formula.end;
+
+
+
+		/*new MyOkHttp.MyOkHttpClient().get(formula.url)
+				.enqueue(new MyOkHttp.Callback1() {
+					@Override
+					public void onFailure(Call call, IOException e) {
+						e.printStackTrace();
+						retrieveFormulaOnlineImg(builder, i + 1);
+					}
+
+					@Override
+					public void onResponse(Call call, Response response) throws IOException {
+						String responseStr = response.body().string();
+						Bitmap resource = BitmapFactory.decodeByteArray(responseStr.getBytes(), 0, responseStr.getBytes().length);
+						response.body().close();
+						if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG) builder.setSpan(new ImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+						else builder.setSpan(new CenteredImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+						new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
+							@Override
+							public void run() {
+								setText(builder);
+							}
+						});
+						retrieveFormulaOnlineImg(builder, i + 1);
+					}
+				});*/
         Glide.with(getContext()).load(formula.url).asBitmap().into(new SimpleTarget<Bitmap>()
         {
             @Override
@@ -262,7 +317,7 @@ public class OnlineImgTextView extends TextView
 			else if (flag3) oldStr = m3.group();
 			else if (flag2) oldStr = m2.group();
 			else oldStr = m1.group();
-			String newStr = oldStr.replaceAll("[\\n\\r]", "");
+			String newStr = oldStr.replaceAll("[\\n\\r]", "");//.replaceAll(" ", "%2520");
 			str = str.replace(oldStr, newStr);
 		}
 

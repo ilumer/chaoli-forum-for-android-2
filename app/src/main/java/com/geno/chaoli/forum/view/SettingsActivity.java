@@ -38,38 +38,16 @@ import com.geno.chaoli.forum.viewmodel.SettingsVM;
  */
 public class SettingsActivity extends BaseActivity implements AccountUtils.GetProfileObserver{
     private static final String TAG = "SettingsActivity";
-    EditText username_txt, password_txt;
-    TextView user_id_txt;
 
     SettingsVM viewModel;
 
     ProgressDialog progressDialog;
 
     Context mContext;
-    File mAvatarFile;
-    Toast mToast;
     AvatarView avatar;
-    //Button change_avatar_btn;
-    ////Spinner language_spn;
-    //CheckBox private_add_chk;
-    //CheckBox star_on_reply_chk;
-    //CheckBox star_private_chk;
-    //CheckBox hide_online_chk;
-    //EditText signature_edtTxt;
-    //EditText user_status_edtTxt;
-    //Button save_btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*Button change_avatar_btn = (Button)findViewById(R.id.btn_change_avatar);
-        //Spinner language_spn = (Spinner)findViewById(R.id.spn_language);
-        private_add_chk = (CheckBox)findViewById(R.id.chk_private_add);
-        star_on_reply_chk = (CheckBox)findViewById(R.id.chk_star_on_reply);
-        star_private_chk = (CheckBox)findViewById(R.id.chk_star_private);
-        hide_online_chk = (CheckBox)findViewById(R.id.chk_hide_online);
-        signature_edtTxt = (EditText)findViewById(R.id.edtTxt_signature);
-        user_status_edtTxt = (EditText)findViewById(R.id.edtTxt_user_status);
-        save_btn = (Button)findViewById(R.id.btn_save);*/
 
         init();
 
@@ -137,9 +115,7 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
             //Log.i("path", path);
 */
             Uri selectedImageUri = data.getData();
-            Log.d(TAG, "onActivityResult: " + selectedImageUri.toString());
             String selectedImagePath = getPath(selectedImageUri);
-            Log.d(TAG, "onActivityResult: " + selectedImagePath);
             viewModel.avatarFile = new File(selectedImagePath);
             Glide.with(this).load(viewModel.avatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
         }
