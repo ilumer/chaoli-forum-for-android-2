@@ -3,7 +3,6 @@ package com.geno.chaoli.forum.view;
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
-import android.databinding.ViewDataBinding;
 import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -11,34 +10,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.databinding.ActivityAnswerQuestionsBinding;
-import com.geno.chaoli.forum.meta.OnlineImgCheckBox;
-import com.geno.chaoli.forum.meta.OnlineImgRadioButton;
-import com.geno.chaoli.forum.meta.OnlineImgTextView;
-import com.geno.chaoli.forum.model.BusinessQuestion;
 import com.geno.chaoli.forum.utils.SignUpUtils;
 
-import com.geno.chaoli.forum.model.Question;
-import com.geno.chaoli.forum.viewmodel.AnswerQuestionsViewModel;
+import com.geno.chaoli.forum.viewmodel.AnswerQuestionsVM;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 注册时显示问题、回答问题的Activity
@@ -48,7 +28,7 @@ public class AnswerQuestionsActivity extends BaseActivity {
     Context mContext;
     Boolean isFirst = true;
 
-    AnswerQuestionsViewModel viewModel;
+    AnswerQuestionsVM viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +40,7 @@ public class AnswerQuestionsActivity extends BaseActivity {
     }
 
     private void init(){
-        setViewModel(new AnswerQuestionsViewModel());
+        setViewModel(new AnswerQuestionsVM());
         ActivityAnswerQuestionsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_answer_questions);
         binding.setViewModel(this.viewModel);
 
@@ -283,6 +263,6 @@ public class AnswerQuestionsActivity extends BaseActivity {
 
     @Override
     public void setViewModel(BaseViewModel viewModel) {
-        this.viewModel = (AnswerQuestionsViewModel) viewModel;
+        this.viewModel = (AnswerQuestionsVM) viewModel;
     }
 }

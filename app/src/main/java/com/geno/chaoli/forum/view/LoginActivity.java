@@ -1,41 +1,34 @@
 package com.geno.chaoli.forum.view;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.databinding.LoginActivityBinding;
-import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.utils.LoginUtils;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
-import com.geno.chaoli.forum.viewmodel.LoginActivityViewModel;
+import com.geno.chaoli.forum.viewmodel.LoginActivityVM;
 
 public class LoginActivity extends BaseActivity
 {
 	public static final String TAG = "LoginActivity";
 
 	Context mContext = this;
-	LoginActivityViewModel viewModel;
+	LoginActivityVM viewModel;
 	ProgressDialog progressDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setViewModel(new LoginActivityViewModel());
+		setViewModel(new LoginActivityVM());
 
 		viewModel.clickAQ.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
@@ -91,7 +84,7 @@ public class LoginActivity extends BaseActivity
 
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
-		this.viewModel = (LoginActivityViewModel) viewModel;
+		this.viewModel = (LoginActivityVM) viewModel;
 		LoginActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.login_activity);
 		binding.setViewModel(this.viewModel);
 	}

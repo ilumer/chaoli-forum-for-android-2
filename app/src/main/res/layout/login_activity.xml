@@ -3,7 +3,7 @@
 	<data>
 		<variable
 			name="viewModel"
-			type="com.geno.chaoli.forum.viewmodel.LoginActivityViewModel"/>
+			type="com.geno.chaoli.forum.viewmodel.LoginActivityVM"/>
 	</data>
 	<LinearLayout
 		android:layout_width="match_parent"

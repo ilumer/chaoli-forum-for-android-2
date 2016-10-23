@@ -6,7 +6,7 @@
 	<data>
 		<variable
 			name="viewModel"
-			type="com.geno.chaoli.forum.viewmodel.MainActivityViewModel"/>
+			type="com.geno.chaoli.forum.viewmodel.MainActivityVM"/>
 	</data>
 
 	<android.support.v4.widget.DrawerLayout

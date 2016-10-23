@@ -1,38 +1,18 @@
 package com.geno.chaoli.forum.view;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.content.res.ResourcesCompat;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.databinding.ActivitySignUpBinding;
-import com.geno.chaoli.forum.meta.Constants;
-import com.geno.chaoli.forum.network.MyOkHttp;
-import com.geno.chaoli.forum.network.MyOkHttp.Callback;
-import com.geno.chaoli.forum.utils.LoginUtils;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
-import com.geno.chaoli.forum.viewmodel.SignUpViewModel;
-
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import okhttp3.Call;
-import okhttp3.Response;
+import com.geno.chaoli.forum.viewmodel.SignUpVM;
 
 /**
  * Created by jianhao on 16-4-7.
@@ -47,7 +27,7 @@ public class SignUpActivity extends BaseActivity {
 
     ProgressDialog progressDialog;
 
-    SignUpViewModel viewModel;
+    SignUpVM viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +45,7 @@ public class SignUpActivity extends BaseActivity {
             Toast.makeText(mContext, inviteCode, Toast.LENGTH_LONG).show();
         }
 
-        setViewModel(new SignUpViewModel(inviteCode));
+        setViewModel(new SignUpVM(inviteCode));
         viewModel.init();
         configToolbar(R.string.sign_up);
 
@@ -105,7 +85,7 @@ public class SignUpActivity extends BaseActivity {
 
     @Override
     public void setViewModel(BaseViewModel viewModel) {
-        this.viewModel = (SignUpViewModel) viewModel;
+        this.viewModel = (SignUpVM) viewModel;
         ActivitySignUpBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         binding.setViewModel(this.viewModel);
     }

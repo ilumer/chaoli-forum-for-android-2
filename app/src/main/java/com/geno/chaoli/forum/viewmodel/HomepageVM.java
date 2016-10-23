@@ -8,14 +8,14 @@ import android.databinding.ObservableInt;
  * Created by jianhao on 16-9-21.
  */
 
-public class HomepageViewModel extends BaseViewModel {
+public class HomepageVM extends BaseViewModel {
     public ObservableField<String> username = new ObservableField<>();
     public ObservableField<String> signature = new ObservableField<>();
     public ObservableField<String> avatarSuffix = new ObservableField<>();
     public ObservableInt userId = new ObservableInt();
     public ObservableBoolean isSelf = new ObservableBoolean();
 
-    public HomepageViewModel(String username, String signature, String avatarSuffix, int userId, Boolean isSelf) {
+    public HomepageVM(String username, String signature, String avatarSuffix, int userId, Boolean isSelf) {
         this.username.set(username);
         this.userId.set(userId);
         this.signature.set(signature);

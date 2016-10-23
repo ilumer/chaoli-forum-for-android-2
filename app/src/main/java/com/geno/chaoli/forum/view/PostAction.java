@@ -18,7 +18,7 @@ import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.databinding.PostActionBinding;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
-import com.geno.chaoli.forum.viewmodel.PostActionViewModel;
+import com.geno.chaoli.forum.viewmodel.PostActionVM;
 
 /**
  * Created by jianhao on 16-5-31.
@@ -31,7 +31,7 @@ public class PostAction extends BaseActivity implements IView {
 
     private Channel preChannel, curChannel;
 
-    private PostActionViewModel viewModel;
+    private PostActionVM viewModel;
 
     private PostActionBinding binding;
 
@@ -43,7 +43,7 @@ public class PostAction extends BaseActivity implements IView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setViewModel(new PostActionViewModel());
+        setViewModel(new PostActionVM());
 
         init();
     }
@@ -134,7 +134,7 @@ public class PostAction extends BaseActivity implements IView {
 
     @Override
     public void setViewModel(BaseViewModel viewModel) {
-        this.viewModel = (PostActionViewModel) viewModel;
+        this.viewModel = (PostActionVM) viewModel;
         binding = DataBindingUtil.setContentView(this, R.layout.post_action);
         binding.setViewModel(this.viewModel);
     }

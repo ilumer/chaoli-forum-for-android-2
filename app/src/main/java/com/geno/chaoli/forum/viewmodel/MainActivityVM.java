@@ -44,8 +44,8 @@ import static android.content.Context.MODE_PRIVATE;
 /**
  * Created by jianhao on 16-9-19.
  */
-public class MainActivityViewModel extends BaseViewModel {
-    private final String TAG = "MainActivityViewModel";
+public class MainActivityVM extends BaseViewModel {
+    private final String TAG = "MainActivityVM";
 
     public ObservableArrayList<Conversation> conversationList = new ObservableArrayList<>();
 

@@ -18,7 +18,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by jianhao on 16-9-21.
  */
 
-public class ReplyActionViewModel extends BaseViewModel {
+public class ReplyActionVM extends BaseViewModel {
     private static final String TAG = "ReplyActionVM";
 
     public ObservableInt flag = new ObservableInt();
@@ -37,7 +37,7 @@ public class ReplyActionViewModel extends BaseViewModel {
     private SharedPreferences sp;
     private SharedPreferences.Editor e;
 
-    public ReplyActionViewModel(int flag, int conversationId, int postId, String replyTo, String replyMsg) {
+    public ReplyActionVM(int flag, int conversationId, int postId, String replyTo, String replyMsg) {
         this.flag.set(flag);
         this.conversationId.set(conversationId);
         this.postId.set(postId);

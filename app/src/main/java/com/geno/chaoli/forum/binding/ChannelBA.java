@@ -9,7 +9,7 @@ import com.geno.chaoli.forum.meta.ChannelTextView;
  * Created by jianhao on 16-9-25.
  */
 
-public class ChannelBindingAdapter {
+public class ChannelBA {
     @BindingAdapter("app:channelId")
     public static void setChannel(ChannelTextView channelTextView, int channelId) {
         channelTextView.setChannel(Channel.getChannel(channelId));

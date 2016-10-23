@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
-import android.databinding.ObservableBoolean;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,14 +24,14 @@ import com.geno.chaoli.forum.utils.ConversationUtils;
 import com.geno.chaoli.forum.meta.DividerItemDecoration;
 import com.geno.chaoli.forum.utils.PostUtils;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
-import com.geno.chaoli.forum.viewmodel.PostActivityViewModel;
+import com.geno.chaoli.forum.viewmodel.PostActivityVM;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.geno.chaoli.forum.viewmodel.PostActivityViewModel.REPLY_CODE;
+import static com.geno.chaoli.forum.viewmodel.PostActivityVM.REPLY_CODE;
 
 public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
@@ -60,7 +59,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 	LinearLayoutManager mLinearLayoutManager;
 
-	PostActivityViewModel viewModel;
+	PostActivityVM viewModel;
 
 	public static final int menu_settings = 0;
 	public static final int menu_share = 1;
@@ -72,7 +71,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	{
 		super.onCreate(savedInstanceState);
 
-		setViewModel(new PostActivityViewModel());
+		setViewModel(new PostActivityVM());
 		ButterKnife.bind(this);
 
 		Bundle data = getIntent().getExtras();
@@ -251,7 +250,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	}
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
-		this.viewModel = (PostActivityViewModel) viewModel;
+		this.viewModel = (PostActivityVM) viewModel;
 		PostActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.post_activity);
 		binding.setViewModel(this.viewModel);
 	}

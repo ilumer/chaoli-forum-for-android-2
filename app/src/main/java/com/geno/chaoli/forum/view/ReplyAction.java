@@ -1,6 +1,5 @@
 package com.geno.chaoli.forum.view;
 
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.os.Bundle;
@@ -10,16 +9,11 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.databinding.ReplyActionBinding;
-import com.geno.chaoli.forum.utils.PostUtils;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
-import com.geno.chaoli.forum.viewmodel.ReplyActionViewModel;
-
-import java.util.Locale;
+import com.geno.chaoli.forum.viewmodel.ReplyActionVM;
 
 
 public class ReplyAction extends BaseActivity
@@ -32,7 +26,7 @@ public class ReplyAction extends BaseActivity
 
 	public static final int menu_reply = 1;
 
-	ReplyActionViewModel viewModel;
+	ReplyActionVM viewModel;
 	ReplyActionBinding binding;
 
 	@Override
@@ -51,7 +45,7 @@ public class ReplyAction extends BaseActivity
 		replyMsg = data.getString("replyMsg", "");
 
 		//setContentView(R.layout.reply_action);
-		setViewModel(new ReplyActionViewModel(flag, conversationId, postId, replyTo, replyMsg));
+		setViewModel(new ReplyActionVM(flag, conversationId, postId, replyTo, replyMsg));
 		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
 		toolbar.setTitle(R.string.reply);
 		toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -136,7 +130,7 @@ public class ReplyAction extends BaseActivity
 
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
-		this.viewModel = (ReplyActionViewModel) viewModel;
+		this.viewModel = (ReplyActionVM) viewModel;
 		binding = DataBindingUtil.setContentView(this, R.layout.reply_action);
 		binding.setViewModel(this.viewModel);
 	}

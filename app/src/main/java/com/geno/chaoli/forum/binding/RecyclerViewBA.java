@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Created by jianhao on 16-9-19.
  */
-public class RecyclerViewBindingAdapter {
+public class RecyclerViewBA {
     private static final String TAG = "RVAdapter";
 
     @BindingAdapter({"app:itemList", "app:selector", "app:handler"})

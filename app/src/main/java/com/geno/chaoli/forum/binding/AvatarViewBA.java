@@ -7,7 +7,7 @@ import com.geno.chaoli.forum.meta.AvatarView;
 /**
  * Created by jianhao on 16-9-19.
  */
-public class AvatarViewAdapter {
+public class AvatarViewBA {
     @BindingAdapter({"bind:imageSuffix", "bind:userId", "bind:username"})
     public static void loadImage(AvatarView avatarView, String imageSuffix, int userId, String username) {
         if (userId != -1) avatarView.update(imageSuffix, userId, username);

@@ -37,7 +37,7 @@ import static com.geno.chaoli.forum.R.id.swipyRefreshLayout;
  * Created by jianhao on 16-9-21.
  */
 
-public class PostActivityViewModel extends BaseViewModel {
+public class PostActivityVM extends BaseViewModel {
     public int conversationId;
     public String title;
     public ObservableBoolean isRefreshing = new ObservableBoolean(false);

@@ -13,7 +13,7 @@ import com.geno.chaoli.forum.utils.LoginUtils;
  * Created by jianhao on 16-9-21.
  */
 
-public class LoginActivityViewModel extends BaseViewModel {
+public class LoginActivityVM extends BaseViewModel {
     public ObservableField<String> username = new ObservableField<>();
     public ObservableField<String> password = new ObservableField<>();
 

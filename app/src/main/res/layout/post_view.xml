@@ -7,7 +7,7 @@
 			type="com.geno.chaoli.forum.model.Post"/>
 		<variable
 			name="handler"
-			type="com.geno.chaoli.forum.viewmodel.PostActivityViewModel"/>
+			type="com.geno.chaoli.forum.viewmodel.PostActivityVM"/>
 	</data>
 	<LinearLayout
 		android:layout_width="match_parent"

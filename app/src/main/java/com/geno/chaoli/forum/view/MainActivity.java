@@ -17,7 +17,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -29,7 +28,7 @@ import com.geno.chaoli.forum.meta.DividerItemDecoration;
 import com.geno.chaoli.forum.model.Conversation;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
-import com.geno.chaoli.forum.viewmodel.MainActivityViewModel;
+import com.geno.chaoli.forum.viewmodel.MainActivityVM;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -67,14 +66,14 @@ public class MainActivity extends BaseActivity
 
 	ActionBarDrawerToggle actionBarDrawerToggle;
 
-	MainActivityViewModel viewModel;
+	MainActivityVM viewModel;
 	MainActivityBinding binding;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		viewModel = new MainActivityViewModel();
+		viewModel = new MainActivityVM();
 		setViewModel(viewModel);
 		ButterKnife.bind(this);
 
@@ -325,7 +324,7 @@ public class MainActivity extends BaseActivity
 
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
-		this.viewModel = (MainActivityViewModel) viewModel;
+		this.viewModel = (MainActivityVM) viewModel;
 		binding = DataBindingUtil.setContentView(this, R.layout.main_activity);
 		binding.setViewModel(this.viewModel);
 		NavigationHeaderBinding navigationHeaderBinding = NavigationHeaderBinding.bind(binding.navigationView.getHeaderView(0));

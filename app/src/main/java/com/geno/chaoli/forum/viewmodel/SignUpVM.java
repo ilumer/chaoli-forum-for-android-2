@@ -29,7 +29,7 @@ import okhttp3.Response;
  * Created by jianhao on 16-9-21.
  */
 
-public class SignUpViewModel extends BaseViewModel {
+public class SignUpVM extends BaseViewModel {
     private static final String TAG = "SignUpVM";
 
     String inviteCode;
@@ -53,7 +53,7 @@ public class SignUpViewModel extends BaseViewModel {
     public ObservableBoolean showProcessDialog = new ObservableBoolean();
     public ObservableBoolean signUpSuccess = new ObservableBoolean();
 
-    public SignUpViewModel(String inviteCode) {
+    public SignUpVM(String inviteCode) {
         this.inviteCode = inviteCode;
         signUpUrl = Constants.SIGN_UP_URL + inviteCode;
     }

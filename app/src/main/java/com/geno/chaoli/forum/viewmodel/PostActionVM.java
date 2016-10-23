@@ -9,8 +9,6 @@ import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.meta.Channel;
 import com.geno.chaoli.forum.utils.ConversationUtils;
-import com.geno.chaoli.forum.view.IView;
-import com.geno.chaoli.forum.view.PostAction;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -18,7 +16,7 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by jianhao on 16-9-21.
  */
 
-public class PostActionViewModel extends BaseViewModel {
+public class PostActionVM extends BaseViewModel {
     private static final String TAG = "PostActionVM";
     public ObservableField<String> title = new ObservableField<>();
     public ObservableField<String> content = new ObservableField<>();
@@ -37,7 +35,7 @@ public class PostActionViewModel extends BaseViewModel {
     private static final String DRAFT_TITLE = "draft_title";
     private static final String DRAFT_CHANNEL = "draft_channel";
 
-    public PostActionViewModel() {
+    public PostActionVM() {
         sharedPreferences = ChaoliApplication.getAppContext().getSharedPreferences(TAG, MODE_PRIVATE);
         editor = sharedPreferences.edit();
         title.set(sharedPreferences.getString(DRAFT_TITLE, ""));
@@ -77,7 +75,7 @@ public class PostActionViewModel extends BaseViewModel {
                 showToast.notifyChange();
                 toastContent.set(getString(R.string.network_err));
 
-                PostActionViewModel.this.channelId.set(preChannel.getChannelId());
+                PostActionVM.this.channelId.set(preChannel.getChannelId());
                 curChannel = preChannel;
                 saveChannelId(curChannel.getChannelId());
             }

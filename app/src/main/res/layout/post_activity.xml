@@ -5,7 +5,7 @@
 	<data>
 		<variable
 			name="viewModel"
-			type="com.geno.chaoli.forum.viewmodel.PostActivityViewModel"/>
+			type="com.geno.chaoli.forum.viewmodel.PostActivityVM"/>
 	</data>
 	<android.support.design.widget.CoordinatorLayout
 		android:layout_height="match_parent"
