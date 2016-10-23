@@ -105,72 +105,10 @@ public class LoginUtils {
         begin_login(username, password, loginObserver);
     }
 
-    /*public static void myLogin(final Context context, final String username, final String password, final LoginObserver loginObserver) {
-        Log.d(TAG, "myLogin() called with: " + "context = [" + context + "], username = [" + username + "], password = [" + password + "], loginObserver = [" + loginObserver + "]");
-        MyRetrofit.getService().getToken()
-                .flatMap(new Func1<String, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(String responseStr) {
-                            String tokenFormat = "\"token\":\"([\\dabcdef]+)";
-                            Pattern pattern = Pattern.compile(tokenFormat);
-                            Matcher matcher = pattern.matcher(responseStr);
-                            if (matcher.find()) {
-                                String token = matcher.group(1);
-                                setToken(token);
-                                //login(context, loginObserver);
-                                return MyRetrofit.getService().login(username, password, token);
-                            } else {
-                                //Log.e("regex_error", "regex_error");
-                                CookieUtils.clearCookie(context);
-                                loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
-                                return null;
-                            }
-                    }
-                })
-                .subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(String responseStr) {
-                            Log.d(TAG, "onResponse: " + responseStr);
-                            String tokenFormat = "\"userId\":(\\d+),\"token\":\"([\\dabcdef]+)";
-                            Pattern pattern = Pattern.compile(tokenFormat);
-                            Matcher matcher = pattern.matcher(responseStr);
-                            if (matcher.find()) {
-                                int userId = Integer.parseInt(matcher.group(1));
-                                setUserId(userId);
-                                User.setUserId(userId);
-
-                                setToken(matcher.group(2));
-
-                                saveUsernameAndPassword(context, username, password);
-                                //CookieUtils.setCookies(CookieUtils.getCookie(context));
-                                setSPIsLoggedIn(true);
-                                User.setUsername(username);
-                                loginObserver.onLoginSuccess(getUserId(), getToken());
-                            } else {
-                                CookieUtils.clearCookie(context);
-                                setSPIsLoggedIn(false);
-                                //loginObserver.onLoginFailure(COOKIE_EXPIRED);
-                                //begin_login(context, loginObserver);
-                                //Log.e("regex_error", "regex_error");
-                            }
-                    }
-                });
-    }*/
-
     private static void pre_login(final Context context, final LoginObserver loginObserver){//获取登录页面的token
         new MyOkHttp.MyOkHttpClient()
                 .get(Constants.LOGIN_URL)
-                .enqueue(context, new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         e.printStackTrace();
@@ -201,7 +139,7 @@ public class LoginUtils {
                 .add("login", "登录")
                 .add("token", getToken())
                 .post(Constants.LOGIN_URL)
-                .enqueue(context, new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         e.printStackTrace();
@@ -221,7 +159,7 @@ public class LoginUtils {
 
                             setToken(matcher.group(2));
 
-                            saveUsernameAndPassword(context, username, password);
+                            saveUsernameAndPassword(username, password);
                             //CookieUtils.setCookies(CookieUtils.getCookie(context));
                             setSPIsLoggedIn(true);
                             Me.setUsername(username);
@@ -239,7 +177,7 @@ public class LoginUtils {
 
     private static void getNewToken(final Context context, final LoginObserver loginObserver){ //得到新的token
         new MyOkHttp.MyOkHttpClient().get(Constants.HOMEPAGE_URL)
-                .enqueue(context, new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         e.printStackTrace();

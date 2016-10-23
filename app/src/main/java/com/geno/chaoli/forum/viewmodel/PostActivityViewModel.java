@@ -21,6 +21,7 @@ import com.geno.chaoli.forum.model.Post;
 import com.geno.chaoli.forum.model.PostListResult;
 import com.geno.chaoli.forum.network.MyRetrofit;
 import com.geno.chaoli.forum.utils.ConversationUtils;
+import com.geno.chaoli.forum.utils.PostUtils;
 import com.geno.chaoli.forum.view.HomepageActivity;
 import com.geno.chaoli.forum.view.IView;
 import com.geno.chaoli.forum.view.PostActivity;
@@ -48,8 +49,9 @@ public class PostActivityViewModel extends BaseViewModel {
     public ObservableField<String> toastContent = new ObservableField<>();
 
     public ObservableBoolean goToReply = new ObservableBoolean(false);
+    public ObservableBoolean goToQuote = new ObservableBoolean();
     public ObservableBoolean goToHomepage = new ObservableBoolean(false);
-    public ObservableField<Post> clickedPost = new ObservableField<>();
+    public Post clickedPost;
 
     public static final int REPLY_CODE = 1;
 
@@ -84,7 +86,7 @@ public class PostActivityViewModel extends BaseViewModel {
                     public void onFailure(retrofit2.Call<PostListResult> call, Throwable t) {
                         isRefreshing.set(false);
                         toastContent.set(ChaoliApplication.getAppContext().getString(R.string.network_err));
-                        showToast.set(true);
+                        showToast.notifyChange();
                         t.printStackTrace();
                     }
                 });
@@ -95,8 +97,12 @@ public class PostActivityViewModel extends BaseViewModel {
     }
 
     public void clickFab() {
-        goToReply.set(true);
-        goToReply.set(false);
+        goToReply.notifyChange();
+    }
+
+    public void quote(Post post) {
+        clickedPost = post;
+        goToQuote.notifyChange();
     }
 
     public void replyComplete(int requestCode, int resultCode, Intent data) {
@@ -109,9 +115,8 @@ public class PostActivityViewModel extends BaseViewModel {
     }
 
     public void clickAvatar(Post post) {
-        clickedPost.set(post);
-        goToHomepage.set(true);
-        goToHomepage.set(false);
+        clickedPost = post;
+        goToHomepage.notifyChange();
     }
 
     /**

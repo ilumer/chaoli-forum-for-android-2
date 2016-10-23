@@ -5,7 +5,7 @@
 	<dimen name="fab_margin">16dp</dimen>
 
 	<dimen name="left_margin_in_post_view">5dp</dimen>
-	<dimen name="right_margin_in_post_view">15dp</dimen>
+	<dimen name="right_margin_in_post_view">40dp</dimen>
 	<dimen name="conversation_view_horizontal_margin">16dp</dimen>
 	<dimen name="conversation_view_vertical_margin">12dp</dimen>
 	<dimen name="middle_margin">10dp</dimen>

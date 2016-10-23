@@ -86,7 +86,7 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (resultCode != RESULT_OK) {        //此处的 RESULT_OK 是系统自定义得一个常量
+        /*if (resultCode != RESULT_OK) {        //此处的 RESULT_OK 是系统自定义得一个常量
             Log.e("error","ActivityResult resultCode error");
             return;
         }
@@ -98,7 +98,7 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
 
         //此处的用于判断接收的Activity是不是你想要的那个
         if (requestCode == IMAGE_CODE) {
-            /*Uri originalUri = data.getData();        //获得图片的uri
+            Uri originalUri = data.getData();        //获得图片的uri
             Log.i("uri", originalUri.toString());
             //bm = MediaStore.Images.Media.getBitmap(resolver, originalUri);        //显得到bitmap图片
 
@@ -113,11 +113,17 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
             //最后根据索引值获取图片路径
             String selectedImagePath = cursor.getString(column_index);
             //Log.i("path", path);
-*/
-            Uri selectedImageUri = data.getData();
-            String selectedImagePath = getPath(selectedImageUri);
+
             viewModel.avatarFile = new File(selectedImagePath);
             Glide.with(this).load(viewModel.avatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
+        }*/
+        if (resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String selectedPath = getPath(selectedImage);
+            Log.d(TAG, "onActivityResult: " + selectedPath);
+            File selectedFile = new File(selectedPath);
+            viewModel.avatarFile = selectedFile;
+            ((AvatarView) findViewById(R.id.iv_avatar)).update(selectedFile);
         }
     }
 
@@ -189,7 +195,7 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
     public void goToAlbum() {
         Intent getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
         getAlbum.setType(IMAGE_TYPE);
-        startActivityForResult(getAlbum, IMAGE_CODE);
+        startActivityForResult(Intent.createChooser(getAlbum, "Select Picture"), IMAGE_CODE);
     }
 
     @Override

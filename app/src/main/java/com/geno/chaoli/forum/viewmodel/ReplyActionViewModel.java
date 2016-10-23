@@ -57,7 +57,7 @@ public class ReplyActionViewModel extends BaseViewModel {
             @Override
             public void onReplySuccess()
             {
-                showToast.set(showToast.get() + 1);
+                showToast.notifyChange();
                 toastContent.set(getString(R.string.reply));
                 clearSaved();
                 replyComplete.set(true);
@@ -66,7 +66,7 @@ public class ReplyActionViewModel extends BaseViewModel {
             @Override
             public void onReplyFailure(int statusCode)
             {
-                showToast.set(showToast.get() + 1);
+                showToast.notifyChange();
                 toastContent.set("Fail: " + statusCode);
             }
         });

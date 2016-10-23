@@ -46,14 +46,14 @@ public class SettingsVM extends BaseViewModel {
                             @Override
                             public void onGetProfileSuccess() {
                                 showProcessDialog.set(false);
-                                showToast.set(showToast.get() + 1);
+                                showToast.notifyChange();
                                 toastContent.set(getString(R.string.modified_successfully));
                             }
 
                             @Override
                             public void onGetProfileFailure() {
                                 showProcessDialog.set(false);
-                                showToast.set(showToast.get() + 1);
+                                showToast.notifyChange();
                                 toastContent.set(getString(R.string.network_err));
                             }
                         });
@@ -62,14 +62,14 @@ public class SettingsVM extends BaseViewModel {
                     @Override
                     public void onModifySettingsFailure(int statusCode) {
                         showProcessDialog.set(false);
-                        showToast.set(showToast.get() + 1);
+                        showToast.notifyChange();
                         toastContent.set(getString(R.string.fail_on_modifying));
                     }
                 });
     }
 
     public void clickChangeAvatar() {
-        goToAlbum.set(goToAlbum.get() + 1);
-        // TODO: 16-10-6 new avatar image after changed
+        goToAlbum.notifyChange();
+
     }
 }

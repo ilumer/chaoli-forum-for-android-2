@@ -94,27 +94,21 @@ public class MainActivity extends BaseActivity
 		viewModel.goToLogin.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				if (((ObservableBoolean) observable).get()) {
-					goToLogin();
-				}
+				goToLogin();
 			}
 		});
 
 		viewModel.goToHomepage.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				if (((ObservableBoolean) observable).get()) {
-					goToMyHomePage();
-				}
+				goToMyHomePage();
 			}
 		});
 
 		viewModel.goToConversation.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				if (((ObservableBoolean) observable).get()) {
-					goToConversation(viewModel.clickedConversation);
-				}
+				goToConversation(viewModel.clickedConversation);
 			}
 		});
 
@@ -157,9 +151,7 @@ public class MainActivity extends BaseActivity
 		viewModel.goToPost.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				if (((ObservableBoolean) observable).get()) {
-					goToPostAction();
-				}
+				goToPostAction();
 			}
 		});
 
@@ -170,7 +162,7 @@ public class MainActivity extends BaseActivity
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				binding.navigationView.getMenu().clear();
-				binding.navigationView.inflateMenu(viewModel.hasLoggedIn.get() ? R.menu.menu_navigation_no_login : R.menu.menu_navigation_no_login);
+				binding.navigationView.inflateMenu(viewModel.hasLoggedIn.get() ? R.menu.menu_navigation : R.menu.menu_navigation_no_login);
 			}
 		});
 

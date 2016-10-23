@@ -27,6 +27,17 @@
 				android:textColor="@color/contentColor"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
+			<ImageButton
+				android:contentDescription="@string/reply"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:background="@android:color/transparent"
+				android:src="@drawable/ic_format_quote_black_24dp"
+				android:onClick="@{() -> handler.quote(item)}"
+				android:layout_marginLeft="5dp"
+				android:layout_marginStart="5dp"
+				android:layout_toStartOf="@+id/floor"
+				android:layout_toLeftOf="@+id/floor"/>
 			<LinearLayout
 				android:id="@+id/firstLineInPost"
 				android:layout_width="match_parent"

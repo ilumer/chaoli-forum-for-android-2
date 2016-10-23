@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -19,8 +20,10 @@ import android.widget.Toast;
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.databinding.PostActivityBinding;
 import com.geno.chaoli.forum.meta.Constants;
+import com.geno.chaoli.forum.model.Post;
 import com.geno.chaoli.forum.utils.ConversationUtils;
 import com.geno.chaoli.forum.meta.DividerItemDecoration;
+import com.geno.chaoli.forum.utils.PostUtils;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
 import com.geno.chaoli.forum.viewmodel.PostActivityViewModel;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
@@ -28,6 +31,8 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.geno.chaoli.forum.viewmodel.PostActivityViewModel.REPLY_CODE;
 
 public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
@@ -100,141 +105,51 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				if (((ObservableBoolean) observable).get()) {
-					Intent toReply = new Intent(mContext, ReplyAction.class);
-					toReply.putExtra("conversationId", viewModel.conversationId);
-					startActivityForResult(toReply, viewModel.REPLY_CODE);
-				}
+				Intent toReply = new Intent(mContext, ReplyAction.class);
+				toReply.putExtra("conversationId", viewModel.conversationId);
+				startActivityForResult(toReply, REPLY_CODE);
 			}
 		});
 
 		viewModel.showToast.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				if (((ObservableBoolean) observable).get()) {
-					showToast(viewModel.toastContent.get());
-				}
+				showToast(viewModel.toastContent.get());
 			}
 		});
 
+		viewModel.goToHomepage.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				Post post = viewModel.clickedPost;
+				Intent intent = new Intent(PostActivity.this, HomepageActivity.class);
+				Bundle bundle = new Bundle();
+				bundle.putString("username", post.getUsername());
+				bundle.putInt("userId", post.getMemberId());
+				bundle.putString("signature", post.getSignature());
+				bundle.putString("avatarSuffix", post.getAvatarFormat() == null ? Constants.NONE : post.getAvatarFormat());
+				intent.putExtras(bundle);
+				startActivity(intent);
+			}
+		});
+
+		viewModel.goToQuote.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				quote(viewModel.clickedPost);
+			}
+		});
 	}
 
-	/*class PostListAdapter extends RecyclerView.Adapter<PostListAdapter.PostViewHolder> {
-		List<Post> mPosts;
-		Context mContext;
-		public PostListAdapter(Context context, List<Post> posts) {
-			mContext = context;
-			mPosts = posts;
-		}
-
-		public void setPosts(List<Post> posts) {
-			this.mPosts = posts;
-		}
-		public List<Post> getPosts() {
-			return mPosts;
-		}
-
-		@Override
-		public int getItemCount() {
-			return mPosts.size();
-		}
-
-		@Override
-		public PostViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			return new PostViewHolder(LayoutInflater.from(mContext).inflate(R.layout.post_view, parent, false));
-		}
-
-		@Override
-		public void onBindViewHolder(final PostViewHolder holder, final int position) {
-			final Post post = mPosts.get(position);
-			holder.avatar.update(post.getAvatarFormat(), post.getMemberId(), post.getUsername());
-			holder.avatar.scale(35);
-			holder.usernameAndSignature.setText(post.signature == null ? post.username : getString(R.string.comma, post.username, post.signature));
-			holder.floor.setText(String.format(Locale.getDefault(), "%d", post.getFloor()));
-
-			if (post.deleteMemberId != 0)
-			{
-				holder.itemView.setBackgroundColor(0xFF808080);
-				holder.avatar.setVisibility(View.GONE);
-				//signature.setVisibility(GONE);
-				holder.content.setVisibility(View.GONE);
-			} else {
-				holder.itemView.setBackgroundColor(Color.WHITE);
-				holder.avatar.setVisibility(View.VISIBLE);
-				holder.content.setVisibility(View.VISIBLE);
-			}
-
-			holder.avatar.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Log.i(TAG, "click");
-					Intent intent = new Intent(mContext, HomepageActivity.class);
-					Bundle bundle = new Bundle();
-					bundle.putString("username", holder.avatar.getUsername());
-					bundle.putInt("userId", holder.avatar.getUserId());
-					bundle.putString("avatarSuffix", holder.avatar.getImagePath());
-					bundle.putString("signature", post.signature);
-					intent.putExtras(bundle);
-					mContext.startActivity(intent);
-				}
-			});
-			holder.content.init(mContext);
-			holder.content.setPost(post);
-			holder.content.setConversationId(mConversationId);
-			for (int i = 0; i < holder.content.getChildCount(); i++) {
-				View child = holder.content.getChildAt(i);
-				if (child instanceof OnlineImgTextView) {
-					child.setOnLongClickListener(new View.OnLongClickListener() {
-						@Override
-						public boolean onLongClick(View view) {
-							new AlertDialog.Builder(mContext).setTitle("请选择")
-									.setItems(new String[]{getString(R.string.reply)}, new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialogInterface, int i) {
-											switch (i){
-												case 0:
-													Intent toReply = new Intent(PostActivity.this, ReplyAction.class);
-													toReply.putExtra("conversationId", mConversationId);
-													toReply.putExtra("postId", post.getShowingPostId());
-													toReply.putExtra("replyTo", post.getUsername());
-													toReply.putExtra("replyMsg", PostUtils.removeQuote(post.getContent()));
-													Log.d(TAG, "onClick: content = " + post.getContent() + ", replyMsg = " + PostUtils.removeQuote(post.getContent()));
-													startActivityForResult(toReply, REPLY_CODE);
-													break;
-											}
-										}
-									})
-									.show();
-							return true;
-						}
-					});
-				}
-			}
-			for (int i = 0; i < ((LinearLayout) holder.itemView).getChildCount(); i++) {
-				View child = ((LinearLayout) holder.itemView).getChildAt(i);
-				if(child instanceof ImageView) {
-					((LinearLayout) holder.itemView).removeViewAt(i);
-				}
-			}
-		}
-
-		class PostViewHolder extends RecyclerView.ViewHolder {
-			@BindView(R.id.avatar)
-			AvatarView avatar;
-			@BindView(R.id.usernameAndSignature)
-			TextView usernameAndSignature;
-			@BindView(R.id.floor)
-			TextView floor;
-			@BindView(R.id.content)
-			PostContentView content;
-			PostViewHolder(View view){
-				super(view);
-				ButterKnife.bind(this, view);
-			}
-			
-		}
+	private void quote(Post post) {
+		Intent toReply = new Intent(PostActivity.this, ReplyAction.class);
+		toReply.putExtra("conversationId", mConversationId);
+		toReply.putExtra("postId", post.getPostId());
+		toReply.putExtra("replyTo", post.getUsername());
+		toReply.putExtra("replyMsg", PostUtils.removeQuote(post.getContent()));
+		Log.d(TAG, "onClick: content = " + post.getContent() + ", replyMsg = " + PostUtils.removeQuote(post.getContent()));
+		startActivityForResult(toReply, REPLY_CODE);
 	}
-	*/
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

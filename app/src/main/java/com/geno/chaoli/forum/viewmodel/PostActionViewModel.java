@@ -56,7 +56,7 @@ public class PostActionViewModel extends BaseViewModel {
 
             @Override
             public void onPostConversationFailure(int statusCode) {
-                showToast.set(showToast.get() + 1);
+                showToast.notifyChange();
                 toastContent.set(getString(R.string.network_err));
             }
         });
@@ -74,7 +74,7 @@ public class PostActionViewModel extends BaseViewModel {
 
             @Override
             public void onSetChannelFailure(int statusCode) {   // restore
-                showToast.set(showToast.get() + 1);
+                showToast.notifyChange();
                 toastContent.set(getString(R.string.network_err));
 
                 PostActionViewModel.this.channelId.set(preChannel.getChannelId());

@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.geno.chaoli.forum.R;
 
+import java.io.File;
+
 public class AvatarView extends RelativeLayout
 {
 	final String TAG = "AvatarView";
@@ -53,6 +55,7 @@ public class AvatarView extends RelativeLayout
 		t.setTextSize((float)20 * lengthdp / 80); //这个80显示效果好一些,然而我不知道为什么
 	}
 	public void update(String imagePath, int userId, String username) {
+		setVisibility(VISIBLE);
 		mImagePath = imagePath;
 		mUserId = userId;
 		mUsername = username;
@@ -74,7 +77,19 @@ public class AvatarView extends RelativeLayout
 		}
 	}
 
+	/**
+	 * 用于在设置页面的改变头像功能中显示新头像
+	 * @param file 选择的新头像文件
+     */
+	public void update(File file) {
+		setVisibility(VISIBLE);
+		Glide.with(mContext).load(file).into(i);
+		t.setVisibility(INVISIBLE);
+		i.setVisibility(VISIBLE);
+	}
+
 	public void init(Context context){
+		setVisibility(INVISIBLE);
 		v = (RelativeLayout) inflate(context, R.layout.avatar_view, this);
 		t = (TextView) v.findViewById(R.id.avatarTxt);
 		i = (ImageView) v.findViewById(R.id.avatarImg);
@@ -84,6 +99,7 @@ public class AvatarView extends RelativeLayout
 	}
 
 	public void setLoginImage(Context context){
+		setVisibility(VISIBLE);
 		if(firstLoad)
 			init(context);
 		Glide.with(context).load(R.drawable.ic_account_plus_white_48dp).into(i);

@@ -62,17 +62,17 @@ public class SignUpViewModel extends BaseViewModel {
         MyOkHttp.clearCookie();
         new MyOkHttp.MyOkHttpClient()
                 .get(signUpUrl)
-                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+                .enqueue(new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        showToast.set(showToast.get() + 1);
+                        showToast.notifyChange();
                         toastContent.set(getString(R.string.network_err));
                     }
 
                     @Override
                     public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200) {
-                            showToast.set(showToast.get() + 1);
+                            showToast.notifyChange();
                             toastContent.set(getString(R.string.network_err));
                         } else {
                             response.body().close();
@@ -83,7 +83,7 @@ public class SignUpViewModel extends BaseViewModel {
                                 token = matcher.group(1);
                                 getAndShowCaptchaImage();
                             } else {
-                                showToast.set(showToast.get() + 1);
+                                showToast.notifyChange();
                                 toastContent.set(getString(R.string.network_err));
                             }
                         }
@@ -94,7 +94,7 @@ public class SignUpViewModel extends BaseViewModel {
         captchaImg.set(ResourcesCompat.getDrawable(ChaoliApplication.getAppContext().getResources(), R.drawable.refreshing, null));
         new MyOkHttp.MyOkHttpClient()
                 .get(Constants.GET_CAPTCHA_URL)
-                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback1() {
+                .enqueue(new MyOkHttp.Callback1() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         Log.d(TAG, "onFailure: ");
@@ -111,29 +111,11 @@ public class SignUpViewModel extends BaseViewModel {
     }
 
     public void clickSignUp() {
-        Log.d(TAG, "clickSignUp() called");
         final String USERNAME_HAS_BEEN_USED = "用户名已经被注册了";
         final String EMAIL_HAS_BEEN_USED = "邮箱已被注册";
         final String WRONG_CAPTCHA = "你也许需要一个计算器";
 
-        //final String username = username_edtTxt.getText().toString();
-        //final String password = password_edtTxt.getText().toString();
-        //String confirm = retype_password_edtTxt.getText().toString();
-        //String email = email_edtTxt.getText().toString();
-
-        //TextInputLayout passwordTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.passwordTIL);
-        //TextInputLayout retypePasswordTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.retypePasswordTIL);
-        //final TextInputLayout usernameTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.usernameTIL);
-        //final TextInputLayout emailTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.emailTIL);
-        //final TextInputLayout captchaTIL = (TextInputLayout) ((Activity) mContext).findViewById(R.id.captchaTIL);
-
         Boolean flagError = false;
-
-        //passwordTIL.setError("");
-        //retypePasswordTIL.setError("");
-        //usernameTIL.setError("");
-        //emailTIL.setError("");
-        //captchaTIL.setError("");
 
         if (username.get().length() < 4 || username.get().length() > 21) {
             usernameError.set(getString(R.string.length_of_username_should_be_between_4_and_21));
@@ -165,7 +147,7 @@ public class SignUpViewModel extends BaseViewModel {
                 .add("submit", "注册");
 
         myOkHttpClient.post(signUpUrl)
-                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+                .enqueue(new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         showToast.set(showToast.get() + 1);
@@ -176,7 +158,7 @@ public class SignUpViewModel extends BaseViewModel {
                     @Override
                     public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200){
-                            showToast.set(showToast.get() + 1);
+                            showToast.notifyChange();
                             toastContent.set(getString(R.string.network_err));
                             getAndShowCaptchaImage();
                             showProcessDialog.set(false);
@@ -192,7 +174,7 @@ public class SignUpViewModel extends BaseViewModel {
                             } else {
                                 Log.d(TAG, "onResponse: " + responseStr);
                                 LoginUtils.saveUsernameAndPassword(username.get(), password.get());
-                                signUpSuccess.set(true);
+                                signUpSuccess.notifyChange();
                             }
                             showProcessDialog.set(false);
                         }

@@ -42,11 +42,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/change_avatar"/>
-                    <ImageView
+                    <!--<ImageView
                         android:id="@+id/iv_new_avatar"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:scaleType="fitXY"/>
+                        android:scaleType="fitXY"/>-->
                 </LinearLayout>
 
                 <View style="@style/Divider"/>

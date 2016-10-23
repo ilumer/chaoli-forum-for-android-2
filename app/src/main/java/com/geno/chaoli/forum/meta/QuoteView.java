@@ -28,8 +28,8 @@ public class QuoteView extends LinearLayout {
     Context mContext;
 
     private static final String TAG = "QuoteView";
-    private static final int BG_COLOR = Color.rgb(153, 255, 224);
-    private static final int BUTTON_TEXT_SIZE = 10;
+    private static final int BG_COLOR = Color.rgb(241, 241, 241);
+    //private static final int BUTTON_TEXT_SIZE = 10;
 
     public QuoteView(Context context, List<Post.Attachment> attachmentList) {
         super(context);
@@ -135,5 +135,6 @@ public class QuoteView extends LinearLayout {
         mTextView.setLayoutParams(params);
         mTextView.setBackgroundColor(BG_COLOR);
         addView(mTextView);
+        mTextView.setTextIsSelectable(true);
     }
 }

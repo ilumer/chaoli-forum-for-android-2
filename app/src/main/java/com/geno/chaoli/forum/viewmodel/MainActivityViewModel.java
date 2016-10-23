@@ -57,18 +57,16 @@ public class MainActivityViewModel extends BaseViewModel {
     public ObservableField<String> myAvatarSuffix = new ObservableField<>();
     public ObservableField<String> mySignature = new ObservableField<>();
 
-    public ObservableInt navigationMenu = new ObservableInt(R.menu.menu_navigation_no_login);
-
     public ObservableBoolean hasLoggedIn = new ObservableBoolean(false);
 
-    public ObservableBoolean goToHomepage = new ObservableBoolean(false);
-    public ObservableBoolean goToLogin = new ObservableBoolean(false);
-    public ObservableBoolean goToConversation = new ObservableBoolean(false);
+    public ObservableInt goToHomepage = new ObservableInt();
+    public ObservableInt goToLogin = new ObservableInt();
+    public ObservableInt goToConversation = new ObservableInt();
     public Conversation clickedConversation;
     public ObservableInt notificationsNum = new ObservableInt(0);
     public ObservableBoolean showLoginProcessDialog = new ObservableBoolean(false);
     public ObservableInt selectedItem = new ObservableInt(-1);
-    public ObservableBoolean goToPost = new ObservableBoolean(false);
+    public ObservableInt goToPost = new ObservableInt();
 
     String channel;
     int page;
@@ -124,26 +122,20 @@ public class MainActivityViewModel extends BaseViewModel {
     public void onClickAvatar(View view) {
         Log.d(TAG, "onClickAvatar() called with: view = [" + view + "]");
         if (hasLoggedIn.get()) {
-            //this.view.goToMyHomePage();
-            goToHomepage.set(true);
-            goToHomepage.set(false);
+            goToHomepage.notifyChange();
         } else {
-            //this.view.goToLogin();
-            goToLogin.set(true);
-            goToLogin.set(false);
+            goToLogin.notifyChange();
         }
     }
 
     public void onClickPostFab(View view) {
-        goToPost.set(true);
-        goToPost.set(false);
+        goToPost.notifyChange();
     }
 
     public void onClickConversation(Conversation conversation) {
         Log.d(TAG, "onClickConversation: ");
         clickedConversation = conversation;
-        goToConversation.set(true);
-        goToConversation.set(false);
+        goToConversation.notifyChange();
     }
 
     Handler notificationHandler = new Handler(){

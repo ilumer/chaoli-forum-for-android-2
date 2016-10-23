@@ -3,6 +3,7 @@ package com.geno.chaoli.forum.view;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.geno.chaoli.forum.R;
+import com.geno.chaoli.forum.databinding.ActivityHomepageBinding;
 import com.geno.chaoli.forum.meta.Constants;
 import com.geno.chaoli.forum.utils.LoginUtils;
 import com.geno.chaoli.forum.viewmodel.BaseViewModel;
@@ -55,8 +57,6 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_homepage);
-
         Bundle bundle = getIntent().getExtras();
         if(bundle == null){
             Log.e(TAG, "bundle can't be null");
@@ -66,6 +66,8 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
 
         viewModel = new HomepageViewModel(bundle.getString("username", ""), bundle.getString("signature", null), bundle.getString("avatarSuffix", Constants.NONE), bundle.getInt("userId", -1),
                 bundle.getBoolean("isSelf", false));
+        setViewModel(viewModel);
+
         /*if("".equals(mUsername) || mUserId == -1){
             this.finish();
             return;
@@ -246,5 +248,7 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
     @Override
     public void setViewModel(BaseViewModel viewModel) {
         this.viewModel = (HomepageViewModel) viewModel;
+        ActivityHomepageBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_homepage);
+        binding.setViewModel(this.viewModel);
     }
 }

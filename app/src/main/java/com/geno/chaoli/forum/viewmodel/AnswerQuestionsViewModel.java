@@ -39,13 +39,13 @@ public class AnswerQuestionsViewModel extends BaseViewModel {
             @Override
             public void onAnswersPass(String code) {
                 AnswerQuestionsViewModel.this.code = code;
-                pass.set(true);
+                pass.notifyChange();
             }
 
             @Override
             public void onFailure(int statusCode) {
                 AnswerQuestionsViewModel.this.code = String.valueOf(statusCode);
-                fail.set(true);
+                fail.notifyChange();
             }
         });
     }

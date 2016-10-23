@@ -28,24 +28,19 @@ public class LoginActivityViewModel extends BaseViewModel {
         if ("".equals(username.get()) || "".equals(password.get())) {
             toastContent = "".equals(username.get()) ? getString(R.string.username)
                     + ("".equals(password.get()) ? " " + getString(R.string.and_password) : "") : getString(R.string.password);
-            showToast.set(showToast.get() + 1);
+            showToast.notifyChange();
         } else {
             showProgressDialog.set(true);
             LoginUtils.LoginObserver observer = new LoginUtils.LoginObserver() {
                 @Override
                 public void onLoginSuccess(int userId, String token) {
                     showProgressDialog.set(false);
-                    //e.putBoolean(Constants.loginBool, true);
-                    //e.apply();
-                    //Toast.makeText(LoginActivity.this, userId + ", " + token, Toast.LENGTH_SHORT).show();
-                    goToMainActivity.set(goToMainActivity.get() + 1);
+                    goToMainActivity.notifyChange();
                 }
 
                 @Override
                 public void onLoginFailure(int statusCode) {
                     showProgressDialog.set(false);
-                    //e.putBoolean(Constants.loginBool, false);
-                    //e.apply();
                     switch (statusCode) {
                         case LoginUtils.FAILED_AT_OPEN_LOGIN_PAGE:
                             toastContent = getString(R.string.network_err_open_login_page);
@@ -69,7 +64,7 @@ public class LoginActivityViewModel extends BaseViewModel {
                             toastContent = getString(R.string.login_err_empty);
                             break;
                     }
-                    showToast.set(showToast.get() + 1);
+                    showToast.notifyChange();
                     LoginUtils.clear(ChaoliApplication.getAppContext());
                 }
             };

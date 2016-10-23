@@ -80,7 +80,7 @@ public class HistoryFragmentVM extends BaseViewModel {
         showProgressDialog.set(true);
         new MyOkHttp.MyOkHttpClient()
                 .get(Constants.GO_TO_POST_URL + item.postId.get())
-                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+                .enqueue(new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         showProgressDialog.set(false);
@@ -116,7 +116,7 @@ public class HistoryFragmentVM extends BaseViewModel {
                             }
                         //}
                         showProgressDialog.set(false);
-                        goToPost.set(goToPost.get() + 1);
+                        goToPost.notifyChange();
                     }
                 });
     }
@@ -154,7 +154,7 @@ public class HistoryFragmentVM extends BaseViewModel {
     public void loadMore() {
         new MyOkHttp.MyOkHttpClient()
                 .get(url + "/" + (page + 1))
-                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+                .enqueue(new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         isRefreshing.set(false);

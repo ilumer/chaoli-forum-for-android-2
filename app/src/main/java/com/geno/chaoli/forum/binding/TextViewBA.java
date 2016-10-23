@@ -15,3 +15,4 @@ public class TextViewBA {
         tp.setFakeBoldText(isBold);
     }
 }
+

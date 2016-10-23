@@ -137,7 +137,7 @@ public class ReplyAction extends BaseActivity
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
 		this.viewModel = (ReplyActionViewModel) viewModel;
-		ReplyActionBinding binding = DataBindingUtil.setContentView(this, R.layout.reply_action);
+		binding = DataBindingUtil.setContentView(this, R.layout.reply_action);
 		binding.setViewModel(this.viewModel);
 	}
 }
