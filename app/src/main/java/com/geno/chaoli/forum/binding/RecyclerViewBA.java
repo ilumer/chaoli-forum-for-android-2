@@ -23,6 +23,11 @@ import java.util.List;
 public class RecyclerViewBA {
     private static final String TAG = "RVAdapter";
 
+    @BindingAdapter("app:position")
+    public static void setPosition(RecyclerView recyclerView, int position) {
+        recyclerView.smoothScrollToPosition(position);
+    }
+
     @BindingAdapter({"app:itemList", "app:selector", "app:handler"})
     @SuppressWarnings("unchecked")
     public static void setItems(RecyclerView recyclerView, ObservableList newItems, LayoutSelector layoutSelector, BaseViewModel viewModel) {
@@ -38,7 +43,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                adapter.notifyDataSetChanged();
+                if (oldItems.size() == 0) {
+                    adapter.notifyDataSetChanged();
+                    newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                }
             }
         }
     }
@@ -58,7 +66,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                adapter.notifyDataSetChanged();
+                if (oldItems.size() == 0) {
+                    adapter.notifyDataSetChanged();
+                    newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                }
             }
         }
     }
@@ -78,7 +89,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                adapter.notifyDataSetChanged();
+                if (oldItems.size() == 0) {
+                    adapter.notifyDataSetChanged();
+                    newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                }
             }
         }
     }
@@ -97,7 +111,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                adapter.notifyDataSetChanged();
+                if (oldItems.size() == 0) {
+                    adapter.notifyDataSetChanged();
+                    newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                }
             }
         }
     }
@@ -107,6 +124,34 @@ public class RecyclerViewBA {
         List itemList;
         BaseViewModel handler;
         LayoutSelector selector;
+        ObservableList.OnListChangedCallback onListChangedCallback = new ObservableList.OnListChangedCallback() {
+            @Override
+            public void onChanged(ObservableList observableList) {
+                MyAdapter.this.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onItemRangeChanged(ObservableList observableList, int i, int i1) {
+                MyAdapter.this.notifyItemRangeChanged(i, i1);
+            }
+
+            @Override
+            public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
+                MyAdapter.this.notifyItemRangeInserted(i, i1);
+            }
+
+            @Override
+            public void onItemRangeMoved(ObservableList observableList, int i, int i1, int i2) {
+                for (int i3 = 0; i3 < i1; i3++) {
+                    MyAdapter.this.notifyItemMoved(i + i3, i2 + i3);
+                }
+            }
+
+            @Override
+            public void onItemRangeRemoved(ObservableList observableList, int i, int i1) {
+                MyAdapter.this.notifyItemRangeRemoved(i, i1);
+            }
+        };
 
         /*@SuppressWarnings("unchecked")
         MyAdapter(int resId, ArrayList itemList) {

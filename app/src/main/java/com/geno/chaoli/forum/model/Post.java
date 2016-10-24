@@ -10,7 +10,7 @@ import com.geno.chaoli.forum.BR;
 import java.util.List;
 import java.util.Map;
 
-public class Post extends BaseObservable
+public class Post extends BaseObservable implements Comparable<Post>
 {
 	public int postId;
 	public int conversationId;
@@ -372,5 +372,12 @@ notifyPropertyChanged(BR.new AvatarView(context, avatarFormat, memberId, usernam
 			this.draftConversationId = draftConversationId;
 			notifyPropertyChanged(BR.draftConversationId);
 		}
+	}
+
+	@Override
+	public int compareTo(Post post) {
+        if (this.getTime() < post.getTime()) return -1;
+		if (this.getTime() == post.getTime()) return 0;
+		else return 1;
 	}
 }

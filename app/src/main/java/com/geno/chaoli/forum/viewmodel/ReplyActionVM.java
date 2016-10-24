@@ -26,7 +26,7 @@ public class ReplyActionVM extends BaseViewModel {
     public ObservableInt postId = new ObservableInt();
     public ObservableField<String> replyTo = new ObservableField<>();
     public ObservableField<String> replyMsg = new ObservableField<>();
-    public ObservableField<String> content = new ObservableField<>();
+    public ObservableField<String> content = new ObservableField<>("");
     public ObservableInt selection = new ObservableInt();
 
     public ObservableInt showToast = new ObservableInt();

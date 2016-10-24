@@ -111,12 +111,12 @@ public class MainActivity extends BaseActivity
 			}
 		});
 
-		viewModel.listPosition.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		/*viewModel.listPosition.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				smoothScrollToPosition(((ObservableInt) observable).get());
 			}
-		});
+		});*/
 
 		viewModel.notificationsNum.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override

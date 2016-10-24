@@ -1,6 +1,7 @@
 package com.geno.chaoli.forum.utils;
 
 import android.databinding.ObservableList;
+import android.util.Log;
 
 import com.geno.chaoli.forum.model.IExpanded;
 
@@ -32,7 +33,7 @@ public class MyUtils {
         if (addBehind) {
             int i;
             for (i = 0; i < B.size(); i++)
-                if (B.get(i).compareTo(A.get(A.size() - 1)) < 0)
+                if (B.get(i).compareTo(A.get(A.size() - 1)) > 0)
                     break;
             A.addAll(B.subList(i, B.size()));
         } else {

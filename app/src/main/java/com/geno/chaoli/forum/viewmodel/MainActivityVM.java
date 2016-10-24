@@ -68,13 +68,16 @@ public class MainActivityVM extends BaseViewModel {
     public ObservableInt selectedItem = new ObservableInt(-1);
     public ObservableInt goToPost = new ObservableInt();
 
-    String channel;
-    int page;
+    private String channel;
+    private int page;
 
-    Timer timer;
-    TimerTask task;
+    private Timer timer;
+    private TimerTask task;
 
-    public void getList(final int page)
+    public void getList(final int page) {
+        getList(page, false);
+    }
+    public void getList(final int page, final Boolean refresh)
     {
         isRefreshing.set(true);
         Log.d(TAG, "getList() called with: page = [" + page + "]");
@@ -105,18 +108,19 @@ public class MainActivityVM extends BaseViewModel {
                             MyUtils.expandUnique(conversationList, newConversationList);
                         }
                         isRefreshing.set(false);
-                        listPosition.set(page == 1 ? 0 : oldLen);
+                        listPosition.set(refresh ? 0 : oldLen);
                         listPosition.notifyChange();
+                        MainActivityVM.this.page++;
                     }
                 });
     }
 
     public void refresh(){
         page = 1;
-        getList(page);
+        getList(page, true);
     }
     public void loadMore() {
-        getList(++page);
+        getList(page + 1);
     }
 
     public void onClickAvatar(View view) {

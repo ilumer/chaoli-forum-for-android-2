@@ -99,7 +99,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
         postListRv.setLayoutManager(mLinearLayoutManager);
 		postListRv.addItemDecoration(new DividerItemDecoration(mContext));
 
-		viewModel.getList(0);
+		//viewModel.getList(0);
+		viewModel.refresh();
 
 		viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override

@@ -170,8 +170,13 @@ public class Conversation extends BaseObservable implements DiffItem, Comparable
 		return this.getConversationId() == newConversation.getConversationId();
 	}
 
+	/**
+	 * 对于主题帖来说，最新的排在最前，不同于单个主题帖中的楼层，最先发表的排在最前
+	 * @param o 另一个主题帖
+	 * @return 比较结果
+     */
 	@Override
 	public int compareTo(Conversation o) {
-		return getLastPostTime().compareTo(o.getLastPostTime());
+		return o.getLastPostTime().compareTo(getLastPostTime());
 	}
 }

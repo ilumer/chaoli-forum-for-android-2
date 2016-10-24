@@ -34,6 +34,7 @@
 				app:itemList="@{viewModel.postList}"
 				app:selector="@{viewModel.layoutSelector}"
 				app:handler="@{viewModel}"
+				app:position="@{viewModel.listPosition}"
 				android:background="@color/white"
 				android:id="@+id/postList"/>
 		</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
