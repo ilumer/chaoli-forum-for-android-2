@@ -38,6 +38,9 @@ public class MyOkHttp {
     public synchronized static OkHttpClient getClient(){
         if (okHttpClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            /**
+             * 解决5.0以下系统默认不支持TLS协议导致网络访问失败的问题。
+             */
             try {
                 // Create a trust manager that does not validate certificate chains
                 final X509TrustManager trustAllCert =

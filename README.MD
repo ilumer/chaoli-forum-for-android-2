@@ -3,6 +3,8 @@
 
 [介绍链接](https://chaoli.club/index.php/2911)
 
+[源码食用指南](http://www.jianshu.com/p/54ea9ada6fe3)
+
 ### 已知的问题
 * LaTeX公式有时会和下面一行交叉~~，行内公式$$....$$的显示会不正常~~ 0.99.1-beta版中可以显示，但不能居中
 * ~~还没有支持\begin和\end之间的LaTeX~~ 0.99.1-beta版已更新
