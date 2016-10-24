@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
@@ -63,20 +64,8 @@ public class MyOkHttp {
             mCookiesManager = new CookiesManager();
             okHttpClient = builder
                     .cookieJar(mCookiesManager)
-                    /*.cookieJar(new CookieJar() {
-                        @Override
-                        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                            mCookieStore.put(url.host(), cookies);
-                        }
-
-                        @Override
-                        public List<Cookie> loadForRequest(HttpUrl url) {
-                            List<Cookie> cookies = mCookieStore.get(url.host());
-                            return cookies != null ? cookies : new ArrayList<Cookie>();
-                        }
-                    })*/
-                    //.addInterceptor(new ReceivedCookiesInterceptor(context))
-                    //.addInterceptor(new AddCookiesInterceptor(context))
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
                     .build();
         }
         return okHttpClient;
@@ -188,6 +177,7 @@ public class MyOkHttp {
         public abstract void onFailure(Call call, IOException e);
         public abstract void onResponse(Call call, Response response) throws IOException;
     }
+
     /**
      * https://segmentfault.com/a/1190000004345545
      */
