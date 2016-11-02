@@ -154,5 +154,6 @@
 	<string name="reply_hint">Please enter your reply here.</string>
 	<string name="modified_successfully">Modified successfully</string>
 	<string name="fail_on_modifying">Fail on modifying, please try again later.</string>
+	<string name="useless_option">This is a useless option.</string>
 
 </resources>

@@ -17,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -276,6 +277,7 @@ public class MainActivity extends BaseActivity
 	}
 
 	public void goToMyHomePage() {
+		Log.d(TAG, "goToMyHomePage: " + Me.isEmpty());
 		if(viewModel.hasLoggedIn.get()){
 			if(!Me.isEmpty()) {
 				Intent intent = new Intent(this, HomepageActivity.class);

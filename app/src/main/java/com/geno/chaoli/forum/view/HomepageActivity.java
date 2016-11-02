@@ -219,7 +219,7 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
     public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
         //The Refresh must be only active when the offset is zero :
         mHistoryFragment.setRefreshEnabled(i == 0);
-        //if(mNotificationFragment != null) mNotificationFragment.setRefreshEnabled(i == 0);
+        if(mNotificationFragment != null) mNotificationFragment.setRefreshEnabled(i == 0);
     }
 
     public void showProcessDialog(String str) {

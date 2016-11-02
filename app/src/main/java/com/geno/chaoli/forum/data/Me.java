@@ -42,7 +42,7 @@ public class Me {
     }
 
     public static String getMySignature(){
-        return me.getPreferences().getSignature() != null ? me.getPreferences().getSignature() : "";
+        return me.getPreferences() != null && me.getPreferences().getSignature() != null ? me.getPreferences().getSignature() : "";
     }
 
     public static Boolean getMyPrivateAdd(){

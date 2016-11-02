@@ -69,7 +69,7 @@ public class StatisticFragment extends Fragment {
 
         new MyOkHttp.MyOkHttpClient()
                 .get(Constants.GET_STATISTICS_URL + mUserId)
-                .enqueue(mCallback, new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         Toast.makeText(mCallback, R.string.network_err, Toast.LENGTH_SHORT).show();
@@ -78,7 +78,6 @@ public class StatisticFragment extends Fragment {
                     @Override
                     public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         response.body().close();
-                        Log.d(TAG, responseStr);
                         Pattern pattern = Pattern.compile("<div>(\\\\n)?(.*?)<");
                         Matcher matcher = pattern.matcher(responseStr);
                         if(matcher.find()){

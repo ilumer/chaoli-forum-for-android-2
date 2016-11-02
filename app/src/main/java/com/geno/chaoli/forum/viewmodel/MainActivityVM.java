@@ -184,19 +184,18 @@ public class MainActivityVM extends BaseViewModel {
                 //((TextView) ((Activity) mContext).findViewById(R.id.loginHWndUsername)).setText(username);
                 Me.setInstanceFromSharedPreference(ChaoliApplication.getAppContext(), username);
                 if (!Me.isEmpty()) {
-                    //Log.d(TAG, "AvatarSuffix: " + User.getMyAvatarSuffix());
-                    //avatar.update(Me.getMyAvatarSuffix(), Me.getMyUserId(), Me.getMyUsername());
                     Log.d(TAG, "onLoginSuccess: " + Me.getMyUserId() + ", " + Me.getMyUsername() + Me.getMyAvatarSuffix() + Me.getMySignature());
                     myUserId.set(Me.getMyUserId());
                     myUsername.set(Me.getMyUsername());
                     myAvatarSuffix.set(Me.getMyAvatarSuffix());
                     mySignature.set(Me.getMySignature());
-                    //signatureTxt.setText(Me.getMySignature());
+                } else {
+                    myUsername.set(getString(R.string.loading));
+                    mySignature.set(getString(R.string.loading));
                 }
                 AccountUtils.getProfile(new AccountUtils.GetProfileObserver() {
                     @Override
                     public void onGetProfileSuccess() {
-                        //Log.d(TAG, "AvatarSuffix: " + User.getMyAvatarSuffix());
                         myUserId.set(Me.getMyUserId());
                         myUsername.set(Me.getMyUsername());
                         myAvatarSuffix.set(Me.getMyAvatarSuffix());

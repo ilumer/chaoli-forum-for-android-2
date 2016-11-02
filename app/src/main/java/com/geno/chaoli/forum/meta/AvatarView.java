@@ -100,8 +100,7 @@ public class AvatarView extends RelativeLayout
 
 	public void setLoginImage(Context context){
 		setVisibility(VISIBLE);
-		if(firstLoad)
-			init(context);
+		if(firstLoad) init(context);
 		Glide.with(context).load(R.drawable.ic_account_plus_white_48dp).into(i);
 		t.setVisibility(INVISIBLE);
 	}

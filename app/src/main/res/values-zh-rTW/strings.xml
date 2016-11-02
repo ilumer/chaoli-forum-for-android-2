@@ -152,4 +152,5 @@
     <string name="reply_hint">輸入妳的回復內容</string>
     <string name="modified_successfully">修改成功</string>
     <string name="fail_on_modifying">修改失敗，請稍後重試</string>
+    <string name="useless_option">這是壹個湊數的選項</string>
 </resources>

@@ -45,7 +45,7 @@ public class HistoryFragmentVM extends BaseViewModel {
     public static final int TYPE_ACTIVITY = 0;
     public static final int TYPE_NOTIFICATION = 1;
 
-    private int type = 0;   //type == 0表示History, type == 1表示Notification
+    private int type = TYPE_ACTIVITY;   //type == 0表示History, type == 1表示Notification
 
     public ObservableList<BusinessHomepageListItem> showingItemList = new ObservableArrayList<>();
 
@@ -69,7 +69,7 @@ public class HistoryFragmentVM extends BaseViewModel {
         this.userId = userId;
         this.username = username;
         this.avatarSuffix = avatarSuffix;
-        url = type == 0 ? Constants.GET_ACTIVITIES_URL + userId : Constants.GET_ALL_NOTIFICATIONS_URL;
+        url = type == TYPE_ACTIVITY ? Constants.GET_ACTIVITIES_URL + userId : Constants.GET_ALL_NOTIFICATIONS_URL;
     }
 
     public HistoryLayoutSelector layoutSelector = new HistoryLayoutSelector();
@@ -125,7 +125,7 @@ public class HistoryFragmentVM extends BaseViewModel {
         isRefreshing.set(true);
         new MyOkHttp.MyOkHttpClient()
                 .get(url)
-                .enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+                .enqueue(new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         //swipyRefreshLayout.setRefreshing(false);
@@ -134,8 +134,6 @@ public class HistoryFragmentVM extends BaseViewModel {
 
                     @Override
                     public void onResponse(Call call, Response response, String responseStr) throws IOException {
-                        Log.d(TAG, "onResponse: " + responseStr);
-
                         List<BusinessHomepageListItem> listItems = parseItems(responseStr);
 
                         //MyUtils.expandUnique(showingItemList, listItems, false);
@@ -152,6 +150,8 @@ public class HistoryFragmentVM extends BaseViewModel {
     }
 
     public void loadMore() {
+        isRefreshing.set(true);
+        Log.d(TAG, "loadMore: " + page);
         new MyOkHttp.MyOkHttpClient()
                 .get(url + "/" + (page + 1))
                 .enqueue(new MyOkHttp.Callback() {
@@ -179,7 +179,7 @@ public class HistoryFragmentVM extends BaseViewModel {
     }
 
     private List<BusinessHomepageListItem> parseItems(String responseStr) {
-        if (type == 0) {
+        if (type == TYPE_ACTIVITY) {
             Gson gson = new GsonBuilder().registerTypeAdapterFactory(new HistoryAdapterFactory()).create();
             HistoryResult historyResult = gson.fromJson(responseStr, HistoryResult.class);
             return BusinessHomepageListItem.parseList(historyResult.activity);

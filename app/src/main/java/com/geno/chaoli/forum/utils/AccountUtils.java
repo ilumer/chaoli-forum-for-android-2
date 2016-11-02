@@ -34,6 +34,7 @@ public class AccountUtils {
                     @Override
                     public void onResponse(Call<User> call, Response<User> response) {
                         Me.setProfile(ChaoliApplication.getAppContext(), response.body());
+                        observer.onGetProfileSuccess();
                     }
 
                     @Override

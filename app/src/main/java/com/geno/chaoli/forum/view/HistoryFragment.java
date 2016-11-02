@@ -32,8 +32,9 @@ public class HistoryFragment extends Fragment implements IView, SwipyRefreshLayo
     //String mUsername, mAvatarSuffix;
     //int mUserId;
     SwipyRefreshLayout mSwipyRefreshLayout;
-    Boolean bottom;
+    Boolean bottom = true;
     Context activityContext;
+    int type;
 
     private static final String TAG = "HistoryFragment";
     private HistoryFragmentVM viewModel;
@@ -42,16 +43,14 @@ public class HistoryFragment extends Fragment implements IView, SwipyRefreshLayo
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle arguments = getArguments();
-        //mUserId = arguments.getInt("userId");
-        //mUsername = arguments.getString("username");
-        //mAvatarSuffix = arguments.getString("avatarSuffix");
-        if (arguments.getInt("type") == HistoryFragmentVM.TYPE_ACTIVITY) {
-            viewModel = new HistoryFragmentVM(arguments.getInt("type"),
+        type = arguments.getInt("type");
+        if (type == HistoryFragmentVM.TYPE_ACTIVITY) {
+            viewModel = new HistoryFragmentVM(type,
                     arguments.getInt("userId"),
                     arguments.getString("username"),
                     arguments.getString("avatarSuffix"));
-        } else if (arguments.getInt("type") == HistoryFragmentVM.TYPE_NOTIFICATION) {
-            viewModel = new HistoryFragmentVM(arguments.getInt("type"), Me.getMyUserId(), Me.getMyUsername(), Me.getMyAvatarSuffix());
+        } else if (type == HistoryFragmentVM.TYPE_NOTIFICATION) {
+            viewModel = new HistoryFragmentVM(type, Me.getMyUserId(), Me.getMyUsername(), Me.getMyAvatarSuffix());
         } else {
             throw new RuntimeException("type can only be 0 or 1");
         }
@@ -62,7 +61,7 @@ public class HistoryFragment extends Fragment implements IView, SwipyRefreshLayo
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mSwipyRefreshLayout = (SwipyRefreshLayout) inflater.inflate(R.layout.homepage_history, container, false);
 
-        mSwipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
+        mSwipyRefreshLayout.setDirection(type == HistoryFragmentVM.TYPE_ACTIVITY ? SwipyRefreshLayoutDirection.BOTH : SwipyRefreshLayoutDirection.TOP);
         mSwipyRefreshLayout.setOnRefreshListener(this);
 
         setViewModel(viewModel);

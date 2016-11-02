@@ -152,4 +152,5 @@
 	<string name="reply_hint">输入你的回复内容</string>
 	<string name="modified_successfully">修改成功</string>
 	<string name="fail_on_modifying">修改失败，请稍后重试</string>
+	<string name="useless_option">这是一个凑数的选项</string>
 </resources>

@@ -25,6 +25,9 @@ public class MyUtils {
         return expandUnique(A, B, true);
     }
 
+    /**
+     * a > b 表示 a 排在 b 后面
+     */
     public static <T extends Comparable> int expandUnique(List<T> A, List<T> B, Boolean addBehind) {
         int lenA = A.size();
         if (lenA == 0) {

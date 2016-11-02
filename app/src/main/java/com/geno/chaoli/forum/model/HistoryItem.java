@@ -4,6 +4,7 @@ import com.geno.chaoli.forum.ChaoliApplication;
 import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.data.Me;
 import com.geno.chaoli.forum.viewmodel.HistoryFragmentVM;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * 存储个人主页中的历史活动的类
@@ -16,6 +17,10 @@ public class HistoryItem extends HistoryFragmentVM.ListItem {
 
     String start;
     String postId;
+    @SerializedName("avatarFormat")
+    String avatarSuffix;
+    int fromMemberId;
+    String fromMemberName;
 
     public String getStart() {
         return start;
@@ -93,7 +98,7 @@ public class HistoryItem extends HistoryFragmentVM.ListItem {
 
     @Override
     public String getAvatarUsername() {
-        return Me.getMyUsername();
+        return fromMemberName;
     }
 
     @Override
@@ -103,12 +108,12 @@ public class HistoryItem extends HistoryFragmentVM.ListItem {
 
     @Override
     public int getAvatarUserId() {
-        return Me.getMyUserId();
+        return fromMemberId;
     }
 
     @Override
     public String getAvatarSuffix() {
-        return Me.getMyAvatarSuffix();
+        return avatarSuffix;
     }
 
     @Override

@@ -13,6 +13,8 @@ import android.view.View;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.geno.chaoli.forum.ChaoliApplication;
+import com.geno.chaoli.forum.R;
 import com.geno.chaoli.forum.model.Post;
 
 import java.util.ArrayList;
@@ -55,6 +57,7 @@ public class OnlineImgImpl {
     }
 
     public void setText(String text){
+        if (text == null) text = "这是一个凑数的选项";//其它选项都是中文这里也直接用中文，所以注释掉了原来的ChaoliApplication.getAppContext().getString(R.string.useless_option);
         text = removeNewlineInFormula(text);
         //Log.d(TAG, "setText: text = " + text);
         text += '\n';

@@ -87,7 +87,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 		configToolbar(mTitle);
 
-		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
+		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTTOM);
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh(SwipyRefreshLayoutDirection direction) {

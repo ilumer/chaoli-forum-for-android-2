@@ -74,9 +74,14 @@ public class BusinessHomepageListItem implements Comparable<BusinessHomepageList
         type = listItem.getType();
     }
 
+    /**
+     * 定义全序关系 a > b 表示 ”a排在b后面"，哈哈哈
+     * @param o 比较的对象
+     * @return 比较的结果
+     */
     @Override
     public int compareTo(BusinessHomepageListItem o) {
-        if (Long.valueOf(time) > Long.valueOf(o.time)) {
+        if (Long.valueOf(time) < Long.valueOf(o.time)) {
             return 1;
         } else if (Long.valueOf(time).equals(Long.valueOf(o.time))){
             return 0;

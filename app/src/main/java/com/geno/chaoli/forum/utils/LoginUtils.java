@@ -166,7 +166,7 @@ public class LoginUtils {
                             loginObserver.onLoginSuccess(getUserId(), getToken());
                         } else {
                             setSPIsLoggedIn(false);
-                            loginObserver.onLoginFailure(COOKIE_EXPIRED);
+                            loginObserver.onLoginFailure(WRONG_USERNAME_OR_PASSWORD);
                             //begin_login(context, loginObserver);
                             //Log.e("regex_error", "regex_error");
                         }
