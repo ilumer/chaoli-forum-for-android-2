@@ -39,7 +39,7 @@
 				android:id="@+id/postList"/>
 		</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 		<android.support.design.widget.FloatingActionButton
-			app:layout_behavior="com.geno.chaoli.forum.meta.ScrollFABBehavior"
+			app:layout_behavior="com.daquexian.chaoli.forum.meta.ScrollFABBehavior"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:id="@+id/reply"

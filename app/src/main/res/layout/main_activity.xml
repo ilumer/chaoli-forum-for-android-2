@@ -63,7 +63,7 @@
 					android:layout_margin="@dimen/fab_margin"
 					android:src="@drawable/ic_menu_notifications"
 					android:onClick="@{viewModel.onClickPostFab}"
-					app:layout_behavior="com.geno.chaoli.forum.meta.ScrollFABBehavior"
+					app:layout_behavior="com.daquexian.chaoli.forum.meta.ScrollFABBehavior"
 					app:borderWidth="0dp" />
 			</android.support.design.widget.CoordinatorLayout>
 		</FrameLayout>

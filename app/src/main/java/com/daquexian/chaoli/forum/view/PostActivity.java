@@ -72,6 +72,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		super.onCreate(savedInstanceState);
 
 		setViewModel(new PostActivityVM());
+		initUI();
 
 		Bundle data = getIntent().getExtras();
 		mConversationId = data.getInt("conversationId");

@@ -239,7 +239,7 @@ public class MainActivity extends BaseActivity
 				// Otherwise, set the URL to null.
 				Uri.parse("http://host/path"),
 				// TODO: Make sure this auto-generated app URL is correct.
-				Uri.parse("android-app://com.geno.chaoli.forum/http/host/path")
+				Uri.parse("android-app://com.daquexian.chaoli.forum/http/host/path")
 		);
 		AppIndex.AppIndexApi.start(client, viewAction);
 	}
@@ -258,7 +258,7 @@ public class MainActivity extends BaseActivity
 				// Otherwise, set the URL to null.
 				Uri.parse("http://host/path"),
 				// TODO: Make sure this auto-generated app URL is correct.
-				Uri.parse("android-app://com.geno.chaoli.forum/http/host/path")
+				Uri.parse("android-app://com.daquexian.chaoli.forum/http/host/path")
 		);
 		AppIndex.AppIndexApi.end(client, viewAction);
 		client.disconnect();
