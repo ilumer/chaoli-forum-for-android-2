@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.geno.chaoli.forum"
+<manifest package="com.daquexian.chaoli.forum"
 		  xmlns:android="http://schemas.android.com/apk/res/android">
 
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
 	<application
-		android:name=".ChaoliApplication"
+		android:name="com.daquexian.chaoli.forum.ChaoliApplication"
 		android:allowBackup="true"
 		android:fullBackupContent="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
-		<activity android:name=".view.Splash"
+		<activity android:name="com.daquexian.chaoli.forum.view.Splash"
 			android:screenOrientation="portrait">
 		</activity>
 		<activity
-			android:name=".view.MainActivity"
+			android:name="com.daquexian.chaoli.forum.view.MainActivity"
 			android:screenOrientation="portrait"
 			android:label="@string/app_name"
 			android:theme="@style/MainActivityTheme">
@@ -26,27 +26,27 @@
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".view.SettingsActivity"
+		<activity android:name="com.daquexian.chaoli.forum.view.SettingsActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".view.AnswerQuestionsActivity"
+		<activity android:name="com.daquexian.chaoli.forum.view.AnswerQuestionsActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".view.SignUpActivity"
+		<activity android:name="com.daquexian.chaoli.forum.view.SignUpActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".view.LoginActivity"
+		<activity android:name="com.daquexian.chaoli.forum.view.LoginActivity"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".view.PostActivity"
+			android:name="com.daquexian.chaoli.forum.view.PostActivity"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".view.ReplyAction"
+			android:name="com.daquexian.chaoli.forum.view.ReplyAction"
 			android:screenOrientation="portrait"/>
-		<activity android:name=".view.HomepageActivity"
+		<activity android:name="com.daquexian.chaoli.forum.view.HomepageActivity"
 			android:screenOrientation="portrait">
 		</activity>
-		<activity android:name=".view.PostAction"
+		<activity android:name="com.daquexian.chaoli.forum.view.PostAction"
 			android:screenOrientation="portrait"/><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
 		<meta-data

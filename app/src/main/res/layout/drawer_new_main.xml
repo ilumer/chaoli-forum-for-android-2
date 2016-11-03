@@ -9,7 +9,7 @@
 		android:paddingTop="@dimen/avatar_marginTop"
 		android:background="#444"
 		android:id="@+id/loginHWnd">
-		<com.geno.chaoli.forum.meta.AvatarView
+		<com.daquexian.chaoli.forum.meta.AvatarView
 			android:layout_width="@dimen/avatar_diameter"
 			android:layout_height="@dimen/avatar_diameter"
 			android:clickable="true"

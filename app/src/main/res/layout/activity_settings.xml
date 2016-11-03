@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.geno.chaoli.forum.viewmodel.SettingsVM"/>
+            type="com.daquexian.chaoli.forum.viewmodel.SettingsVM"/>
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-                    <com.geno.chaoli.forum.meta.AvatarView
+                    <com.daquexian.chaoli.forum.meta.AvatarView
                         android:id="@+id/iv_avatar"
                         android:layout_marginLeft="10dp"
                         android:layout_width="50dp"

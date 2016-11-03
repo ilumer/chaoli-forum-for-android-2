@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.geno.chaoli.forum.viewmodel.SignUpVM"/>
+            type="com.daquexian.chaoli.forum.viewmodel.SignUpVM"/>
     </data>
     <LinearLayout
         android:orientation="vertical" android:layout_width="match_parent"

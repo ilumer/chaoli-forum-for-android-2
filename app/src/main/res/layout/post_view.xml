@@ -4,10 +4,10 @@
 	<data>
 		<variable
 			name="item"
-			type="com.geno.chaoli.forum.model.Post"/>
+			type="com.daquexian.chaoli.forum.model.Post"/>
 		<variable
 			name="handler"
-			type="com.geno.chaoli.forum.viewmodel.PostActivityVM"/>
+			type="com.daquexian.chaoli.forum.viewmodel.PostActivityVM"/>
 	</data>
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -45,7 +45,7 @@
 				android:layout_marginEnd="@dimen/right_margin_in_post_view"
 				android:layout_height="wrap_content"
 				android:gravity="center_vertical">
-				<com.geno.chaoli.forum.meta.AvatarView
+				<com.daquexian.chaoli.forum.meta.AvatarView
 					android:id="@+id/avatar"
 					android:clickable="true"
 					android:onClick="@{() -> handler.clickAvatar(item)}"
@@ -69,7 +69,7 @@
 			</LinearLayout>
 		</RelativeLayout>
 
-		<com.geno.chaoli.forum.meta.PostContentView
+		<com.daquexian.chaoli.forum.meta.PostContentView
 			android:id="@+id/content"
 			app:post="@{item}"
 			android:orientation="vertical"

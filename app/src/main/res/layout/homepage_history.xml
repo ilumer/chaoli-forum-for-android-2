@@ -3,7 +3,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.geno.chaoli.forum.viewmodel.HistoryFragmentVM"/>
+            type="com.daquexian.chaoli.forum.viewmodel.HistoryFragmentVM"/>
     </data>
     <com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

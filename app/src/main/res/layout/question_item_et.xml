@@ -3,13 +3,13 @@
     <data>
         <variable
             name="item"
-            type="com.geno.chaoli.forum.model.BusinessQuestion"/>
+            type="com.daquexian.chaoli.forum.model.BusinessQuestion"/>
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/QuestionItem">
-        <com.geno.chaoli.forum.meta.OnlineImgTextView
+        <com.daquexian.chaoli.forum.meta.OnlineImgTextView
             android:id="@+id/content"
             android:text="@={item.question}"
             android:layout_width="match_parent"

@@ -3,7 +3,7 @@
     <data>
         <variable
             name="item"
-            type="com.geno.chaoli.forum.model.BusinessHomepageListItem"/>
+            type="com.daquexian.chaoli.forum.model.BusinessHomepageListItem"/>
     </data>
     <Space
         android:layout_width="match_parent"

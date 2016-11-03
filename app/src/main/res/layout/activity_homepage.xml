@@ -4,7 +4,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.geno.chaoli.forum.viewmodel.HomepageVM"/>
+            type="com.daquexian.chaoli.forum.viewmodel.HomepageVM"/>
     </data>
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                    <com.geno.chaoli.forum.meta.AvatarView
+                    <com.daquexian.chaoli.forum.meta.AvatarView
                         android:id="@+id/ivAvatar"
                         android:layout_width="75dp"
                         android:layout_height="75dp"

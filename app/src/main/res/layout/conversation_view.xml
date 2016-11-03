@@ -4,10 +4,10 @@
 	<data>
 		<variable
 			name="item"
-			type="com.geno.chaoli.forum.model.Conversation"/>
+			type="com.daquexian.chaoli.forum.model.Conversation"/>
 		<variable
 			name="handler"
-			type="com.geno.chaoli.forum.viewmodel.MainActivityVM"/>
+			type="com.daquexian.chaoli.forum.viewmodel.MainActivityVM"/>
 	</data>
 	<RelativeLayout
 		android:layout_width="wrap_content"
@@ -25,7 +25,7 @@
 			android:layout_height="wrap_content"
 			android:gravity="center_vertical"
 			android:orientation="horizontal">
-			<com.geno.chaoli.forum.meta.AvatarView
+			<com.daquexian.chaoli.forum.meta.AvatarView
 				android:id="@+id/avatar"
 				app:username="@{item.startMember}"
 				app:userId="@{Integer.parseInt(item.startMemberId)}"
@@ -35,7 +35,7 @@
 				android:layout_height="wrap_content"
 				android:layout_marginRight="10dp"
 				android:layout_marginEnd="10dp">
-			</com.geno.chaoli.forum.meta.AvatarView>
+			</com.daquexian.chaoli.forum.meta.AvatarView>
 			<TextView
 				android:id="@+id/username"
 				android:text="@{item.startMember}"
@@ -45,7 +45,7 @@
 				android:layout_height="wrap_content" />
 		</LinearLayout>
 
-		<com.geno.chaoli.forum.meta.ChannelTextView
+		<com.daquexian.chaoli.forum.meta.ChannelTextView
 			android:id="@+id/channel"
 			app:channelId="@{item.channelId}"
 			android:layout_width="wrap_content"

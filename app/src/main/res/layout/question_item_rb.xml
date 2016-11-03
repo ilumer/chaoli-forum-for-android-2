@@ -3,13 +3,13 @@
     <data>
         <variable
             name="item"
-            type="com.geno.chaoli.forum.model.BusinessQuestion"/>
+            type="com.daquexian.chaoli.forum.model.BusinessQuestion"/>
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/QuestionItem">
-        <com.geno.chaoli.forum.meta.OnlineImgTextView
+        <com.daquexian.chaoli.forum.meta.OnlineImgTextView
             android:id="@+id/content"
             android:text="@{item.question}"
             android:layout_width="match_parent"
@@ -18,25 +18,25 @@
             android:id="@+id/choices"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <com.geno.chaoli.forum.meta.OnlineImgRadioButton
+            <com.daquexian.chaoli.forum.meta.OnlineImgRadioButton
                 android:id="@+id/choice_1"
                 android:text="@{item.options[0]}"
                 android:checked="@={item.isChecked[0]}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <com.geno.chaoli.forum.meta.OnlineImgRadioButton
+            <com.daquexian.chaoli.forum.meta.OnlineImgRadioButton
                 android:id="@+id/choice_2"
                 android:text="@{item.options[1]}"
                 android:checked="@={item.isChecked[1]}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <com.geno.chaoli.forum.meta.OnlineImgRadioButton
+            <com.daquexian.chaoli.forum.meta.OnlineImgRadioButton
                 android:id="@+id/choice_3"
                 android:text="@{item.options[2]}"
                 android:checked="@={item.isChecked[2]}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <com.geno.chaoli.forum.meta.OnlineImgRadioButton
+            <com.daquexian.chaoli.forum.meta.OnlineImgRadioButton
                 android:id="@+id/choice_4"
                 android:text="@{item.options[3]}"
                 android:checked="@={item.isChecked[3]}"

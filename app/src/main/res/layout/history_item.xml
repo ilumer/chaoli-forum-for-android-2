@@ -4,10 +4,10 @@
     <data>
         <variable
             name="item"
-            type="com.geno.chaoli.forum.model.BusinessHomepageListItem"/>
+            type="com.daquexian.chaoli.forum.model.BusinessHomepageListItem"/>
         <variable
             name="handler"
-            type="com.geno.chaoli.forum.viewmodel.HistoryFragmentVM"/>
+            type="com.daquexian.chaoli.forum.viewmodel.HistoryFragmentVM"/>
     </data>
     <RelativeLayout
         android:orientation="vertical" android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:onClick="@{() -> handler.clickItem(item)}"
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/middle_margin">
-        <com.geno.chaoli.forum.meta.AvatarView
+        <com.daquexian.chaoli.forum.meta.AvatarView
             android:id="@+id/avatar"
             android:layout_marginRight="@dimen/middle_margin"
             android:layout_marginEnd="@dimen/middle_margin"
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-        </com.geno.chaoli.forum.meta.AvatarView>
+        </com.daquexian.chaoli.forum.meta.AvatarView>
         <TextView
             android:id="@+id/tv_description"
             android:text="@{item.title}"
