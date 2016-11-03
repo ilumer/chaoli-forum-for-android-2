@@ -7,7 +7,7 @@ android {
     buildToolsVersion '23.0.3'
 
     defaultConfig {
-        applicationId "com.geno.chaoli.forum"
+        applicationId "com.daquexian.chaoli.forum"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 7
@@ -42,7 +42,4 @@ dependencies {
 // Because RxAndroid releases are few and far between, it is recommended you also
 // explicitly depend on RxJava's latest version for bug fixes and new features.
     compile 'io.reactivex:rxjava:1.1.9'
-
-    compile 'com.jakewharton:butterknife:8.2.1'
-    apt 'com.jakewharton:butterknife-compiler:8.2.1'
 }

@@ -36,9 +36,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class MainActivity extends BaseActivity
 {
 	public static final String TAG = "MainActivity";
@@ -59,10 +56,8 @@ public class MainActivity extends BaseActivity
 	 */
 	private GoogleApiClient client;
 
-	@BindView(R.id.conversationList)
 	RecyclerView l;
 
-	@BindView(R.id.conversationListRefreshLayout)
 	public SwipyRefreshLayout swipyRefreshLayout;
 
 	ActionBarDrawerToggle actionBarDrawerToggle;
@@ -76,7 +71,6 @@ public class MainActivity extends BaseActivity
 
 		viewModel = new MainActivityVM();
 		setViewModel(viewModel);
-		ButterKnife.bind(this);
 
 		initUI();
 
@@ -211,9 +205,11 @@ public class MainActivity extends BaseActivity
 		actionBarDrawerToggle.syncState();
 		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
 
+		l = binding.conversationList;
 		l.setLayoutManager(new LinearLayoutManager(mContext));
 		l.addItemDecoration(new DividerItemDecoration(mContext));
 
+		swipyRefreshLayout = binding.conversationListRefreshLayout;
 	}
 
 	@Override

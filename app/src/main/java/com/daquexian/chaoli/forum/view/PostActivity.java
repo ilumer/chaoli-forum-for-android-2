@@ -28,9 +28,6 @@ import com.daquexian.chaoli.forum.viewmodel.PostActivityVM;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static com.daquexian.chaoli.forum.viewmodel.PostActivityVM.REPLY_CODE;
 
 public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
@@ -41,7 +38,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 	private final Context mContext = this;
 
-	@BindView(R.id.reply)
 	public FloatingActionButton reply;
 
 	public static SharedPreferences sp;
@@ -52,27 +48,30 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	String mTitle;
 	int mPage;
 
-	@BindView(R.id.postList)
 	RecyclerView postListRv;
-	@BindView(R.id.swipyRefreshLayout)
 	SwipyRefreshLayout swipyRefreshLayout;
 
 	LinearLayoutManager mLinearLayoutManager;
 
 	PostActivityVM viewModel;
+	PostActivityBinding binding;
 
 	public static final int menu_settings = 0;
 	public static final int menu_share = 1;
 	public static final int menu_author_only = 2;
 	public static final int menu_star = 3;
 
+	private void initUI() {
+		reply = binding.reply;
+		postListRv = binding.postList;
+		swipyRefreshLayout = binding.swipyRefreshLayout;
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
 		setViewModel(new PostActivityVM());
-		ButterKnife.bind(this);
 
 		Bundle data = getIntent().getExtras();
 		mConversationId = data.getInt("conversationId");
@@ -252,7 +251,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
 		this.viewModel = (PostActivityVM) viewModel;
-		PostActivityBinding binding = DataBindingUtil.setContentView(this, R.layout.post_activity);
+		binding = DataBindingUtil.setContentView(this, R.layout.post_activity);
 		binding.setViewModel(this.viewModel);
 	}
 }
