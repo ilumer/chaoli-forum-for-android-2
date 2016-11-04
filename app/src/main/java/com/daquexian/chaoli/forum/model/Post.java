@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.daquexian.chaoli.forum.BR;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,10 +27,19 @@ public class Post extends BaseObservable implements Comparable<Post>
 	public String username;
 	public String avatarFormat;
 	public String signature;
-	public List<Attachment> attachments;
+	public List<Attachment> attachments = new ArrayList<>();
 
 	public Post(){}
-	public Post(Context context, int postId, int conversationId,
+	public Post(int memberId, String username, String avatarSuffix, String content, String time) {
+		this.memberId = memberId;
+		this.username = username;
+		this.avatarFormat = avatarSuffix;
+		this.content = content;
+		this.time = Long.parseLong(time);
+		this.floor = 1;
+	}
+
+	public Post(int postId, int conversationId,
 				int memberId, long time,
 				int editMemberId, long editTime,
 				int deleteMemberId, long deleteTime,

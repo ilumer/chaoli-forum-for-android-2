@@ -2,13 +2,14 @@ package com.daquexian.chaoli.forum.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.daquexian.chaoli.forum.BR;
 import com.daquexian.chaoli.forum.binding.DiffItem;
 import com.google.gson.annotations.SerializedName;
 
-public class Conversation extends BaseObservable implements DiffItem, Comparable<Conversation>
-{
+public class Conversation extends BaseObservable implements DiffItem, Comparable<Conversation>,Parcelable {
 	private int conversationId;
 	private int channelId;
 	private String title;
@@ -19,11 +20,20 @@ public class Conversation extends BaseObservable implements DiffItem, Comparable
 	private String startMember;
 	@SerializedName("startMemberAvatarFormat")
 	private String startMemberAvatarSuffix;
+	private String startTime;
 	@SerializedName("lastPostMemberAvatarFormat")
 	private String lastPostMemberAvatarSuffix;
 	private String lastPostMember;
 	private String lastPostTime;
 	private int replies;
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
 
 	@Bindable
 	public int getConversationId() {
@@ -179,4 +189,59 @@ public class Conversation extends BaseObservable implements DiffItem, Comparable
 	public int compareTo(Conversation o) {
 		return o.getLastPostTime().compareTo(getLastPostTime());
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(this.conversationId);
+		dest.writeInt(this.channelId);
+		dest.writeString(this.title);
+		dest.writeString(this.firstPost);
+		dest.writeString(this.link);
+		dest.writeString(this.startMemberId);
+		dest.writeString(this.lastPostMemberId);
+		dest.writeString(this.startMember);
+		dest.writeString(this.startMemberAvatarSuffix);
+		dest.writeString(this.lastPostMemberAvatarSuffix);
+		dest.writeString(this.lastPostMember);
+		dest.writeString(this.lastPostTime);
+		dest.writeInt(this.replies);
+		dest.writeString(this.startTime);
+	}
+
+	public Conversation() {
+	}
+
+	protected Conversation(Parcel in) {
+		this.conversationId = in.readInt();
+		this.channelId = in.readInt();
+		this.title = in.readString();
+		this.firstPost = in.readString();
+		this.link = in.readString();
+		this.startMemberId = in.readString();
+		this.lastPostMemberId = in.readString();
+		this.startMember = in.readString();
+		this.startMemberAvatarSuffix = in.readString();
+		this.lastPostMemberAvatarSuffix = in.readString();
+		this.lastPostMember = in.readString();
+		this.lastPostTime = in.readString();
+		this.replies = in.readInt();
+		this.startTime = in.readString();
+	}
+
+	public static final Parcelable.Creator<Conversation> CREATOR = new Parcelable.Creator<Conversation>() {
+		@Override
+		public Conversation createFromParcel(Parcel source) {
+			return new Conversation(source);
+		}
+
+		@Override
+		public Conversation[] newArray(int size) {
+			return new Conversation[size];
+		}
+	};
 }

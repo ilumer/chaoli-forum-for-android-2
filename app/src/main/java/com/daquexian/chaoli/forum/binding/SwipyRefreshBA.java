@@ -3,6 +3,7 @@ package com.daquexian.chaoli.forum.binding;
 import android.databinding.BindingAdapter;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 /**
  * SwipyRefreshLayout的BindingAdapter
@@ -18,5 +19,15 @@ public class SwipyRefreshBA {
                 swipyRefreshLayout.setRefreshing(isRefreshing);
             }
         });
+    }
+
+    /**
+     * 为了应对奇怪的事情：把方向设为BOTTOM就没法在setRefreshing(true)之后看到小圆圈
+     * @param swipyRefreshLayout ..
+     * @param direction ..
+     */
+    @BindingAdapter("app:direction")
+    public static void setDirection(final SwipyRefreshLayout swipyRefreshLayout, final SwipyRefreshLayoutDirection direction) {
+        swipyRefreshLayout.setDirection(direction);
     }
 }

@@ -278,8 +278,9 @@ public class MainActivity extends BaseActivity
 
 	public void goToConversation(Conversation conversation) {
 		Intent jmp = new Intent();
-		jmp.putExtra("conversationId", conversation.getConversationId());
-		jmp.putExtra("conversationTitle", conversation.getTitle());
+		jmp.putExtra("conversation", conversation);
+		//jmp.putExtra("conversationId", conversation.getConversationId());
+		//jmp.putExtra("conversationTitle", conversation.getTitle());
 		jmp.setClass(this, PostActivity.class);
 		startActivity(jmp);
 	}

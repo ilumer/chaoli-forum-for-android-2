@@ -26,11 +26,12 @@
 			android:id="@+id/swipyRefreshLayout"
 			app:layout_behavior="@string/appbar_scrolling_view_behavior"
 			app:isRefreshing="@{viewModel.isRefreshing}"
+			app:direction="@{viewModel.direction}"
 			android:layout_width="match_parent"
-			android:layout_height="wrap_content">
+			android:layout_height="match_parent">
 			<android.support.v7.widget.RecyclerView
 				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
+				android:layout_height="match_parent"
 				app:itemList="@{viewModel.postList}"
 				app:selector="@{viewModel.layoutSelector}"
 				app:handler="@{viewModel}"

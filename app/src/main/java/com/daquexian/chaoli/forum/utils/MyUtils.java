@@ -1,5 +1,7 @@
 package com.daquexian.chaoli.forum.utils;
 
+import android.util.Log;
+
 import java.util.List;
 
 /**
@@ -7,6 +9,8 @@ import java.util.List;
  */
 
 public class MyUtils {
+    private static final String TAG = "MyUtils";
+
     /**
      * 针对可能有其他帖子被顶到最上方，导致下一页的主题帖与这一页的主题帖有重合的现象
      * @param A 已有的主题帖列表
@@ -22,8 +26,10 @@ public class MyUtils {
      */
     public static <T extends Comparable> int expandUnique(List<T> A, List<T> B, Boolean addBehind) {
         int lenA = A.size();
+        Log.d(TAG, "expandUnique: ");
         if (lenA == 0) {
             A.addAll(B);
+            Log.d(TAG, "expandUnique() called with: A = [" + A + "], B = [" + B + "], addBehind = [" + addBehind + "]");
         }
         if (addBehind) {
             int i;

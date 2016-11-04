@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActivityBinding;
 import com.daquexian.chaoli.forum.meta.Constants;
+import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.utils.ConversationUtils;
 import com.daquexian.chaoli.forum.meta.DividerItemDecoration;
@@ -42,8 +43,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	public static SharedPreferences sp;
 	public SharedPreferences.Editor e;
 
+	Conversation mConversation;
 	int mConversationId;
-
 	String mTitle;
 	int mPage;
 
@@ -65,32 +66,37 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		postListRv = binding.postList;
 		swipyRefreshLayout = binding.swipyRefreshLayout;
 	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		setViewModel(new PostActivityVM());
-		initUI();
-
 		Bundle data = getIntent().getExtras();
-		mConversationId = data.getInt("conversationId");
-		viewModel.setConversationId(mConversationId);
-		mTitle = data.getString("conversationTitle", "");
+		mConversation = data.getParcelable("conversation");
+		mConversationId = mConversation.getConversationId();
+		//viewModel.setConversationId(mConversationId);
+		mTitle = mConversation.getTitle();
 		setTitle(mTitle);
-		viewModel.setTitle(mTitle);
+		//viewModel.setTitle(mTitle);
 		mPage = data.getInt("page", 1);
+		viewModel = new PostActivityVM(mConversation);
+		setViewModel(viewModel);
 		viewModel.setPage(mPage);
 		viewModel.setAuthorOnly(data.getBoolean("isAuthorOnly", false));
 		sp = getSharedPreferences(Constants.postSP + mConversationId, MODE_PRIVATE);
 
+		initUI();
+
 		configToolbar(mTitle);
 
-		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTTOM);
+		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
 			@Override
 			public void onRefresh(SwipyRefreshLayoutDirection direction) {
-				viewModel.loadMore();
+				if (direction == SwipyRefreshLayoutDirection.BOTTOM) {
+					PostActivity.this.viewModel.loadMore();
+				}
 			}
 		});
 
@@ -100,26 +106,26 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 		viewModel.refresh();
 
-		viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		this.viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				Intent toReply = new Intent(mContext, ReplyAction.class);
-				toReply.putExtra("conversationId", viewModel.conversationId);
+				toReply.putExtra("conversationId", PostActivity.this.viewModel.conversationId);
 				startActivityForResult(toReply, REPLY_CODE);
 			}
 		});
 
-		viewModel.showToast.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		this.viewModel.showToast.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				showToast(viewModel.toastContent.get());
+				showToast(PostActivity.this.viewModel.toastContent.get());
 			}
 		});
 
-		viewModel.goToHomepage.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		this.viewModel.goToHomepage.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				Post post = viewModel.clickedPost;
+				Post post = PostActivity.this.viewModel.clickedPost;
 				Intent intent = new Intent(PostActivity.this, HomepageActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putString("username", post.getUsername());
@@ -131,10 +137,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			}
 		});
 
-		viewModel.goToQuote.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		this.viewModel.goToQuote.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				quote(viewModel.clickedPost);
+				quote(PostActivity.this.viewModel.clickedPost);
 			}
 		});
 	}

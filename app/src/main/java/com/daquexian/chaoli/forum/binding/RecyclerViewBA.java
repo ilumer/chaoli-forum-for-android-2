@@ -42,9 +42,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                if (oldItems.size() == 0) {
+                if (adapter.preview) {
                     adapter.notifyDataSetChanged();
                     newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                    adapter.preview = false;
                 }
             }
         }
@@ -65,9 +66,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                if (oldItems.size() == 0) {
+                if (adapter.preview) {
                     adapter.notifyDataSetChanged();
                     newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                    adapter.preview = false;
                 }
             }
         }
@@ -88,9 +90,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                if (oldItems.size() == 0) {
+                if (adapter.preview) {
                     adapter.notifyDataSetChanged();
                     newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                    adapter.preview = false;
                 }
             }
         }
@@ -110,9 +113,10 @@ public class RecyclerViewBA {
                 DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(oldItems, newItems), true);
                 diffResult.dispatchUpdatesTo(adapter);
             } else {
-                if (oldItems.size() == 0) {
+                if (adapter.preview) {
                     adapter.notifyDataSetChanged();
                     newItems.addOnListChangedCallback(adapter.onListChangedCallback);
+                    adapter.preview = false;
                 }
             }
         }
@@ -120,27 +124,32 @@ public class RecyclerViewBA {
 
     private static class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         //int resId;
-        List itemList;
+        Boolean preview = true;
+        List itemList = new ArrayList();
         BaseViewModel handler;
         LayoutSelector selector;
         ObservableList.OnListChangedCallback onListChangedCallback = new ObservableList.OnListChangedCallback() {
             @Override
             public void onChanged(ObservableList observableList) {
+                Log.d(TAG, "onChanged() called with: observableList = [" + observableList + "]");
                 MyAdapter.this.notifyDataSetChanged();
             }
 
             @Override
             public void onItemRangeChanged(ObservableList observableList, int i, int i1) {
+                Log.d(TAG, "onItemRangeChanged() called with: observableList = [" + observableList + "], i = [" + i + "], i1 = [" + i1 + "]");
                 MyAdapter.this.notifyItemRangeChanged(i, i1);
             }
 
             @Override
             public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
+                Log.d(TAG, "onItemRangeInserted() called with: observableList = [" + observableList + "], i = [" + i + "], i1 = [" + i1 + "]");
                 MyAdapter.this.notifyItemRangeInserted(i, i1);
             }
 
             @Override
             public void onItemRangeMoved(ObservableList observableList, int i, int i1, int i2) {
+                Log.d(TAG, "onItemRangeMoved() called with: observableList = [" + observableList + "], i = [" + i + "], i1 = [" + i1 + "], i2 = [" + i2 + "]");
                 for (int i3 = 0; i3 < i1; i3++) {
                     MyAdapter.this.notifyItemMoved(i + i3, i2 + i3);
                 }
@@ -148,6 +157,7 @@ public class RecyclerViewBA {
 
             @Override
             public void onItemRangeRemoved(ObservableList observableList, int i, int i1) {
+                Log.d(TAG, "onItemRangeRemoved() called with: observableList = [" + observableList + "], i = [" + i + "], i1 = [" + i1 + "]");
                 MyAdapter.this.notifyItemRangeRemoved(i, i1);
             }
         };

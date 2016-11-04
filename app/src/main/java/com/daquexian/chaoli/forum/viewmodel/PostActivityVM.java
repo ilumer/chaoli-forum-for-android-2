@@ -4,31 +4,39 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.util.Log;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.binding.PostLayoutSelector;
 import com.daquexian.chaoli.forum.meta.Constants;
+import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.model.PostListResult;
 import com.daquexian.chaoli.forum.network.MyRetrofit;
 import com.daquexian.chaoli.forum.utils.MyUtils;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.util.List;
+
+import rx.functions.Action1;
 
 /**
  * Created by jianhao on 16-9-21.
  */
 
 public class PostActivityVM extends BaseViewModel {
+    public Conversation conversation;
     public int conversationId;
     public String title;
     public ObservableBoolean isRefreshing = new ObservableBoolean(false);
-    public final ObservableArrayList postList = new ObservableArrayList();
+    public ObservableField<SwipyRefreshLayoutDirection> direction = new ObservableField<>(SwipyRefreshLayoutDirection.BOTH);
+    public final ObservableArrayList<Post> postList = new ObservableArrayList();
     public int page;
     boolean isAuthorOnly;
 
     private Boolean reversed = false;
+    private Boolean preview = true;     //是否是只加载了第一条帖子的状态
 
     public ObservableInt listPosition = new ObservableInt();
     public ObservableBoolean showToast = new ObservableBoolean(false);
@@ -42,6 +50,13 @@ public class PostActivityVM extends BaseViewModel {
     private static final String TAG = "PostActivityVM";
 
     public PostLayoutSelector layoutSelector = new PostLayoutSelector();
+
+    public PostActivityVM(Conversation conversation) {
+        this.conversation = conversation;
+        postList.add(new Post(Integer.valueOf(conversation.getStartMemberId()), conversation.getStartMember(), conversation.getStartMemberAvatarSuffix(), conversation.getFirstPost(), conversation.getStartTime()));
+        conversationId = conversation.getConversationId();
+        title = conversation.getTitle();
+    }
 
     private void getList(final int page) {
         getList(page, false);
@@ -65,6 +80,10 @@ public class PostActivityVM extends BaseViewModel {
                         swipyRefreshLayout.setRefreshing(false);
                         page = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
                         postListRv.smoothScrollToPosition(page == 1 ? 0 : oldLen);*/
+                        if (preview) {
+                            postList.clear();
+                            preview = false;
+                        }
                         int oldLen = postList.size();
                         List<Post> newPostList = response.body().getPosts();
                         MyUtils.expandUnique(postList, newPostList);
@@ -73,6 +92,8 @@ public class PostActivityVM extends BaseViewModel {
                         isRefreshing.set(false);
 
                         if (!refresh) PostActivityVM.this.page++;
+
+                        direction.set(SwipyRefreshLayoutDirection.BOTTOM);
                     }
 
                     @Override
@@ -86,8 +107,9 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void refresh() {
+        Log.d(TAG, "refresh() called");
         page = 1;
-        getList(0, true);
+        getList(page, true);
     }
 
     public void loadMore() {
@@ -99,8 +121,10 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void quote(Post post) {
-        clickedPost = post;
-        goToQuote.notifyChange();
+        if (!preview) {
+            clickedPost = post;
+            goToQuote.notifyChange();
+        }
     }
 
     public void replyComplete() {
@@ -115,10 +139,6 @@ public class PostActivityVM extends BaseViewModel {
 
     public void setPage(int page) {
         this.page = page;
-    }
-
-    public void setConversationId(int conversationId) {
-        this.conversationId = conversationId;
     }
 
     public void setTitle(String title) {
