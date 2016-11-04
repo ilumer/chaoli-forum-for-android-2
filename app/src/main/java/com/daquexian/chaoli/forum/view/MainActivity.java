@@ -50,6 +50,8 @@ public class MainActivity extends BaseActivity
 
 	private ProgressDialog loginProgressDialog;
 
+	private int POST_CONVERSATION_CODE = 1;
+
 	/**
 	 * ATTENTION: This was auto-generated to implement the App Indexing API.
 	 * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -264,6 +266,16 @@ public class MainActivity extends BaseActivity
 		client.disconnect();
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == POST_CONVERSATION_CODE) {
+			if (resultCode == RESULT_OK) {
+				viewModel.refresh();
+			}
+		}
+	}
+
 	public void goToConversation(Conversation conversation) {
 		Intent jmp = new Intent();
 		jmp.putExtra("conversationId", conversation.getConversationId());
@@ -295,7 +307,7 @@ public class MainActivity extends BaseActivity
 
 	public void goToPostAction() {
 		Intent intent = new Intent(this, PostAction.class);
-		startActivity(intent);
+		startActivityForResult(intent, POST_CONVERSATION_CODE);
 	}
 
 	public void setCircleIndicator() {

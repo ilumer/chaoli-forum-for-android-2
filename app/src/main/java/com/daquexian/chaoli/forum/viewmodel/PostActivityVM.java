@@ -1,6 +1,5 @@
 package com.daquexian.chaoli.forum.viewmodel;
 
-import android.content.Intent;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
@@ -17,8 +16,6 @@ import com.daquexian.chaoli.forum.utils.MyUtils;
 
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * Created by jianhao on 16-9-21.
  */
@@ -31,6 +28,8 @@ public class PostActivityVM extends BaseViewModel {
     public int page;
     boolean isAuthorOnly;
 
+    private Boolean reversed = false;
+
     public ObservableInt listPosition = new ObservableInt();
     public ObservableBoolean showToast = new ObservableBoolean(false);
     public ObservableField<String> toastContent = new ObservableField<>();
@@ -40,17 +39,15 @@ public class PostActivityVM extends BaseViewModel {
     public ObservableBoolean goToHomepage = new ObservableBoolean(false);
     public Post clickedPost;
 
-    public static final int REPLY_CODE = 1;
-
     private static final String TAG = "PostActivityVM";
 
     public PostLayoutSelector layoutSelector = new PostLayoutSelector();
 
-    public void getList(final int page) {
+    private void getList(final int page) {
         getList(page, false);
     }
 
-    public void getList(final int page, final Boolean refresh) {
+    private void getList(int page, final Boolean refresh) {
         isRefreshing.set(true);
         MyRetrofit.getService()
                 .listPosts(conversationId, page)
@@ -74,6 +71,8 @@ public class PostActivityVM extends BaseViewModel {
                         listPosition.set(refresh ? 0 : oldLen);
                         listPosition.notifyChange();
                         isRefreshing.set(false);
+
+                        if (!refresh) PostActivityVM.this.page++;
                     }
 
                     @Override
@@ -92,7 +91,7 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void loadMore() {
-        getList(postList.size() < page * Constants.POST_PER_PAGE ? page : (page += 1));
+        getList(postList.size() < page * Constants.POST_PER_PAGE ? page : (page + 1));
     }
 
     public void clickFab() {
@@ -104,13 +103,9 @@ public class PostActivityVM extends BaseViewModel {
         goToQuote.notifyChange();
     }
 
-    public void replyComplete(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REPLY_CODE) {
-            if (resultCode == RESULT_OK) {
-                isRefreshing.set(true);
-                loadMore();
-            }
-        }
+    public void replyComplete() {
+        isRefreshing.set(true);
+        loadMore();
     }
 
     public void clickAvatar(Post post) {

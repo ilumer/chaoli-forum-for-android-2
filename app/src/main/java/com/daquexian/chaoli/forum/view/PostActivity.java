@@ -28,13 +28,12 @@ import com.daquexian.chaoli.forum.viewmodel.PostActivityVM;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-import static com.daquexian.chaoli.forum.viewmodel.PostActivityVM.REPLY_CODE;
-
 public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
 {
 	public static final String TAG = "PostActivity";
 
 	private static final int POST_NUM_PER_PAGE = 20;
+	public static final int REPLY_CODE = 1;
 
 	private final Context mContext = this;
 
@@ -99,7 +98,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
         postListRv.setLayoutManager(mLinearLayoutManager);
 		postListRv.addItemDecoration(new DividerItemDecoration(mContext));
 
-		//viewModel.getList(0);
 		viewModel.refresh();
 
 		viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
@@ -147,14 +145,17 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		toReply.putExtra("postId", post.getPostId());
 		toReply.putExtra("replyTo", post.getUsername());
 		toReply.putExtra("replyMsg", PostUtils.removeQuote(post.getContent()));
-		Log.d(TAG, "onClick: content = " + post.getContent() + ", replyMsg = " + PostUtils.removeQuote(post.getContent()));
 		startActivityForResult(toReply, REPLY_CODE);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		viewModel.replyComplete(requestCode, resultCode, data);
+		if (requestCode == REPLY_CODE) {
+			if (resultCode == RESULT_OK) {
+				viewModel.replyComplete();
+			}
+		}
 	}
 
 	@Override

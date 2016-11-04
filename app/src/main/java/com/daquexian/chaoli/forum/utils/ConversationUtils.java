@@ -180,7 +180,7 @@ public class ConversationUtils {
                 .add("userId", String.valueOf(LoginUtils.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(Constants.POST_CONVERSATION_URL)
-                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         observer.onPostConversationFailure(-3);

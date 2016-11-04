@@ -153,4 +153,5 @@
     <string name="modified_successfully">修改成功</string>
     <string name="fail_on_modifying">修改失敗，請稍後重試</string>
     <string name="useless_option">這是壹個湊數的選項</string>
+    <string name="content_cannot_be_null">內容不能為空</string>
 </resources>

@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -104,9 +105,15 @@ public class PostAction extends BaseActivity implements IView {
         viewModel.postComplete.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
-                Intent intent = new Intent(PostAction.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
+
+        viewModel.showToast.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                showToast(viewModel.toastContent.get());
             }
         });
     }
@@ -126,6 +133,7 @@ public class PostAction extends BaseActivity implements IView {
         switch (item.getOrder())
         {
             case MENU_POST:
+                Log.d(TAG, "onOptionsItemSelected: ");
                 viewModel.postConversation();
                 break;
         }

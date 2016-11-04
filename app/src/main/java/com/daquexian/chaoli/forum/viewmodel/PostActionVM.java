@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.util.Log;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
@@ -45,17 +46,25 @@ public class PostActionVM extends BaseViewModel {
     }
 
     public void postConversation() {
+        if (content.get().length() == 0) {
+            toastContent.set(getString(R.string.content_cannot_be_null));
+            showToast.notifyChange();
+            return;
+        }
         ConversationUtils.postConversation(title.get(), content.get(), new ConversationUtils.PostConversationObserver() {
             @Override
             public void onPostConversationSuccess(int conversationId) {
+                Log.d(TAG, "onPostConversationSuccess() called with: conversationId = [" + conversationId + "]");
                 editor.clear().apply();
-                postComplete.set(true);
+                postComplete.notifyChange();
+                //postComplete.set(true);
             }
 
             @Override
             public void onPostConversationFailure(int statusCode) {
-                showToast.notifyChange();
+                Log.d(TAG, "onPostConversationFailure() called with: statusCode = [" + statusCode + "]");
                 toastContent.set(getString(R.string.network_err));
+                showToast.notifyChange();
             }
         });
     }

@@ -91,7 +91,6 @@ public class MainActivityVM extends BaseViewModel {
                         int oldLen = conversationList.size();
                         List<Conversation> newConversationList = conversationListResult.getResults();
                         if (page == 1) {
-                            Log.d(TAG, "onNext: ");
                             conversationList.clear();
                             conversationList.addAll(newConversationList);
                         } else {
@@ -254,14 +253,14 @@ public class MainActivityVM extends BaseViewModel {
     public void resume() {
         if(!Me.isEmpty()) {
             //timer.cancel();
-            task.cancel();
+            if (task != null) task.cancel();
             task = new TimerTask() {
                 @Override
                 public void run() {
                     notificationHandler.sendEmptyMessage(0);
                 }
             };
-            //timer = new Timer();
+            timer = new Timer();
             timer.schedule(task, 0, Constants.getNotificationInterval * 1000);
         }
     }
