@@ -1,6 +1,7 @@
 package com.daquexian.chaoli.forum.binding;
 
 import android.databinding.BindingAdapter;
+import android.util.Log;
 
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
@@ -10,6 +11,7 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
  * Created by daquexian on 16-9-19.
  */
 public class SwipyRefreshBA {
+    private static final String TAG = "SWBA";
     //trigger the circle to animate
     @BindingAdapter("app:isRefreshing")
     public static void setRefreshing(final SwipyRefreshLayout swipyRefreshLayout, final Boolean isRefreshing) {
@@ -28,6 +30,12 @@ public class SwipyRefreshBA {
      */
     @BindingAdapter("app:direction")
     public static void setDirection(final SwipyRefreshLayout swipyRefreshLayout, final SwipyRefreshLayoutDirection direction) {
+        Log.d(TAG, "setDirection() called with: swipyRefreshLayout = [" + swipyRefreshLayout + "], direction = [" + direction + "]");
         swipyRefreshLayout.setDirection(direction);
+    }
+
+    @BindingAdapter("app:canRefresh")
+    public static void canRefresh(final SwipyRefreshLayout swipyRefreshLayout, final Boolean canRefresh) {
+        swipyRefreshLayout.setEnabled(canRefresh);
     }
 }

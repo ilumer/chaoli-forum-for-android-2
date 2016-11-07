@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,7 +30,7 @@ import com.daquexian.chaoli.forum.viewmodel.PostActivityVM;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver
+public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver, AppBarLayout.OnOffsetChangedListener
 {
 	public static final String TAG = "PostActivity";
 
@@ -66,6 +67,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		reply = binding.reply;
 		postListRv = binding.postList;
 		swipyRefreshLayout = binding.swipyRefreshLayout;
+		binding.appbar.addOnOffsetChangedListener(this);
 	}
 
 	@Override
@@ -75,13 +77,19 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 		Bundle data = getIntent().getExtras();
 		mConversation = data.getParcelable("conversation");
-		mConversationId = mConversation.getConversationId();
-		//viewModel.setConversationId(mConversationId);
-		mTitle = mConversation.getTitle();
+		if (mConversation != null) {
+			mConversationId = mConversation.getConversationId();
+			//viewModel.setConversationId(mConversationId);
+			mTitle = mConversation.getTitle();
+			viewModel = new PostActivityVM(mConversation);
+		} else {
+			mConversationId = data.getInt("conversationId");
+			mTitle = data.getString("conversationTitle");
+			viewModel = new PostActivityVM(mConversationId, mTitle);
+		}
 		setTitle(mTitle);
 		//viewModel.setTitle(mTitle);
 		mPage = data.getInt("page", 1);
-		viewModel = new PostActivityVM(mConversation);
 		setViewModel(viewModel);
 		viewModel.setPage(mPage);
 		viewModel.setAuthorOnly(data.getBoolean("isAuthorOnly", false));
@@ -266,6 +274,15 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		shareIntent.setType("text/plain");
 		startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
 	}
+
+	@Override
+	public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+		/**
+		 * verticalOffset == 0说明appbar已经是展开状态
+		 */
+		viewModel.canRefresh.set(verticalOffset == 0);
+	}
+
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
 		this.viewModel = (PostActivityVM) viewModel;

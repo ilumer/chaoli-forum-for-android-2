@@ -39,6 +39,7 @@ public class MainActivityVM extends BaseViewModel {
 
     public ObservableArrayList<Conversation> conversationList = new ObservableArrayList<>();
 
+    public ObservableBoolean canRefresh = new ObservableBoolean(true);
     public ObservableBoolean isRefreshing = new ObservableBoolean();
     public ObservableInt listPosition = new ObservableInt(0);
 

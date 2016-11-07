@@ -32,7 +32,8 @@ public class PostActivityVM extends BaseViewModel {
     public int conversationId;
     public String title;
     public ObservableBoolean isRefreshing = new ObservableBoolean(false);
-    public ObservableField<SwipyRefreshLayoutDirection> direction = new ObservableField<>(SwipyRefreshLayoutDirection.BOTH);
+    //public ObservableField<SwipyRefreshLayoutDirection> direction = new ObservableField<>(SwipyRefreshLayoutDirection.BOTH);
+    public ObservableBoolean canRefresh = new ObservableBoolean(true);
     public final ObservableArrayList<Post> postList = new ObservableArrayList();
     public int page;
     boolean isAuthorOnly;
@@ -52,6 +53,11 @@ public class PostActivityVM extends BaseViewModel {
     private static final String TAG = "PostActivityVM";
 
     public PostLayoutSelector layoutSelector = new PostLayoutSelector();
+
+    public PostActivityVM(int conversationId, String title) {
+        this.conversationId = conversationId;
+        this.title = title;
+    }
 
     public PostActivityVM(Conversation conversation) {
         this.conversation = conversation;
@@ -104,7 +110,7 @@ public class PostActivityVM extends BaseViewModel {
                         if (!refresh)
                             PostActivityVM.this.page += reversed ? -1 : 1;
 
-                        direction.set(SwipyRefreshLayoutDirection.BOTTOM);
+                        //direction.set(SwipyRefreshLayoutDirection.BOTTOM);
                     }
 
                     @Override
@@ -123,7 +129,7 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void refresh() {
-        direction.set(SwipyRefreshLayoutDirection.BOTH);
+        //direction.set(SwipyRefreshLayoutDirection.BOTH);
         postList.clear();
         page = reversed ? (int) Math.ceil((conversation.getReplies() + 1) / 20.0) : 1;
         getList(page, true);

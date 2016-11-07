@@ -10,6 +10,7 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -36,7 +37,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-public class MainActivity extends BaseActivity
+public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener
 {
 	public static final String TAG = "MainActivity";
 
@@ -212,6 +213,8 @@ public class MainActivity extends BaseActivity
 		l.addItemDecoration(new DividerItemDecoration(mContext));
 
 		swipyRefreshLayout = binding.conversationListRefreshLayout;
+
+		binding.appbar.addOnOffsetChangedListener(this);
 	}
 
 	@Override
@@ -331,6 +334,15 @@ public class MainActivity extends BaseActivity
 
 	public void smoothScrollToPosition(int pos) {
 		l.smoothScrollToPosition(pos);
+	}
+
+
+	@Override
+	public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+		/**
+		 * verticalOffset == 0说明appbar已经是展开状态
+		 */
+		viewModel.canRefresh.set(verticalOffset == 0);
 	}
 
 	@Override
