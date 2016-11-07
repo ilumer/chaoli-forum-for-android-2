@@ -17,6 +17,8 @@ import com.daquexian.chaoli.forum.network.MyRetrofit;
 import com.daquexian.chaoli.forum.utils.MyUtils;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
+import org.abego.treelayout.internal.util.java.util.ListUtil;
+
 import java.util.List;
 
 import rx.functions.Action1;
@@ -58,6 +60,10 @@ public class PostActivityVM extends BaseViewModel {
         title = conversation.getTitle();
     }
 
+    public Boolean isReversed() {
+        return reversed;
+    }
+
     private void getList(final int page) {
         getList(page, false);
     }
@@ -80,18 +86,23 @@ public class PostActivityVM extends BaseViewModel {
                         swipyRefreshLayout.setRefreshing(false);
                         page = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
                         postListRv.smoothScrollToPosition(page == 1 ? 0 : oldLen);*/
+                        Log.d(TAG, "onResponse: " + call.request().url().toString());
                         if (preview) {
                             postList.clear();
                             preview = false;
                         }
                         int oldLen = postList.size();
                         List<Post> newPostList = response.body().getPosts();
-                        MyUtils.expandUnique(postList, newPostList);
+                        if (!reversed)
+                            MyUtils.expandUnique(postList, newPostList);
+                        else
+                            postList.addAll(MyUtils.reverse(newPostList));
                         listPosition.set(refresh ? 0 : oldLen);
                         listPosition.notifyChange();
                         isRefreshing.set(false);
 
-                        if (!refresh) PostActivityVM.this.page++;
+                        if (!refresh)
+                            PostActivityVM.this.page += reversed ? -1 : 1;
 
                         direction.set(SwipyRefreshLayoutDirection.BOTTOM);
                     }
@@ -106,14 +117,33 @@ public class PostActivityVM extends BaseViewModel {
                 });
     }
 
+    public void reverse() {
+        reversed = !reversed;
+        refresh();
+    }
+
     public void refresh() {
-        Log.d(TAG, "refresh() called");
-        page = 1;
+        direction.set(SwipyRefreshLayoutDirection.BOTH);
+        postList.clear();
+        page = reversed ? (int) Math.ceil((conversation.getReplies() + 1) / 20.0) : 1;
         getList(page, true);
     }
 
     public void loadMore() {
-        getList(postList.size() < page * Constants.POST_PER_PAGE ? page : (page + 1));
+        if (reversed && page == 1) {
+            Log.d(TAG, "loadMore: ");
+            isRefreshing.set(false);
+            isRefreshing.notifyChange();
+            return;
+        }
+        int nextPage = page;
+        if (reversed) {
+            nextPage = page - 1;
+        } else
+            if (postList.size() >= page * Constants.POST_PER_PAGE)
+                nextPage = page + 1;
+        getList(nextPage);
+        //getList(postList.size() < page * Constants.POST_PER_PAGE ? page : (reversed ? page - 1 : page + 1));
     }
 
     public void clickFab() {

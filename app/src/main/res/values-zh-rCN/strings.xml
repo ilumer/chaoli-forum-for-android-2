@@ -154,4 +154,7 @@
 	<string name="fail_on_modifying">修改失败，请稍后重试</string>
 	<string name="useless_option">这是一个凑数的选项</string>
 	<string name="content_cannot_be_null">内容不能为空</string>
+	<string name="reverse"></string>
+	<string name="descend">倒序查看</string>
+	<string name="ascend">正序查看</string>
 </resources>
