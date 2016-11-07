@@ -57,7 +57,10 @@ public class AvatarView extends RelativeLayout
 
 		if (Constants.NONE.equals(imagePath) || imagePath == null)
 		{
-			t.setText(String.format("%s", username.toUpperCase().charAt(0)));
+			if (username == null)
+				t.setText("?");
+			else
+				t.setText(String.format("%s", username.toUpperCase().charAt(0)));
 			i.setVisibility(INVISIBLE);
 			t.setVisibility(VISIBLE);
 		}

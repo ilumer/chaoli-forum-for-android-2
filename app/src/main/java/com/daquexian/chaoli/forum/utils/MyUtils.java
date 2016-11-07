@@ -2,6 +2,7 @@ package com.daquexian.chaoli.forum.utils;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,5 +46,13 @@ public class MyUtils {
             A.addAll(0, B.subList(0, i));
         }
         return A.size();
+    }
+
+    public static <T> List reverse(List<T> list) {
+        List reversed = new ArrayList();
+        for (T item : list) {
+            reversed.add(0, item);
+        }
+        return reversed;
     }
 }
