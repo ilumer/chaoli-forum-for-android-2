@@ -26,6 +26,7 @@ public class MyUtils {
      * a > b 表示 a 排在 b 后面
      */
     public static <T extends Comparable> int expandUnique(List<T> A, List<T> B, Boolean addBehind) {
+        /*
         int lenA = A.size();
         Log.d(TAG, "expandUnique: ");
         if (lenA == 0) {
@@ -44,6 +45,29 @@ public class MyUtils {
                 if (B.get(i).compareTo(A.get(0)) >= 0)
                     break;
             A.addAll(0, B.subList(0, i));
+        }
+        return A.size();
+        */
+        return expandUnique(A, B, addBehind, false);
+    }
+
+    public static <T extends Comparable> int expandUnique(List<T> A, List<T> B, Boolean addBehind, Boolean reversed) {
+        int lenA = A.size();
+        if (lenA == 0) A.addAll(B);
+        else {
+            if (addBehind) {
+                int i;
+                for (i = 0; i < B.size(); i++)
+                    if ((!reversed && B.get(i).compareTo(A.get(A.size() - 1)) > 0) || (reversed && B.get(i).compareTo(A.get(A.size() - 1)) < 0))
+                        break;
+                A.addAll(B.subList(i, B.size()));
+            } else {
+                int i;
+                for (i = 0; i < B.size(); i++)
+                    if ((!reversed && B.get(i).compareTo(A.get(0)) >= 0) || (reversed && B.get(i).compareTo(A.get(0)) <= 0))
+                        break;
+                A.addAll(0, B.subList(0, i));
+            }
         }
         return A.size();
     }

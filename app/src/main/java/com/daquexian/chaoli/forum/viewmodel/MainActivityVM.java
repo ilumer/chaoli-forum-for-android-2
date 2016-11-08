@@ -70,7 +70,7 @@ public class MainActivityVM extends BaseViewModel {
     }
     public void getList(final int page, final Boolean refresh)
     {
-        isRefreshing.set(true);
+        showCircle();
         Log.d(TAG, "getList() called with: page = [" + page + "]");
         MyRetrofit.getService()
                 .listConversations(channel, "#第 " + page + " 页")
@@ -84,7 +84,7 @@ public class MainActivityVM extends BaseViewModel {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        isRefreshing.set(false);
+                        removeCircle();
                     }
 
                     @Override
@@ -97,7 +97,7 @@ public class MainActivityVM extends BaseViewModel {
                         } else {
                             MyUtils.expandUnique(conversationList, newConversationList);
                         }
-                        isRefreshing.set(false);
+                        removeCircle();
                         listPosition.set(refresh ? 0 : oldLen);
                         listPosition.notifyChange();
                         MainActivityVM.this.page++;
@@ -111,6 +111,22 @@ public class MainActivityVM extends BaseViewModel {
     }
     public void loadMore() {
         getList(page + 1);
+    }
+
+    /**
+     * 去掉刷新时的圆圈
+     */
+    public void removeCircle() {
+        isRefreshing.set(false);
+        isRefreshing.notifyChange();
+    }
+
+    /**
+     * 显示刷新时的圆圈
+     */
+    public void showCircle() {
+        isRefreshing.set(true);
+        isRefreshing.notifyChange();
     }
 
     public void onClickAvatar(View view) {

@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.daquexian.chaoli.forum.R;
@@ -57,6 +58,8 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	PostActivityVM viewModel;
 	PostActivityBinding binding;
 
+	Boolean bottom = true; //是否滚动到底部
+
 	public static final int menu_settings = 0;
 	public static final int menu_reverse = menu_settings + 1;
 	public static final int menu_share = menu_reverse + 1;
@@ -68,6 +71,34 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		postListRv = binding.postList;
 		swipyRefreshLayout = binding.swipyRefreshLayout;
 		binding.appbar.addOnOffsetChangedListener(this);
+		binding.postList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				Log.d(TAG, "onScrolled() called with: recyclerView = [" + recyclerView + "], dx = [" + dx + "], dy = [" + dy + "]");
+				//得到当前显示的最后一个item的view
+				View lastChildView = recyclerView.getLayoutManager().getChildAt(recyclerView.getLayoutManager().getChildCount()-1);
+				if (lastChildView == null) return;
+				//得到lastChildView的bottom坐标值
+				int lastChildBottom = lastChildView.getBottom();
+				//得到Recyclerview的底部坐标减去底部padding值，也就是显示内容最底部的坐标
+				int recyclerBottom =  recyclerView.getBottom()-recyclerView.getPaddingBottom();
+				//通过这个lastChildView得到这个view当前的position值
+				int lastPosition  = recyclerView.getLayoutManager().getPosition(lastChildView);
+
+				//判断lastChildView的bottom值跟recyclerBottom
+				//判断lastPosition是不是最后一个position
+				//如果两个条件都满足则说明是真正的滑动到了底部
+				/* Why <= ? */
+				Log.d(TAG, "onScrolled: " + lastPosition + ", " + (recyclerView.getLayoutManager().getItemCount() - 1) + ", " + lastChildBottom + ", " + recyclerBottom);
+				if(lastChildBottom <= recyclerBottom && lastPosition == recyclerView.getLayoutManager().getItemCount()-1 ){
+					bottom = true;
+					viewModel.canRefresh.set(true);
+				}else{
+					bottom = false;
+				}
+			}
+		});
 	}
 
 	@Override
@@ -104,7 +135,9 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			@Override
 			public void onRefresh(SwipyRefreshLayoutDirection direction) {
 				if (direction == SwipyRefreshLayoutDirection.BOTTOM) {
-					PostActivity.this.viewModel.loadMore();
+                    PostActivity.this.viewModel.pullFromBottom();
+				} else {
+					PostActivity.this.viewModel.pullFromTop();
 				}
 			}
 		});
@@ -113,7 +146,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
         postListRv.setLayoutManager(mLinearLayoutManager);
 		postListRv.addItemDecoration(new DividerItemDecoration(mContext));
 
-		viewModel.refresh();
+		viewModel.firstLoad();
 
 		this.viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
@@ -280,7 +313,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		/**
 		 * verticalOffset == 0说明appbar已经是展开状态
 		 */
-		viewModel.canRefresh.set(verticalOffset == 0);
+		viewModel.canRefresh.set(verticalOffset == 0 || bottom);
 	}
 
 	@Override

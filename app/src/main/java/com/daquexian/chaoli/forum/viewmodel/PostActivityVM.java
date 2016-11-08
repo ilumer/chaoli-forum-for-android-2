@@ -15,13 +15,8 @@ import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.model.PostListResult;
 import com.daquexian.chaoli.forum.network.MyRetrofit;
 import com.daquexian.chaoli.forum.utils.MyUtils;
-import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
-
-import org.abego.treelayout.internal.util.java.util.ListUtil;
 
 import java.util.List;
-
-import rx.functions.Action1;
 
 /**
  * Created by jianhao on 16-9-21.
@@ -35,7 +30,8 @@ public class PostActivityVM extends BaseViewModel {
     //public ObservableField<SwipyRefreshLayoutDirection> direction = new ObservableField<>(SwipyRefreshLayoutDirection.BOTH);
     public ObservableBoolean canRefresh = new ObservableBoolean(true);
     public final ObservableArrayList<Post> postList = new ObservableArrayList();
-    public int page;
+    public int minPage;
+    public int maxPage;
     boolean isAuthorOnly;
 
     private Boolean reversed = false;
@@ -70,45 +66,50 @@ public class PostActivityVM extends BaseViewModel {
         return reversed;
     }
 
-    private void getList(final int page) {
+    /*private void getList(final int page) {
         getList(page, false);
-    }
+    }*/
 
-    private void getList(int page, final Boolean refresh) {
-        isRefreshing.set(true);
+    private void getList(final int page, final SuccessCallback callback) {
         MyRetrofit.getService()
                 .listPosts(conversationId, page)
                 .enqueue(new retrofit2.Callback<PostListResult>() {
                     @Override
                     public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
-                        /*List<Post> newPostList = response.body().getPosts();
-                        List<Post> postList = mPostListAdapter.getPosts();
-                        int oldLen = postList.size();
-                        expandUnique(postList, newPostList);
-                        mPostListAdapter.setPosts(postList);
-                        mPostListAdapter.notifyItemRangeInserted(oldLen, postList.size() - oldLen);
+                        callback.doWhenSuccess(response.body().getPosts());
+                        removeCircle();
+                        //moveToPosition(firstLoad ? 0 : oldLen);
+                        //isRefreshing.set(false);
 
-                        //postListRv.smoothScrollToPosition(page * POST_NUM_PER_PAGE + 1);
-                        swipyRefreshLayout.setRefreshing(false);
-                        page = (postList.size() + POST_NUM_PER_PAGE - 1) / POST_NUM_PER_PAGE;
-                        postListRv.smoothScrollToPosition(page == 1 ? 0 : oldLen);*/
+                        //PostActivityVM.this.page = page;
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<PostListResult> call, Throwable t) {
+                        isRefreshing.set(false);
+                        toastContent.set(ChaoliApplication.getAppContext().getString(R.string.network_err));
+                        showToast.notifyChange();
+                        t.printStackTrace();
+                    }
+                });
+    }
+    /*private void getList(final int page, final Boolean refresh) {
+        MyRetrofit.getService()
+                .listPosts(conversationId, page)
+                .enqueue(new retrofit2.Callback<PostListResult>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
                         Log.d(TAG, "onResponse: " + call.request().url().toString());
-                        if (preview) {
-                            postList.clear();
-                            preview = false;
-                        }
                         int oldLen = postList.size();
                         List<Post> newPostList = response.body().getPosts();
                         if (!reversed)
                             MyUtils.expandUnique(postList, newPostList);
                         else
                             postList.addAll(MyUtils.reverse(newPostList));
-                        listPosition.set(refresh ? 0 : oldLen);
-                        listPosition.notifyChange();
+                        moveToPosition(refresh ? 0 : oldLen);
                         isRefreshing.set(false);
 
-                        if (!refresh)
-                            PostActivityVM.this.page += reversed ? -1 : 1;
+                        PostActivityVM.this.page = page;
 
                         //direction.set(SwipyRefreshLayoutDirection.BOTTOM);
                     }
@@ -121,21 +122,41 @@ public class PostActivityVM extends BaseViewModel {
                         t.printStackTrace();
                     }
                 });
-    }
+    }*/
 
+    /*private Call<PostListResult> getList(int page) {
+        return MyRetrofit.getService().listPosts(conversationId, page);
+    }
+*/
     public void reverse() {
         reversed = !reversed;
-        refresh();
+        firstLoad();
     }
 
-    public void refresh() {
+    public void firstLoad() {
         //direction.set(SwipyRefreshLayoutDirection.BOTH);
+        if (preview) {
+            postList.clear();
+            preview = false;
+        }
+        showCircle();
         postList.clear();
-        page = reversed ? (int) Math.ceil((conversation.getReplies() + 1) / 20.0) : 1;
-        getList(page, true);
+        maxPage = minPage = reversed ? (int) Math.ceil((conversation.getReplies() + 1) / 20.0) : 1;
+        getList(maxPage, new SuccessCallback() {
+            @Override
+            public void doWhenSuccess(List<Post> newPostList) {
+                if (reversed) postList.addAll(MyUtils.reverse(newPostList));
+                else postList.addAll(newPostList);
+            }
+        });
+
     }
 
-    public void loadMore() {
+    private void moveToPosition(int position) {
+        listPosition.set(position);
+        listPosition.notifyChange();
+    }
+    /*public void loadMore() {
         if (reversed && page == 1) {
             Log.d(TAG, "loadMore: ");
             isRefreshing.set(false);
@@ -150,6 +171,72 @@ public class PostActivityVM extends BaseViewModel {
                 nextPage = page + 1;
         getList(nextPage);
         //getList(postList.size() < page * Constants.POST_PER_PAGE ? page : (reversed ? page - 1 : page + 1));
+    }*/
+
+    private void loadAfterward() {
+        final int nextPage;
+        if (postList.size() >= (maxPage - minPage) * Constants.POST_PER_PAGE)
+            nextPage = maxPage + 1;
+        else
+            nextPage = maxPage;
+        showCircle();
+        //getList(nextPage);
+        final int oldLen = postList.size();
+        getList(nextPage, new SuccessCallback() {
+            @Override
+            public void doWhenSuccess(List<Post> newPostList) {
+                if (reversed) MyUtils.expandUnique(postList, newPostList, false, true);
+                else MyUtils.expandUnique(postList, newPostList);
+                if (!reversed) moveToPosition(oldLen);
+                maxPage = nextPage;
+            }
+        });
+    }
+
+    private void loadBackward() {
+        if (minPage == 1) {
+            removeCircle();
+            return;
+        }
+        final int nextPage = minPage - 1;
+        showCircle();
+        //getList(nextPage);
+        final int oldLen = postList.size();
+        getList(nextPage, new SuccessCallback() {
+            @Override
+            public void doWhenSuccess(List<Post> newPostList) {
+                if (reversed) postList.addAll(MyUtils.reverse(newPostList));
+                else MyUtils.expandUnique(postList, newPostList, false);
+                if (reversed) moveToPosition(oldLen);
+                minPage = nextPage;
+            }
+        });
+    }
+
+    /**
+     * 去掉刷新时的圆圈
+     */
+    public void removeCircle() {
+        isRefreshing.set(false);
+        isRefreshing.notifyChange();
+    }
+
+    /**
+     * 显示刷新时的圆圈
+     */
+    public void showCircle() {
+        isRefreshing.set(true);
+        isRefreshing.notifyChange();
+    }
+
+    public void pullFromTop() {
+        if (isReversed()) loadAfterward();
+        else loadBackward();
+    }
+
+    public void pullFromBottom() {
+        if (isReversed()) loadBackward();
+        else loadAfterward();
     }
 
     public void clickFab() {
@@ -165,7 +252,7 @@ public class PostActivityVM extends BaseViewModel {
 
     public void replyComplete() {
         isRefreshing.set(true);
-        loadMore();
+        loadAfterward();
     }
 
     public void clickAvatar(Post post) {
@@ -174,7 +261,8 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void setPage(int page) {
-        this.page = page;
+        //this.page = page;
+        maxPage = minPage = page;
     }
 
     public void setTitle(String title) {
@@ -189,4 +277,7 @@ public class PostActivityVM extends BaseViewModel {
         isAuthorOnly = authorOnly;
     }
 
+    private interface SuccessCallback {
+        void doWhenSuccess(List<Post> newPostList);
+    }
 }
