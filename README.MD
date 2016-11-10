@@ -1,7 +1,7 @@
 ## 超理论坛Android app测试版
 [超理论坛](https://chaoli.club)
 
-[介绍链接](https://chaoli.club/index.php/2911)
+[Google Play](https://play.google.com/store/apps/details?id=com.daquexian.chaoli.forum&hl=zh)
 
 [源码食用指南](http://www.jianshu.com/p/54ea9ada6fe3)
 
