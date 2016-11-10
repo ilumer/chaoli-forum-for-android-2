@@ -4,7 +4,6 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
-import android.util.Log;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
@@ -36,6 +35,7 @@ public class PostActivityVM extends BaseViewModel {
 
     private Boolean reversed = false;
     private Boolean preview = true;     //是否是只加载了第一条帖子的状态
+    private Boolean canAutoLoad = false;  // 是否可以自动加载
 
     public ObservableInt listPosition = new ObservableInt();
     public ObservableBoolean showToast = new ObservableBoolean(false);
@@ -53,6 +53,7 @@ public class PostActivityVM extends BaseViewModel {
     public PostActivityVM(int conversationId, String title) {
         this.conversationId = conversationId;
         this.title = title;
+        init();
     }
 
     public PostActivityVM(Conversation conversation) {
@@ -60,6 +61,11 @@ public class PostActivityVM extends BaseViewModel {
         postList.add(new Post(Integer.valueOf(conversation.getStartMemberId()), conversation.getStartMember(), conversation.getStartMemberAvatarSuffix(), conversation.getFirstPost(), conversation.getStartTime()));
         conversationId = conversation.getConversationId();
         title = conversation.getTitle();
+        init();
+    }
+
+    private void init() {
+        //postList.add(new Post());
     }
 
     public Boolean isReversed() {
@@ -76,8 +82,10 @@ public class PostActivityVM extends BaseViewModel {
                 .enqueue(new retrofit2.Callback<PostListResult>() {
                     @Override
                     public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
-                        callback.doWhenSuccess(response.body().getPosts());
+                        List<Post> newPosts = response.body().getPosts();
+                        callback.doWhenSuccess(newPosts);
                         removeCircle();
+                        if (newPosts.size() == Constants.POST_PER_PAGE) canAutoLoad = true;
                         //moveToPosition(firstLoad ? 0 : oldLen);
                         //isRefreshing.set(false);
 
@@ -90,8 +98,16 @@ public class PostActivityVM extends BaseViewModel {
                         toastContent.set(ChaoliApplication.getAppContext().getString(R.string.network_err));
                         showToast.notifyChange();
                         t.printStackTrace();
+                        //postList.get(postList.size() - 1).content = getString(R.string.error_click_to_retry);
                     }
                 });
+    }
+
+    public void tryToLoadFromBottom() {
+        if (canAutoLoad) {
+            canAutoLoad = false;
+            pullFromBottom();
+        }
     }
     /*private void getList(final int page, final Boolean refresh) {
         MyRetrofit.getService()
@@ -133,20 +149,26 @@ public class PostActivityVM extends BaseViewModel {
         firstLoad();
     }
 
+    public boolean hasFooterView() {
+        return postList.size() > 0 && postList.get(postList.size() - 1).username == null;
+    }
+
     public void firstLoad() {
         //direction.set(SwipyRefreshLayoutDirection.BOTH);
-        if (preview) {
-            postList.clear();
-            preview = false;
-        }
         showCircle();
-        postList.clear();
+        //postList.clear();
         maxPage = minPage = reversed ? (int) Math.ceil((conversation.getReplies() + 1) / 20.0) : 1;
         getList(maxPage, new SuccessCallback() {
             @Override
             public void doWhenSuccess(List<Post> newPostList) {
+                //if (preview) {
+                postList.clear();
+                preview = false;
+                //}
+                //if (hasFooterView()) postList.remove(postList.size() - 1);
                 if (reversed) postList.addAll(MyUtils.reverse(newPostList));
                 else postList.addAll(newPostList);
+            //    postList.add(new Post());
             }
         });
 
@@ -180,15 +202,16 @@ public class PostActivityVM extends BaseViewModel {
         else
             nextPage = maxPage;
         showCircle();
-        //getList(nextPage);
         final int oldLen = postList.size();
         getList(nextPage, new SuccessCallback() {
             @Override
             public void doWhenSuccess(List<Post> newPostList) {
+                //if (postList.size() > 0) postList.remove(postList.size() - 1);
                 if (reversed) MyUtils.expandUnique(postList, newPostList, false, true);
                 else MyUtils.expandUnique(postList, newPostList);
-                if (!reversed) moveToPosition(oldLen);
+                //if (!reversed) moveToPosition(oldLen);
                 maxPage = nextPage;
+                //postList.add(new Post());
             }
         });
     }
@@ -205,10 +228,12 @@ public class PostActivityVM extends BaseViewModel {
         getList(nextPage, new SuccessCallback() {
             @Override
             public void doWhenSuccess(List<Post> newPostList) {
+                //if (postList.size() > 0) postList.remove(postList.size() - 1);
                 if (reversed) postList.addAll(MyUtils.reverse(newPostList));
                 else MyUtils.expandUnique(postList, newPostList, false);
-                if (reversed) moveToPosition(oldLen);
+                //if (reversed) moveToPosition(oldLen);
                 minPage = nextPage;
+                //postList.add(new Post());
             }
         });
     }
@@ -230,11 +255,13 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void pullFromTop() {
+        if (isRefreshing.get()) return;
         if (isReversed()) loadAfterward();
         else loadBackward();
     }
 
     public void pullFromBottom() {
+        if (isRefreshing.get()) return;
         if (isReversed()) loadBackward();
         else loadAfterward();
     }
@@ -256,6 +283,7 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void clickAvatar(Post post) {
+        if (post.username == null) return;
         clickedPost = post;
         goToHomepage.notifyChange();
     }

@@ -7,4 +7,5 @@ package com.daquexian.chaoli.forum.binding;
 public abstract class LayoutSelector<T> {
     abstract int getLayout(int type);
     abstract int getType(T item);
+    public static final int FOOTER_VIEW = -1;
 }

@@ -158,5 +158,6 @@
 	<string name="content_cannot_be_null">Content cannot be null</string>
 	<string name="descend">Descend</string>
 	<string name="ascend">Ascend</string>
+	<string name="error_click_to_retry">Error, click to retry</string>
 
 </resources>

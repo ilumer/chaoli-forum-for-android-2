@@ -8,6 +8,7 @@ import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.daquexian.chaoli.forum.BR;
@@ -79,7 +80,6 @@ public class RecyclerViewBA {
     @SuppressWarnings("unchecked")
     public static void setItems(RecyclerView recyclerView, ObservableList newItems, LayoutSelector layoutSelector) {
         if (recyclerView.getAdapter() == null) {
-            Log.d(TAG, "setItems: " + newItems.size());
             MyAdapter adapter = new MyAdapter(layoutSelector, newItems);
             recyclerView.setAdapter(adapter);
         } else {
@@ -176,10 +176,10 @@ public class RecyclerViewBA {
 
         @Override
         public void onBindViewHolder(MyViewHolder holder, int position) {
-            ViewDataBinding binding = holder.getBinding();
-            binding.setVariable(BR.item, itemList.get(position));
-            if (handler != null) {
-                binding.setVariable(BR.handler, handler);
+            if (holder.hasItem) {
+                ViewDataBinding binding = holder.getBinding();
+                if (holder.hasItem) binding.setVariable(BR.item, itemList.get(position));
+                if (handler != null) binding.setVariable(BR.handler, handler);
             }
         }
 
@@ -195,15 +195,22 @@ public class RecyclerViewBA {
 
         @Override
         public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            //if (viewType == LayoutSelector.FOOTER_VIEW) return new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(selector.getLayout(viewType), parent, false));
             ViewDataBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), selector.getLayout(viewType), parent, false);
             return new MyViewHolder(binding);
         }
 
         class MyViewHolder extends RecyclerView.ViewHolder {
+            Boolean hasItem = true;
             ViewDataBinding binding;
             MyViewHolder(ViewDataBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
+            }
+
+            MyViewHolder(View view) {
+                super(view);
+                hasItem = false;
             }
 
             public ViewDataBinding getBinding() {

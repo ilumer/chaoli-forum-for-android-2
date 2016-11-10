@@ -156,4 +156,5 @@
     <string name="content_cannot_be_null">內容不能為空</string>
     <string name="descend">倒序查看</string>
     <string name="ascend">正序查看</string>
+    <string name="error_click_to_retry">錯誤，點擊可重試</string>
 </resources>

@@ -75,7 +75,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
 				super.onScrolled(recyclerView, dx, dy);
-				Log.d(TAG, "onScrolled() called with: recyclerView = [" + recyclerView + "], dx = [" + dx + "], dy = [" + dy + "]");
 				//得到当前显示的最后一个item的view
 				View lastChildView = recyclerView.getLayoutManager().getChildAt(recyclerView.getLayoutManager().getChildCount()-1);
 				if (lastChildView == null) return;
@@ -84,19 +83,21 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				//得到Recyclerview的底部坐标减去底部padding值，也就是显示内容最底部的坐标
 				int recyclerBottom =  recyclerView.getBottom()-recyclerView.getPaddingBottom();
 				//通过这个lastChildView得到这个view当前的position值
-				int lastPosition  = recyclerView.getLayoutManager().getPosition(lastChildView);
+				int lastVisiblePosition  = recyclerView.getLayoutManager().getPosition(lastChildView);
 
 				//判断lastChildView的bottom值跟recyclerBottom
 				//判断lastPosition是不是最后一个position
 				//如果两个条件都满足则说明是真正的滑动到了底部
 				/* Why <= ? */
-				Log.d(TAG, "onScrolled: " + lastPosition + ", " + (recyclerView.getLayoutManager().getItemCount() - 1) + ", " + lastChildBottom + ", " + recyclerBottom);
-				if(lastChildBottom <= recyclerBottom && lastPosition == recyclerView.getLayoutManager().getItemCount()-1 ){
+				int lastPosition = recyclerView.getLayoutManager().getItemCount() - 1;
+				if(lastChildBottom <= recyclerBottom && lastVisiblePosition == lastPosition){
 					bottom = true;
 					viewModel.canRefresh.set(true);
 				}else{
 					bottom = false;
 				}
+
+				if (lastVisiblePosition >= lastPosition - 3) viewModel.tryToLoadFromBottom();
 			}
 		});
 	}

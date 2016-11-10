@@ -214,6 +214,7 @@ public class Conversation extends BaseObservable implements DiffItem, Comparable
 	}
 
 	public Conversation() {
+		replies = -1;
 	}
 
 	protected Conversation(Parcel in) {

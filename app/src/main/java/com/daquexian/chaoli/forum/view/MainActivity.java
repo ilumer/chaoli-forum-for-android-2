@@ -68,7 +68,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	MainActivityVM viewModel;
 	MainActivityBinding binding;
 
-	Boolean bottom;	//是否滚到底部
+	Boolean bottom = true;	//是否滚到底部
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -211,8 +211,9 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
 
 		l = binding.conversationList;
-		l.setLayoutManager(new LinearLayoutManager(mContext));
-		l.addItemDecoration(new DividerItemDecoration(mContext));
+		final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
+		l.setLayoutManager(layoutManager);
+		l.addItemDecoration(new android.support.v7.widget.DividerItemDecoration(mContext, android.support.v7.widget.DividerItemDecoration.VERTICAL));
 
 		swipyRefreshLayout = binding.conversationListRefreshLayout;
 
@@ -228,17 +229,19 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
                 //得到Recyclerview的底部坐标减去底部padding值，也就是显示内容最底部的坐标
                 int recyclerBottom =  recyclerView.getBottom()-recyclerView.getPaddingBottom();
                 //通过这个lastChildView得到这个view当前的position值
-                int lastPosition  = recyclerView.getLayoutManager().getPosition(lastChildView);
+                int lastVisiblePosition  = layoutManager.findLastVisibleItemPosition();
 
                 //判断lastChildView的bottom值跟recyclerBottom
                 //判断lastPosition是不是最后一个position
                 //如果两个条件都满足则说明是真正的滑动到了底部
-                if(lastChildBottom == recyclerBottom && lastPosition == recyclerView.getLayoutManager().getItemCount()-1 ){
+				int lastPosition = recyclerView.getLayoutManager().getItemCount() - 1;
+				if(lastChildBottom == recyclerBottom && lastVisiblePosition == lastPosition){
                     bottom = true;
                     viewModel.canRefresh.set(true);
                 }else{
                     bottom = false;
                 }
+				if (lastVisiblePosition >= lastPosition - 3) viewModel.tryToLoadFromBottom();
 			}
 		});
 	}

@@ -11,6 +11,8 @@ import android.view.View;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
+import com.daquexian.chaoli.forum.binding.ConversationLayoutSelector;
+import com.daquexian.chaoli.forum.binding.LayoutSelector;
 import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.meta.Channel;
 import com.daquexian.chaoli.forum.meta.Constants;
@@ -41,7 +43,6 @@ public class MainActivityVM extends BaseViewModel {
 
     public ObservableBoolean canRefresh = new ObservableBoolean(true);
     public ObservableBoolean isRefreshing = new ObservableBoolean();
-    public ObservableInt listPosition = new ObservableInt(0);
 
     public ObservableField<Integer> myUserId = new ObservableField<>(-1);
     public ObservableField<String> myUsername = new ObservableField<>();
@@ -59,11 +60,19 @@ public class MainActivityVM extends BaseViewModel {
     public ObservableInt selectedItem = new ObservableInt(-1);
     public ObservableInt goToPost = new ObservableInt();
 
+    public LayoutSelector<Conversation> layoutSelector = new ConversationLayoutSelector();
+
     private String channel;
     private int page;
 
     private Timer timer;
     private TimerTask task;
+
+    private Boolean canAutoLoad = false;
+
+    public MainActivityVM() {
+        //conversationList.add(new Conversation());
+    }
 
     public void getList(final int page) {
         getList(page, false);
@@ -84,12 +93,15 @@ public class MainActivityVM extends BaseViewModel {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
+                        //if (conversationList.size() > 0) conversationList.get(conversationList.size() - 1).setFirstPost(getString(R.string.error_click_to_retry));
                         removeCircle();
                     }
 
                     @Override
                     public void onNext(ConversationListResult conversationListResult) {
+                        //conversationList.remove(conversationList.size() - 1);
                         int oldLen = conversationList.size();
+                        Log.d(TAG, "onNext: " + oldLen);
                         List<Conversation> newConversationList = conversationListResult.getResults();
                         if (page == 1) {
                             conversationList.clear();
@@ -97,10 +109,12 @@ public class MainActivityVM extends BaseViewModel {
                         } else {
                             MyUtils.expandUnique(conversationList, newConversationList);
                         }
+                        //conversationList.add(new Conversation());
+                        canAutoLoad = true;
                         removeCircle();
-                        listPosition.set(refresh ? 0 : oldLen);
-                        listPosition.notifyChange();
-                        MainActivityVM.this.page++;
+                        //listPosition.set(refresh ? 0 : oldLen);
+                        //listPosition.notifyChange();
+                        MainActivityVM.this.page = page;
                     }
                 });
     }
@@ -110,6 +124,7 @@ public class MainActivityVM extends BaseViewModel {
         getList(page, true);
     }
     public void loadMore() {
+        if (isRefreshing.get()) return;
         getList(page + 1);
     }
 
@@ -146,6 +161,13 @@ public class MainActivityVM extends BaseViewModel {
         Log.d(TAG, "onClickConversation: ");
         clickedConversation = conversation;
         goToConversation.notifyChange();
+    }
+
+    public void tryToLoadFromBottom() {
+        if (canAutoLoad) {
+            canAutoLoad = false;
+            loadMore();
+        }
     }
 
     Handler notificationHandler = new Handler(){
