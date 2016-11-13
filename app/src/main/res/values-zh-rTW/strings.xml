@@ -157,4 +157,7 @@
     <string name="descend">倒序查看</string>
     <string name="ascend">正序查看</string>
     <string name="error_click_to_retry">錯誤，點擊可重試</string>
+    <string name="click_once_more_to_exit">再按壹次退出</string>
+    <string name="app_settings">app設置</string>
+    <string name="click_twice_to_exit">點擊兩次退出</string>
 </resources>

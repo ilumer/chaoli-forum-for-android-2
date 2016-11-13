@@ -66,6 +66,9 @@ public class Constants
 	/* 关注主题 */
 	public static final String STAR_CONVERSATION_URL = BASE_URL + "?p=conversation/star.json/";
 
+	public static final String SETTINGS_SP = "settings";
+	public static final String CLICK_TWICE_TO_EXIT = "ctte";
+
 	public static final String conversationSP = "conversationList";
 	public static final String conversationSPKey = "listJSON";
 

@@ -1,13 +1,17 @@
 package com.daquexian.chaoli.forum.viewmodel;
 
+import android.content.SharedPreferences;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 
 import com.daquexian.chaoli.forum.R;
+import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.utils.AccountUtils;
 
 import java.io.File;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by jianhao on 16-10-6.
@@ -18,6 +22,7 @@ public class SettingsVM extends BaseViewModel {
     public ObservableInt showToast = new ObservableInt();
     public ObservableField<String> toastContent = new ObservableField<>();
     public ObservableInt goToAlbum = new ObservableInt();
+    //public ObservableBoolean complete = new ObservableBoolean();
 
     public ObservableField<String> signature = new ObservableField<>();
     public ObservableField<String> userStatus = new ObservableField<>();
@@ -27,6 +32,11 @@ public class SettingsVM extends BaseViewModel {
     public ObservableBoolean hideOnline = new ObservableBoolean();
     public File avatarFile;
 
+    /* App Settings */
+    public ObservableBoolean clickTwiceToExit = new ObservableBoolean();
+
+    private SharedPreferences sharedPreferences;
+
     public SettingsVM(String signature, String userStatus, Boolean privateAdd, Boolean starOnReply, Boolean starPrivate, Boolean hideOnline) {
         this.signature.set(signature);
         this.userStatus.set(userStatus);
@@ -34,10 +44,16 @@ public class SettingsVM extends BaseViewModel {
         this.starOnReply.set(starOnReply);
         this.starPrivate.set(starPrivate);
         this.hideOnline.set(hideOnline);
+
+        sharedPreferences = getSharedPreferences(Constants.SETTINGS_SP, MODE_PRIVATE);
+        clickTwiceToExit.set(sharedPreferences.getBoolean(Constants.CLICK_TWICE_TO_EXIT, false));
     }
 
     public void save() {
         showProcessDialog.set(true);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(Constants.CLICK_TWICE_TO_EXIT, clickTwiceToExit.get());
+        editor.apply();
         AccountUtils.modifySettings(avatarFile, "Chinese", privateAdd.get(), starOnReply.get(),
                 starPrivate.get(), hideOnline.get(), signature.get(), userStatus.get(), new AccountUtils.ModifySettingsObserver() {
                     @Override
@@ -46,15 +62,15 @@ public class SettingsVM extends BaseViewModel {
                             @Override
                             public void onGetProfileSuccess() {
                                 showProcessDialog.set(false);
-                                showToast.notifyChange();
                                 toastContent.set(getString(R.string.modified_successfully));
+                                showToast.notifyChange();
                             }
 
                             @Override
                             public void onGetProfileFailure() {
                                 showProcessDialog.set(false);
-                                showToast.notifyChange();
                                 toastContent.set(getString(R.string.network_err));
+                                showToast.notifyChange();
                             }
                         });
                     }

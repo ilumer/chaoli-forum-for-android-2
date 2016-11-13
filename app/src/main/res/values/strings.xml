@@ -159,5 +159,8 @@
 	<string name="descend">Descend</string>
 	<string name="ascend">Ascend</string>
 	<string name="error_click_to_retry">Error, click to retry</string>
+	<string name="click_once_more_to_exit">Click once more to exit</string>
+	<string name="app_settings">App settings</string>
+	<string name="click_twice_to_exit">Click twice to exit</string>
 
 </resources>

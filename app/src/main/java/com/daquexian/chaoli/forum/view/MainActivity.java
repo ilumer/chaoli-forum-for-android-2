@@ -10,6 +10,7 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,12 +22,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.MainActivityBinding;
 import com.daquexian.chaoli.forum.databinding.NavigationHeaderBinding;
-import com.daquexian.chaoli.forum.meta.DividerItemDecoration;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
@@ -68,7 +69,9 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	MainActivityVM viewModel;
 	MainActivityBinding binding;
 
-	Boolean bottom = true;	//是否滚到底部
+	boolean bottom = true;	//是否滚到底部
+	boolean needTwoClick = false;
+	boolean clickedOnce = false;	//点击Back键两次退出
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,17 +81,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		setViewModel(viewModel);
 
 		initUI();
-
-
-		final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-			@Override
-			public boolean onNavigationItemSelected(MenuItem item) {
-				selectItem(item.getOrder());
-				item.setChecked(true);
-				return true;
-			}
-		});
 
 		viewModel.goToLogin.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
@@ -245,6 +237,32 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 				if (lastVisiblePosition >= lastPosition - 3) viewModel.tryToLoadFromBottom();
 			}
 		});
+
+		final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+			@Override
+			public boolean onNavigationItemSelected(MenuItem item) {
+				selectItem(item.getOrder());
+				item.setChecked(true);
+				return true;
+			}
+		});
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) mDrawerLayout.closeDrawer(GravityCompat.START);
+		else if (clickedOnce || !needTwoClick) super.onBackPressed();
+		else {
+			showToast(R.string.click_once_more_to_exit);
+			clickedOnce = true;
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					clickedOnce = false;
+				}
+			}, 2500);
+		}
 	}
 
 	@Override
@@ -257,6 +275,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	protected void onResume() {
 		super.onResume();
 		viewModel.resume();
+		needTwoClick = getSharedPreferences(Constants.SETTINGS_SP, MODE_PRIVATE).getBoolean(Constants.CLICK_TWICE_TO_EXIT, false);
 	}
 
 	@Override
