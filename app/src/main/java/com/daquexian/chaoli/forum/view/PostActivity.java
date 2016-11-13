@@ -23,6 +23,7 @@ import com.daquexian.chaoli.forum.databinding.PostActivityBinding;
 import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.Post;
+import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.utils.ConversationUtils;
 import com.daquexian.chaoli.forum.meta.DividerItemDecoration;
 import com.daquexian.chaoli.forum.utils.PostUtils;
@@ -322,5 +323,11 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		this.viewModel = (PostActivityVM) viewModel;
 		binding = DataBindingUtil.setContentView(this, R.layout.post_activity);
 		binding.setViewModel(this.viewModel);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		MyOkHttp.getClient().dispatcher().cancelAll();
 	}
 }

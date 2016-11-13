@@ -19,6 +19,7 @@ import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.ConversationListResult;
 import com.daquexian.chaoli.forum.model.NotificationList;
+import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.network.MyRetrofit;
 import com.daquexian.chaoli.forum.utils.AccountUtils;
 import com.daquexian.chaoli.forum.utils.LoginUtils;
@@ -34,6 +35,7 @@ import rx.schedulers.Schedulers;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
+ * ViewModel of MainActivity
  * Created by jianhao on 16-9-19.
  */
 public class MainActivityVM extends BaseViewModel {
@@ -50,6 +52,8 @@ public class MainActivityVM extends BaseViewModel {
     public ObservableField<String> mySignature = new ObservableField<>();
 
     public ObservableBoolean hasLoggedIn = new ObservableBoolean(false);
+
+    public ObservableInt listPosition = new ObservableInt();
 
     public ObservableInt goToHomepage = new ObservableInt();
     public ObservableInt goToLogin = new ObservableInt();
@@ -74,10 +78,10 @@ public class MainActivityVM extends BaseViewModel {
         //conversationList.add(new Conversation());
     }
 
-    public void getList(final int page) {
+    private void getList(final int page) {
         getList(page, false);
     }
-    public void getList(final int page, final Boolean refresh)
+    private void getList(final int page, final Boolean refresh)
     {
         showCircle();
         Log.d(TAG, "getList() called with: page = [" + page + "]");
@@ -112,8 +116,10 @@ public class MainActivityVM extends BaseViewModel {
                         //conversationList.add(new Conversation());
                         canAutoLoad = true;
                         removeCircle();
-                        //listPosition.set(refresh ? 0 : oldLen);
-                        //listPosition.notifyChange();
+                        if (refresh) {
+                            listPosition.set(0);
+                            listPosition.notifyChange();
+                        }
                         MainActivityVM.this.page = page;
                     }
                 });
@@ -131,7 +137,7 @@ public class MainActivityVM extends BaseViewModel {
     /**
      * 去掉刷新时的圆圈
      */
-    public void removeCircle() {
+    private void removeCircle() {
         isRefreshing.set(false);
         isRefreshing.notifyChange();
     }
@@ -139,7 +145,7 @@ public class MainActivityVM extends BaseViewModel {
     /**
      * 显示刷新时的圆圈
      */
-    public void showCircle() {
+    private void showCircle() {
         isRefreshing.set(true);
         isRefreshing.notifyChange();
     }
@@ -170,7 +176,7 @@ public class MainActivityVM extends BaseViewModel {
         }
     }
 
-    Handler notificationHandler = new Handler(){
+    private Handler notificationHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -306,5 +312,6 @@ public class MainActivityVM extends BaseViewModel {
 
     public void destory() {
         if (timer != null) timer.cancel();
+        MyOkHttp.getClient().dispatcher().cancelAll();
     }
 }

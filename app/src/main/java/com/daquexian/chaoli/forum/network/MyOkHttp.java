@@ -35,6 +35,15 @@ public class MyOkHttp {
     private static CookiesManager mCookiesManager;
     private static Context mContext = ChaoliApplication.getAppContext();
 
+    public static void cancel(Object tag) {
+        for (Call call : okHttpClient.dispatcher().queuedCalls()) {
+            if (tag.equals(call.request().tag())) call.cancel();
+        }
+        for (Call call : okHttpClient.dispatcher().runningCalls()) {
+            if (tag.equals(call.request().tag())) call.cancel();
+        }
+    }
+
     public synchronized static OkHttpClient getClient(){
         if (okHttpClient == null) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();

@@ -224,6 +224,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 				super.onScrolled(recyclerView, dx, dy);
 				//得到当前显示的最后一个item的view
                 View lastChildView = recyclerView.getLayoutManager().getChildAt(recyclerView.getLayoutManager().getChildCount()-1);
+				if (lastChildView == null) return;
                 //得到lastChildView的bottom坐标值
                 int lastChildBottom = lastChildView.getBottom();
                 //得到Recyclerview的底部坐标减去底部padding值，也就是显示内容最底部的坐标

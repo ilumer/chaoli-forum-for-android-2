@@ -50,6 +50,7 @@
 						app:handler="@{viewModel}"
 						app:itemList="@{viewModel.conversationList}"
 						app:selector="@{viewModel.layoutSelector}"
+						app:position="@{viewModel.listPosition}"
 						android:dividerHeight="0dp"
 						android:layout_marginLeft="@dimen/conversationListMargin"
 						android:layout_marginStart="@dimen/conversationListMargin"

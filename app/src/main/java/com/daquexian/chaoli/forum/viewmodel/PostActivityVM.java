@@ -4,6 +4,7 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.util.Log;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
@@ -12,6 +13,7 @@ import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.model.PostListResult;
+import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.network.MyRetrofit;
 import com.daquexian.chaoli.forum.utils.MyUtils;
 
@@ -95,6 +97,8 @@ public class PostActivityVM extends BaseViewModel {
                     @Override
                     public void onFailure(retrofit2.Call<PostListResult> call, Throwable t) {
                         isRefreshing.set(false);
+                        if (call.isCanceled()) return;
+                        if (t.getMessage().contains("CANCEL")) return;
                         toastContent.set(ChaoliApplication.getAppContext().getString(R.string.network_err));
                         showToast.notifyChange();
                         t.printStackTrace();
@@ -197,7 +201,7 @@ public class PostActivityVM extends BaseViewModel {
 
     private void loadAfterward() {
         final int nextPage;
-        if (postList.size() >= (maxPage - minPage) * Constants.POST_PER_PAGE)
+        if (postList.size() >= (maxPage - minPage + 1) * Constants.POST_PER_PAGE)
             nextPage = maxPage + 1;
         else
             nextPage = maxPage;
@@ -207,6 +211,7 @@ public class PostActivityVM extends BaseViewModel {
             @Override
             public void doWhenSuccess(List<Post> newPostList) {
                 //if (postList.size() > 0) postList.remove(postList.size() - 1);
+                Log.d(TAG, "doWhenSuccess: " + newPostList.size());
                 if (reversed) MyUtils.expandUnique(postList, newPostList, false, true);
                 else MyUtils.expandUnique(postList, newPostList);
                 //if (!reversed) moveToPosition(oldLen);
