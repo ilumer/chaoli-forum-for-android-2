@@ -24,7 +24,6 @@
         </android.support.design.widget.AppBarLayout>
         <android.support.v4.widget.NestedScrollView
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <LinearLayout
@@ -35,6 +34,7 @@
                 android:focusableInTouchMode="true" >
 
                 <TextView style="@style/TitleInSettings"
+                    android:layout_marginTop="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/avatar"/>
@@ -121,6 +121,9 @@
                     android:layout_marginRight="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+
+                <View style="@style/Divider"
+                    android:layout_marginTop="20dp"/>
 
                 <TextView style="@style/TitleInSettings"
                     android:layout_width="wrap_content"
