@@ -8,6 +8,7 @@
 		<variable
 			name="handler"
 			type="com.daquexian.chaoli.forum.viewmodel.MainActivityVM"/>
+		<import type="com.daquexian.chaoli.forum.data.Me"/>
 	</data>
 	<RelativeLayout
 		android:layout_width="wrap_content"
@@ -59,7 +60,7 @@
 			<TextView
 				android:id="@+id/title"
 				android:text="@{item.title}"
-				app:bold="@{item.unread != &quot;0&quot;}"
+				app:bold="@{!Me.isEmpty() &amp;&amp; !item.unread.equals(&quot;0&quot;)}"
 				android:layout_centerVertical="true"
 				android:textSize="20sp"
 				android:textColor="#000000"
@@ -86,7 +87,7 @@
 		<TextView
 			android:id="@+id/excerpt"
 			android:text="@{item.firstPost}"
-			app:bold="@{item.unread != &quot;0&quot;}"
+			app:bold="@{!Me.isEmpty() &amp;&amp; !item.unread.equals(&quot;0&quot;)}"
 			android:layout_below="@id/title_and_replies"
 			android:ellipsize="end"
 			android:textSize="16sp"
