@@ -25,12 +25,15 @@ public class ReplyActionVM extends BaseViewModel {
     public ObservableField<String> replyTo = new ObservableField<>();
     public ObservableField<String> replyMsg = new ObservableField<>();
     public ObservableField<String> content = new ObservableField<>("");
+    private String prevContent;
     public ObservableInt selection = new ObservableInt();
 
     public ObservableInt showToast = new ObservableInt();
     public ObservableField<String> toastContent = new ObservableField<>();
     public ObservableBoolean replyComplete = new ObservableBoolean(false);
     public ObservableBoolean editComplete = new ObservableBoolean(false);
+    public ObservableBoolean demoMode = new ObservableBoolean();
+    public ObservableBoolean updateRichText = new ObservableBoolean();
 
     private SharedPreferences sp;
     private SharedPreferences.Editor e;
@@ -89,11 +92,23 @@ public class ReplyActionVM extends BaseViewModel {
             }
         });
     }
-    public void saveReply() {
+    public void doAfterContentChanged() {
+        String newContent = content.get();
+        if (newContent.equals(prevContent)) return;
+        prevContent = newContent;
+        updateRichText.notifyChange();
+        saveReply();
+    }
+
+    public void changeDemoMode() {
+        demoMode.set(!demoMode.get());
+    }
+
+    private void saveReply() {
         e.putString(String.valueOf(conversationId.get()), content.get()).apply();
     }
 
-    public void clearSaved() {
+    private void clearSaved() {
         e.clear().apply();
     }
 }

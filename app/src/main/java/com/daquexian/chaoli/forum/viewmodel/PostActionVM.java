@@ -1,6 +1,7 @@
 package com.daquexian.chaoli.forum.viewmodel;
 
 import android.content.SharedPreferences;
+import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
@@ -21,11 +22,15 @@ public class PostActionVM extends BaseViewModel {
     private static final String TAG = "PostActionVM";
     public ObservableField<String> title = new ObservableField<>();
     public ObservableField<String> content = new ObservableField<>();
+    private String prevContent;
     public ObservableInt channelId = new ObservableInt();
 
     public ObservableBoolean postComplete = new ObservableBoolean(false);
     public ObservableInt showToast = new ObservableInt();
     public ObservableField<String> toastContent = new ObservableField<>();
+
+    public ObservableBoolean updateRichText = new ObservableBoolean();
+    public ObservableBoolean demoMode = new ObservableBoolean();
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -41,8 +46,16 @@ public class PostActionVM extends BaseViewModel {
         editor = sharedPreferences.edit();
         title.set(sharedPreferences.getString(DRAFT_TITLE, ""));
         content.set(sharedPreferences.getString(DRAFT_CONTENT, ""));
+        prevContent = content.get();
         channelId.set(sharedPreferences.getInt(DRAFT_CHANNEL, Channel.caff.getChannelId()));
         curChannel = Channel.getChannel(channelId.get());
+
+        content.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+
+            }
+        });
     }
 
     public void postConversation() {
@@ -67,6 +80,18 @@ public class PostActionVM extends BaseViewModel {
                 showToast.notifyChange();
             }
         });
+    }
+
+    public void changeDemoMode() {
+        demoMode.set(!demoMode.get());
+    }
+
+    public void doAfterContentChanged() {
+        String newContent = content.get();
+        if (newContent.equals(prevContent)) return;
+        prevContent = newContent;
+        updateRichText.notifyChange();
+        saveContent(newContent);
     }
 
     public void setChannelId(final int channelId) {
@@ -95,11 +120,11 @@ public class PostActionVM extends BaseViewModel {
         editor.putString(DRAFT_TITLE, title).apply();
     }
 
-    public void saveContent(String content) {
+    private void saveContent(String content) {
         editor.putString(DRAFT_CONTENT, content).apply();
     }
 
-    public void saveChannelId(int channelId) {
+    private void saveChannelId(int channelId) {
         editor.putInt(DRAFT_CHANNEL, channelId).apply();
     }
 }

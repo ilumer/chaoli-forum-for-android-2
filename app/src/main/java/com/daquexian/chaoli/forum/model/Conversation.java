@@ -249,7 +249,7 @@ public class Conversation extends BaseObservable implements DiffItem, Comparable
 
 	@Bindable
 	public String getUnread() {
-		//Log.d(TAG, "getUnread() called, unread = " + unread);
+		Log.d(TAG, "getUnread() called, unread = " + unread);
 		return unread;
 	}
 
