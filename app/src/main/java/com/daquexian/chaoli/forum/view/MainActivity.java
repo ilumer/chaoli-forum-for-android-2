@@ -329,6 +329,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	}
 
 	public void goToConversation(Conversation conversation) {
+		conversation.setUnread("0");
 		Intent jmp = new Intent();
 		jmp.putExtra("conversation", conversation);
 		//jmp.putExtra("conversationId", conversation.getConversationId());
