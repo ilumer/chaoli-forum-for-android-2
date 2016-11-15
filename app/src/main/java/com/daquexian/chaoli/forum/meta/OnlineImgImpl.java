@@ -3,11 +3,13 @@ package com.daquexian.chaoli.forum.meta;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.opengl.ETC1;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -62,7 +64,15 @@ public class OnlineImgImpl {
         mText = text;
         SpannableStringBuilder builder = SFXParser3.parse(((View) mView).getContext(), text, mAttachmentList);
         //SpannableStringBuilder builder = new SpannableStringBuilder(text);
-        mView.setText(builder);
+        if (mView instanceof EditText) {
+            EditText editText = (EditText) mView;
+            int selectionStart = editText.getSelectionStart();
+            int selectionEnd = editText.getSelectionEnd();
+            mView.setText(builder);
+            editText.setSelection(selectionStart, selectionEnd);
+        } else {
+            mView.setText(builder);
+        }
 
         retrieveOnlineImg(builder);
     }
@@ -224,7 +234,15 @@ public class OnlineImgImpl {
                         }
                         if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG) builder.setSpan(new ImageSpan(((View)mView).getContext(), newImage), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         else builder.setSpan(new CenteredImageSpan(((View)mView).getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        mView.setText(builder);
+                        if (mView instanceof EditText) {
+                            EditText editText = (EditText) mView;
+                            int selectionStart = editText.getSelectionStart();
+                            int selectionEnd = editText.getSelectionEnd();
+                            mView.setText(builder);
+                            editText.setSelection(selectionStart, selectionEnd);
+                        } else {
+                            mView.setText(builder);
+                        }
                         retrieveFormulaOnlineImg(builder, i + 1);
                     }
                 });

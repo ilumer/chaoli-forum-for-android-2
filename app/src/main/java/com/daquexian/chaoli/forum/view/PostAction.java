@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -15,9 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActionBinding;
 import com.daquexian.chaoli.forum.meta.Channel;
+import com.daquexian.chaoli.forum.meta.SFXParser3;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.PostActionVM;
 
@@ -29,16 +32,15 @@ public class PostAction extends BaseActivity implements IView {
     private static final String TAG = "PostAction";
 
     public static final int MENU_POST = 1;
-
-    private Channel preChannel, curChannel;
+    public static final int MENU_DEMO = 2;
 
     private PostActionVM viewModel;
-
     private PostActionBinding binding;
 
-    private final Context mContext = this;
+    /* 切换至演示模式时保存光标位置，切换回普通模式时恢复 */
+    private int selectionStart, selectionEnd;
 
-    //SharedPreferences sharedPreferences;
+    private final Context mContext = this;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,6 +57,34 @@ public class PostAction extends BaseActivity implements IView {
         final String[] channelArr = {getString(R.string.channel_caff), getString(R.string.channel_maths), getString(R.string.channel_physics),
                 getString(R.string.channel_biology),getString(R.string.channel_tech), getString(R.string.channel_lang),
                 getString(R.string.channel_socsci)};
+
+        viewModel.updateRichText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                int selectionStart = binding.content.getSelectionStart();
+                int selectionEnd = binding.content.getSelectionEnd();
+                binding.content.setText(SFXParser3.parse(getApplicationContext(), viewModel.content.get(), null));
+                binding.content.setSelection(selectionStart, selectionEnd);
+            }
+        });
+
+        viewModel.demoMode.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (((ObservableBoolean) observable).get()) {
+                    selectionStart = binding.content.getSelectionStart();
+                    selectionEnd = binding.content.getSelectionEnd();
+                    binding.content.setEnabled(false);
+                    binding.content.setOnlineImgEnabled(true);
+                    binding.content.update();
+                } else {
+                    binding.content.setEnabled(true);
+                    binding.content.setOnlineImgEnabled(false);
+                    binding.content.update();
+                    binding.content.setSelection(selectionStart, selectionEnd);
+                }
+            }
+        });
 
         binding.title.addTextChangedListener(new TextWatcher() {
             @Override
@@ -86,7 +116,7 @@ public class PostAction extends BaseActivity implements IView {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                viewModel.saveContent(editable.toString());
+                viewModel.doAfterContentChanged();
             }
         });
 
@@ -122,6 +152,7 @@ public class PostAction extends BaseActivity implements IView {
     public boolean onCreateOptionsMenu(Menu menu)
     {
         super.onCreateOptionsMenu(menu);
+        menu.add(Menu.NONE, Menu.NONE, MENU_DEMO, R.string.post).setIcon(R.drawable.ic_functions_white_24dp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         menu.add(Menu.NONE, Menu.NONE, MENU_POST, R.string.post).setIcon(R.drawable.ic_cab_done_mtrl_alpha).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return true;
     }
@@ -135,6 +166,9 @@ public class PostAction extends BaseActivity implements IView {
             case MENU_POST:
                 Log.d(TAG, "onOptionsItemSelected: ");
                 viewModel.postConversation();
+                break;
+            case MENU_DEMO:
+                viewModel.changeDemoMode();
                 break;
         }
         return true;

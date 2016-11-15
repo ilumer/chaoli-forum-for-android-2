@@ -50,6 +50,7 @@ public class ChannelTextView extends TextView
 
 	public Channel getChannel()
 	{
+		if (channel == null) return Channel.caff;
 		return channel;
 	}
 

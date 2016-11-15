@@ -14,7 +14,7 @@
 			android:layout_height="wrap_content">
 			<include layout="@layout/custom_toolbar"/>
 		</android.support.design.widget.AppBarLayout>
-		<EditText
+        <com.daquexian.chaoli.forum.meta.OnlineImgEditText
 			android:text="@={viewModel.content}"
 			app:selection="@{viewModel.selection}"
 			android:hint="@string/reply_hint"
