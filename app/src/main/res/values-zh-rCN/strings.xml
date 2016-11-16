@@ -163,4 +163,5 @@
 	<string name="network_error_click_to_retry_again">网络错误，点击重试</string>
 	<string name="retrieving_new_data">正在更新用户数据。。</string>
 	<string name="welcome_to_demo_mode">嗨，欢迎来到演示模式。点击顶栏的公式按钮可以进入演示模式，让LaTeX以图像的形式展示【请把LaTeX写在$或\\(与\\)之间】，这需要一定时间（根据网速不同而不同），请耐心等待~</string>
+	<string name="reply_successfully">回复成功</string>
 </resources>

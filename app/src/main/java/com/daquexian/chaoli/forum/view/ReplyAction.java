@@ -1,11 +1,14 @@
 package com.daquexian.chaoli.forum.view;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -15,13 +18,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.ReplyActionBinding;
+import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.meta.SFXParser3;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.ReplyActionVM;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ReplyAction extends BaseActivity
@@ -35,12 +44,17 @@ public class ReplyAction extends BaseActivity
 	private static final int MENU_REPLY = 2;
 	private static final int MENU_DEMO = 1;
 
+	private List<View> expressionsIVList = new ArrayList<>();
+
 	private ReplyActionVM viewModel;
 	private ReplyActionBinding binding;
+
+	private ProgressDialog progressDialog;
 
 	/* 切换至演示模式时保存光标位置，切换回普通模式时恢复 */
 	private int selectionStart, selectionEnd;
 
+	private BottomSheetBehavior behavior;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -101,8 +115,10 @@ public class ReplyAction extends BaseActivity
 		binding.replyText.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+				if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED || behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+				}
 			}
 		});
 		viewModel.editComplete.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
@@ -160,6 +176,63 @@ public class ReplyAction extends BaseActivity
 						.show();
 			}
 		});
+
+		viewModel.showDialog.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) progressDialog = ProgressDialog.show(ReplyAction.this, "", getString(R.string.just_a_sec));
+				else progressDialog.dismiss();
+			}
+		});
+
+		/**
+		 * 让各个表情按钮响应单击事件
+		 */
+
+		View.OnClickListener onClickListener = new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+					for (int j = 0; j < Constants.icons.length; j++) {
+						String icon = Constants.icons[j];
+						CharSequence contentDescription =  view.getContentDescription();
+						if (icon.equals(contentDescription)) {
+							int start = Math.max(binding.replyText.getSelectionStart(), 0);
+							int end = Math.max(binding.replyText.getSelectionEnd(), 0);
+							binding.replyText.getText().replace(Math.min(start, end), Math.max(start, end),
+									Constants.iconStrs[j], 0, Constants.iconStrs[j].length());
+							break;
+						}
+					}
+				}
+			}
+		};
+
+		final ViewGroup expressions = (ViewGroup) ((ViewGroup) binding.expressions).getChildAt(0);
+		for (int i = 0; i < expressions.getChildCount(); i++) {
+			ViewGroup subView = (ViewGroup) expressions.getChildAt(i);
+			for (int j = 0; j < subView.getChildCount(); j++) {
+				View expressionView = subView.getChildAt(j);
+				expressionsIVList.add(expressionView);
+				expressionView.setAlpha(Constants.MIN_EXPRESSION_ALPHA);
+				expressionView.setOnClickListener(onClickListener);
+			}
+		}
+
+		behavior = BottomSheetBehavior.from(binding.bottomSheet);
+		behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+			@Override
+			public void onStateChanged(@NonNull View bottomSheet, int newState) {
+				//bottomSheetState = newState;
+			}
+
+			@Override
+			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+				for (View expressionView : expressionsIVList) {
+					expressionView.setAlpha(Constants.MIN_EXPRESSION_ALPHA + slideOffset * (1 - Constants.MIN_EXPRESSION_ALPHA));
+				}
+			}
+		});
 	}
 
 	@Override
@@ -193,6 +266,22 @@ public class ReplyAction extends BaseActivity
 				break;
 		}
 		return true;
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+		else super.onBackPressed();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		View view = this.getCurrentFocus();
+		if (view != null) {
+			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+		}
 	}
 
 	@Override

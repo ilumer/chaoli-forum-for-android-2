@@ -84,5 +84,27 @@ public class Constants
 
 	public static final String NONE = "none";
 
+	public static final float MIN_EXPRESSION_ALPHA = 0.4f;
+
 	public static final int POST_PER_PAGE = 20;
+
+	public static final String[] iconStrs = new String[]{ " /:) " ,  " /:D " ,  " /^b^ " ,  " /o.o " ,  " /xx " ,  " /# " ,  " /)) " ,  " /-- " ,  " /TT " ,  " /== " ,
+			" /.** " ,  " /:( " ,  " /vv " ,  " /$$ " ,  " /?? " ,  " /:/ " ,  " /xo " ,  " /o0 " ,  " />< " ,  " /love " ,
+			" /... " ,  " /XD " ,  " /ii " ,  " /^^ " ,  " /<< " ,  " />. " ,  " /-_- " ,  " /0o0 " ,  " /zz " ,  " /O!O " ,
+			" /## " ,  " /:O " ,  " /< " ,  " /heart " ,  " /break " ,  " /rose " ,  " /gift " ,  " /bow " ,  " /moon " ,  " /sun " ,
+			" /coin " ,  " /bulb " ,  " /tea " ,  " /cake " ,  " /music " ,  " /rock " ,  " /v " ,  " /good " ,  " /bad " ,  " /ok " ,
+			" /asnowwolf-smile " ,  " /asnowwolf-laugh " ,  " /asnowwolf-upset " ,  " /asnowwolf-tear " ,
+			" /asnowwolf-worry " ,  " /asnowwolf-shock " ,  " /asnowwolf-amuse " };
+	public static final String[] icons = new String[]{"1", "2", "3", "4",
+			"5", "6", "7", "8", "9",
+			"10", "11", "12", "13", "14",
+			"15", "16", "17", "18", "19",
+			"20", "21", "22", "23", "24",
+			"25", "26", "27", "28", "29",
+			"30", "31", "32", "33", "34",
+			"35", "36", "37", "38", "39",
+			"40", "41", "42", "43", "44",
+			"45", "46", "47", "48", "49",
+			"50", "asonwwolf_smile", "asonwwolf_laugh", "asonwwolf_upset", "asonwwolf_tear",
+			"asonwwolf_worry", "asonwwolf_shock", "asonwwolf_amuse"};
 }

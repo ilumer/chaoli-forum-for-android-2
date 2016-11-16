@@ -5,7 +5,7 @@
 			name="viewModel"
 			type="com.daquexian.chaoli.forum.viewmodel.ReplyActionVM"/>
 	</data>
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:orientation="vertical">
@@ -14,19 +14,35 @@
 			android:layout_height="wrap_content">
 			<include layout="@layout/custom_toolbar"/>
 		</android.support.design.widget.AppBarLayout>
-        <com.daquexian.chaoli.forum.meta.OnlineImgEditText
-			android:text="@={viewModel.content}"
-			app:selection="@{viewModel.selection}"
-			android:hint="@string/reply_hint"
+		<android.support.v4.widget.NestedScrollView
+			android:id="@+id/replyNestedSV"
+			app:layout_behavior="@string/appbar_scrolling_view_behavior"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:paddingTop="@dimen/text_field_vertical_padding"
-			android:paddingBottom="@dimen/text_field_vertical_padding"
-			android:paddingLeft="@dimen/text_field_horizontal_padding"
-			android:paddingRight="@dimen/text_field_horizontal_padding"
-			android:id="@+id/replyText"
-			android:inputType="textLongMessage|textMultiLine"
-			android:gravity="top|start"
-			android:background="@null"/>
-	</LinearLayout>
+			android:layout_height="match_parent">
+
+			<com.daquexian.chaoli.forum.meta.OnlineImgEditText
+				android:text="@={viewModel.content}"
+				android:hint="@string/reply_hint"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:paddingTop="@dimen/text_field_vertical_padding"
+				android:paddingBottom="@dimen/text_field_vertical_padding"
+				android:paddingLeft="@dimen/text_field_horizontal_padding"
+				android:paddingRight="@dimen/text_field_horizontal_padding"
+				android:id="@+id/replyText"
+				android:inputType="textLongMessage|textMultiLine"
+				android:gravity="top|start"
+				android:background="@null"/>
+		</android.support.v4.widget.NestedScrollView>
+
+		<android.support.v4.widget.NestedScrollView
+			android:id="@+id/bottom_sheet"
+			app:layout_behavior="@string/bottom_sheet_behavior"
+			app:behavior_peekHeight="20dp"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+			<include android:id="@+id/expressions"
+				layout="@layout/expressions"/>
+		</android.support.v4.widget.NestedScrollView>
+	</android.support.design.widget.CoordinatorLayout>
 </layout>

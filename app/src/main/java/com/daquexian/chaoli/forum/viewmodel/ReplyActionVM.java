@@ -30,6 +30,7 @@ public class ReplyActionVM extends BaseViewModel {
     private String prevContent;
     public ObservableBoolean selectionLast = new ObservableBoolean();
 
+    public ObservableBoolean showDialog = new ObservableBoolean();
     public ObservableBoolean showWelcome = new ObservableBoolean();
     public ObservableInt showToast = new ObservableInt();
     public ObservableField<String> toastContent = new ObservableField<>();
@@ -57,22 +58,25 @@ public class ReplyActionVM extends BaseViewModel {
     }
 
     public void reply() {
+        showDialog.set(true);
         PostUtils.reply(conversationId.get(), content.get(), new PostUtils.ReplyObserver()
         {
             @Override
             public void onReplySuccess()
             {
+                toastContent.set(getString(R.string.reply_successfully));
                 showToast.notifyChange();
-                toastContent.set(getString(R.string.reply));
                 clearSaved();
+                showDialog.set(false);
                 replyComplete.set(true);
             }
 
             @Override
             public void onReplyFailure(int statusCode)
             {
-                showToast.notifyChange();
+                showDialog.set(false);
                 toastContent.set("Fail: " + statusCode);
+                showToast.notifyChange();
             }
         });
 

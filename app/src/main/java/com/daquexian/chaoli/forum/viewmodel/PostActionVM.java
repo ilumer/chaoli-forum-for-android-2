@@ -31,6 +31,7 @@ public class PostActionVM extends BaseViewModel {
     public ObservableInt showToast = new ObservableInt();
     public ObservableField<String> toastContent = new ObservableField<>();
     public ObservableBoolean showWelcome = new ObservableBoolean();
+    public ObservableBoolean showDialog = new ObservableBoolean();
 
     public ObservableBoolean updateContentRichText = new ObservableBoolean();
     public ObservableBoolean updateTitleRichText = new ObservableBoolean();
@@ -70,6 +71,8 @@ public class PostActionVM extends BaseViewModel {
             showToast.notifyChange();
             return;
         }
+
+        showDialog.set(true);
         ConversationUtils.postConversation(title.get(), content.get(), new ConversationUtils.PostConversationObserver() {
             @Override
             public void onPostConversationSuccess(int conversationId) {
@@ -77,6 +80,7 @@ public class PostActionVM extends BaseViewModel {
                 editor.clear().apply();
                 postComplete.notifyChange();
                 //postComplete.set(true);
+                showDialog.set(false);
             }
 
             @Override
@@ -84,6 +88,7 @@ public class PostActionVM extends BaseViewModel {
                 Log.d(TAG, "onPostConversationFailure() called with: statusCode = [" + statusCode + "]");
                 toastContent.set(getString(R.string.network_err));
                 showToast.notifyChange();
+                showDialog.set(false);
             }
         });
     }

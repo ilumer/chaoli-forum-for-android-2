@@ -5,7 +5,8 @@
             name="viewModel"
             type="com.daquexian.chaoli.forum.viewmodel.PostActionVM"/>
     </data>
-    <LinearLayout android:layout_width="match_parent"
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@drawable/divider"
         android:showDividers="middle"
@@ -16,68 +17,88 @@
             android:layout_height="wrap_content">
             <include layout="@layout/custom_toolbar"/>
         </android.support.design.widget.AppBarLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <com.daquexian.chaoli.forum.meta.OnlineImgEditText
-                android:id="@+id/title"
-                android:text="@={viewModel.title}"
-                android:background="@null"
-                android:hint="@string/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginRight="70dp"
-                android:layout_marginEnd="70dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
-                android:maxLines="1"/>
-            <com.daquexian.chaoli.forum.meta.ChannelTextView
-                android:id="@+id/channel"
-                app:channelId="@{viewModel.channelId}"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginRight="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <!--<LinearLayout
-                android:id="@+id/channel"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginRight="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_width="55dp"
-                android:layout_height="wrap_content">
-
-            </LinearLayout>-->
-        </RelativeLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AAA" />
-        <ScrollView
+        <LinearLayout
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <com.daquexian.chaoli.forum.meta.OnlineImgEditText
-                android:id="@+id/content"
-                android:text="@={viewModel.content}"
-                android:background="@null"
-                android:hint="@string/content"
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/text_field_horizontal_padding"
-                android:paddingRight="@dimen/text_field_horizontal_padding"
-                android:paddingTop="@dimen/text_field_vertical_padding"
-                android:paddingBottom="@dimen/text_field_vertical_padding"
-                android:inputType="textLongMessage|textMultiLine"
-                android:gravity="top|start"/>
-        </ScrollView>
-    </LinearLayout>
+                android:layout_height="wrap_content">
+                <HorizontalScrollView
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginRight="70dp"
+                    android:layout_marginEnd="70dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <com.daquexian.chaoli.forum.meta.OnlineImgEditText
+                        android:id="@+id/title"
+                        android:text="@={viewModel.title}"
+                        android:background="@null"
+                        android:hint="@string/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp"
+                        android:maxLines="1"/>
+                </HorizontalScrollView>
+                <com.daquexian.chaoli.forum.meta.ChannelTextView
+                    android:id="@+id/channel"
+                    app:channelId="@{viewModel.channelId}"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <!--<LinearLayout
+                    android:id="@+id/channel"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="55dp"
+                    android:layout_height="wrap_content">
+
+                </LinearLayout>-->
+            </RelativeLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#AAA" />
+            <android.support.v4.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <com.daquexian.chaoli.forum.meta.OnlineImgEditText
+                    android:id="@+id/content"
+                    android:text="@={viewModel.content}"
+                    android:background="@null"
+                    android:hint="@string/content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/text_field_horizontal_padding"
+                    android:paddingRight="@dimen/text_field_horizontal_padding"
+                    android:paddingTop="@dimen/text_field_vertical_padding"
+                    android:paddingBottom="@dimen/text_field_vertical_padding"
+                    android:inputType="textLongMessage|textMultiLine"
+                    android:gravity="top|start"/>
+            </android.support.v4.widget.NestedScrollView>
+        </LinearLayout>
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/bottom_sheet"
+            app:layout_behavior="@string/bottom_sheet_behavior"
+            app:behavior_peekHeight="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <include android:id="@+id/expressions"
+                layout="@layout/expressions"/>
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.design.widget.CoordinatorLayout>
 </layout>

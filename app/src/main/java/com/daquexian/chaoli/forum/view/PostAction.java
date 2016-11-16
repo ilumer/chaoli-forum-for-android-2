@@ -1,12 +1,15 @@
 package com.daquexian.chaoli.forum.view;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,14 +17,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActionBinding;
 import com.daquexian.chaoli.forum.meta.Channel;
+import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.meta.SFXParser3;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.PostActionVM;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by jianhao on 16-5-31.
@@ -36,8 +45,14 @@ public class PostAction extends BaseActivity implements IView {
     private PostActionVM viewModel;
     private PostActionBinding binding;
 
+    private ProgressDialog progressDialog;
+
+    private List<View> expressionsIVList = new ArrayList<>();
+
     /* 切换至演示模式时保存光标位置，切换回普通模式时恢复 */
     private int selectionStart, selectionEnd;
+
+    private BottomSheetBehavior behavior;
 
     private final Context mContext = this;
 
@@ -115,8 +130,10 @@ public class PostAction extends BaseActivity implements IView {
         View.OnClickListener onClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+                if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED || behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+                }
             }
         };
 
@@ -180,6 +197,67 @@ public class PostAction extends BaseActivity implements IView {
                         .show();
             }
         });
+
+        viewModel.showDialog.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (((ObservableBoolean) observable).get()) progressDialog = ProgressDialog.show(PostAction.this, "", getString(R.string.just_a_sec));
+                else progressDialog.dismiss();
+            }
+        });
+
+        /**
+         * 让各个表情按钮响应单击事件
+         */
+
+        View.OnClickListener onExpressionClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                    final View focused = getCurrentFocus();
+                    if (focused instanceof EditText) {
+                        final EditText focusedET = (EditText) focused;
+                        for (int j = 0; j < Constants.icons.length; j++) {
+                            String icon = Constants.icons[j];
+                            CharSequence contentDescription = view.getContentDescription();
+                            if (icon.equals(contentDescription)) {
+                                int start = Math.max(focusedET.getSelectionStart(), 0);
+                                int end = Math.max(focusedET.getSelectionEnd(), 0);
+                                focusedET.getText().replace(Math.min(start, end), Math.max(start, end),
+                                        Constants.iconStrs[j], 0, Constants.iconStrs[j].length());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        final ViewGroup expressions = (ViewGroup) ((ViewGroup) binding.expressions).getChildAt(0);
+        for (int i = 0; i < expressions.getChildCount(); i++) {
+            ViewGroup subView = (ViewGroup) expressions.getChildAt(i);
+            for (int j = 0; j < subView.getChildCount(); j++) {
+                View expressionView = subView.getChildAt(j);
+                expressionsIVList.add(expressionView);
+                expressionView.setAlpha(Constants.MIN_EXPRESSION_ALPHA);
+                expressionView.setOnClickListener(onExpressionClickListener);
+            }
+        }
+
+        behavior = BottomSheetBehavior.from(binding.bottomSheet);
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                //bottomSheetState = newState;
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                for (View expressionView : expressionsIVList) {
+                    expressionView.setAlpha(Constants.MIN_EXPRESSION_ALPHA + slideOffset * (1 - Constants.MIN_EXPRESSION_ALPHA));
+                }
+            }
+        });
     }
 
     @Override
@@ -206,6 +284,22 @@ public class PostAction extends BaseActivity implements IView {
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (behavior.getState() == BottomSheetBehavior.STATE_EXPANDED) behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        else super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override

@@ -165,5 +165,6 @@
 	<string name="network_error_click_to_retry_again">Network errer, click to retry again</string>
 	<string name="retrieving_new_data">Retrieving new data...</string>
 	<string name="welcome_to_demo_mode">hi, welcome to demo mode by clicking function button. In demo mode, your LaTeX [surrounded by $ or \\( and \\)] will be displayed as image. Just wait for a second~</string>
+	<string name="reply_successfully">Reply successfully</string>
 
 </resources>
