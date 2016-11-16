@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActionBinding;
@@ -110,6 +111,17 @@ public class PostAction extends BaseActivity implements IView {
                 viewModel.doAfterTitleChanged();
             }
         });
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+            }
+        };
+
+        binding.title.setOnClickListener(onClickListener);
+        binding.content.setOnClickListener(onClickListener);
 
         binding.content.addTextChangedListener(new TextWatcher() {
             @Override

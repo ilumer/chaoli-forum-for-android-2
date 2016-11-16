@@ -1,5 +1,6 @@
 package com.daquexian.chaoli.forum.view;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
@@ -9,9 +10,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.ReplyActionBinding;
@@ -54,6 +58,7 @@ public class ReplyAction extends BaseActivity
 
 		//setContentView(R.layout.reply_action);
 		setViewModel(new ReplyActionVM(flag, conversationId, postId, replyTo, replyMsg));
+
 		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
 		toolbar.setTitle(R.string.reply);
 		toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -80,6 +85,7 @@ public class ReplyAction extends BaseActivity
 
 			@Override
 			public void afterTextChanged(Editable editable) {
+				Log.d(TAG, "afterTextChanged() called with: editable = [" + editable + "]");
 				viewModel.doAfterContentChanged();
 			}
 		});
@@ -92,6 +98,13 @@ public class ReplyAction extends BaseActivity
 			}
 		});
 
+		binding.replyText.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+			}
+		});
 		viewModel.editComplete.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {

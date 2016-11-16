@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
+import android.util.Log;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.meta.Constants;
@@ -27,7 +28,7 @@ public class ReplyActionVM extends BaseViewModel {
     public ObservableField<String> replyMsg = new ObservableField<>();
     public ObservableField<String> content = new ObservableField<>("");
     private String prevContent;
-    public ObservableInt selection = new ObservableInt();
+    public ObservableBoolean selectionLast = new ObservableBoolean();
 
     public ObservableBoolean showWelcome = new ObservableBoolean();
     public ObservableInt showToast = new ObservableInt();
@@ -51,7 +52,8 @@ public class ReplyActionVM extends BaseViewModel {
         String draft = sp.getString(String.valueOf(conversationId), "");
         if (!"".equals(draft)) content.set(draft);
         if (this.postId.get() != -1) content.set(String.format(Locale.ENGLISH, "[quote=%d:@%s]%s[/quote]\n", this.postId.get(), this.replyTo.get(), this.replyMsg.get()));
-        selection.set(content.get().length());
+        //selectionLast.notifyChange();
+        //selectionLast.set(content.get().length());
     }
 
     public void reply() {
@@ -73,6 +75,7 @@ public class ReplyActionVM extends BaseViewModel {
                 toastContent.set("Fail: " + statusCode);
             }
         });
+
     }
 
     public void edit() {
@@ -105,6 +108,7 @@ public class ReplyActionVM extends BaseViewModel {
     }
 
     public void doAfterContentChanged() {
+        Log.d(TAG, "doAfterContentChanged() called");
         String newContent = content.get();
         if (newContent.equals(prevContent)) return;
         prevContent = newContent;
