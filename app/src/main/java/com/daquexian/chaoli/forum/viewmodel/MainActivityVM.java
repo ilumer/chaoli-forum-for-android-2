@@ -30,6 +30,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -63,6 +64,9 @@ public class MainActivityVM extends BaseViewModel {
     public ObservableBoolean showLoginProcessDialog = new ObservableBoolean(false);
     public ObservableInt selectedItem = new ObservableInt(-1);
     public ObservableInt goToPost = new ObservableInt();
+    public ObservableBoolean failed = new ObservableBoolean();
+    public ObservableBoolean showToast = new ObservableBoolean();
+    public String toastContent;
 
     public LayoutSelector<Conversation> layoutSelector = new ConversationLayoutSelector();
 
@@ -88,6 +92,7 @@ public class MainActivityVM extends BaseViewModel {
         MyRetrofit.getService()
                 .listConversations(channel, "#第 " + page + " 页")
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<ConversationListResult>() {
                     @Override
                     public void onCompleted() {
@@ -96,9 +101,11 @@ public class MainActivityVM extends BaseViewModel {
 
                     @Override
                     public void onError(Throwable e) {
-                        e.printStackTrace();
-                        //if (conversationList.size() > 0) conversationList.get(conversationList.size() - 1).setFirstPost(getString(R.string.error_click_to_retry));
                         removeCircle();
+                        if (refresh) {
+                            failed.set(true);
+                            failed.notifyChange();
+                        }
                     }
 
                     @Override
@@ -210,6 +217,7 @@ public class MainActivityVM extends BaseViewModel {
         LoginUtils.begin_login(new LoginUtils.LoginObserver() {
             @Override
             public void onLoginSuccess(int userId, String token) {
+                failed.set(false);
                 showLoginProcessDialog.set(false);
                 hasLoggedIn.set(true);
                 /*navigationView.getMenu().clear();
@@ -261,7 +269,14 @@ public class MainActivityVM extends BaseViewModel {
             @Override
             public void onLoginFailure(int statusCode) {
                 showLoginProcessDialog.set(false);
-                selectedItem.set(0);
+                if (statusCode == LoginUtils.EMPTY_UN_OR_PW) {
+                    selectedItem.set(0);
+                    selectedItem.notifyChange();
+                }
+                else {
+                    failed.set(true);
+
+                }
                 Log.d(TAG, "onLoginFailure: " + statusCode);
             }
         });
@@ -298,6 +313,8 @@ public class MainActivityVM extends BaseViewModel {
     public void resume() {
         if(!Me.isEmpty()) {
             //timer.cancel();
+            mySignature.set(Me.getMySignature());
+            myAvatarSuffix.set(Me.getAvatarSuffix());
             if (task != null) task.cancel();
             task = new TimerTask() {
                 @Override

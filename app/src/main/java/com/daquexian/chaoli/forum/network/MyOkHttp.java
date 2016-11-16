@@ -78,6 +78,8 @@ public class MyOkHttp {
                     .cookieJar(mCookiesManager)
                     .connectTimeout(15, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
+                    //.connectTimeout(5, TimeUnit.SECONDS)
+                    //.readTimeout(5, TimeUnit.SECONDS)
                     .build();
         }
         return okHttpClient;

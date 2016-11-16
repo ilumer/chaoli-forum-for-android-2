@@ -1,9 +1,11 @@
 package com.daquexian.chaoli.forum.view;
 
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,8 +28,8 @@ public class ReplyAction extends BaseActivity
 	public static final int FLAG_REPLY = 1;
 	public static final int FLAG_EDIT = 2;
 
-	private static final int MENU_REPLY = 1;
-	private static final int MENU_DEMO = 2;
+	private static final int MENU_REPLY = 2;
+	private static final int MENU_DEMO = 1;
 
 	private ReplyActionVM viewModel;
 	private ReplyActionBinding binding;
@@ -129,6 +131,20 @@ public class ReplyAction extends BaseActivity
 					binding.replyText.update();
 					binding.replyText.setSelection(selectionStart, selectionEnd);
 				}
+			}
+		});
+
+		viewModel.showWelcome.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				new AlertDialog.Builder(ReplyAction.this).setMessage(R.string.welcome_to_demo_mode)
+						.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialogInterface, int i) {
+
+							}
+						})
+						.show();
 			}
 		});
 	}

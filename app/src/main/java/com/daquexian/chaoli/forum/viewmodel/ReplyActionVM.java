@@ -6,6 +6,7 @@ import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 
 import com.daquexian.chaoli.forum.R;
+import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.utils.PostUtils;
 
 import java.util.Locale;
@@ -28,6 +29,7 @@ public class ReplyActionVM extends BaseViewModel {
     private String prevContent;
     public ObservableInt selection = new ObservableInt();
 
+    public ObservableBoolean showWelcome = new ObservableBoolean();
     public ObservableInt showToast = new ObservableInt();
     public ObservableField<String> toastContent = new ObservableField<>();
     public ObservableBoolean replyComplete = new ObservableBoolean(false);
@@ -92,16 +94,22 @@ public class ReplyActionVM extends BaseViewModel {
             }
         });
     }
+
+    public void changeDemoMode() {
+        demoMode.set(!demoMode.get());
+        SharedPreferences globalSP = getSharedPreferences(Constants.GLOBAL, MODE_PRIVATE);
+        if (globalSP.getBoolean(Constants.FIRST_ENTER_DEMO_MODE, true) && demoMode.get()) {
+            showWelcome.notifyChange();
+            globalSP.edit().putBoolean(Constants.FIRST_ENTER_DEMO_MODE, false).apply();
+        }
+    }
+
     public void doAfterContentChanged() {
         String newContent = content.get();
         if (newContent.equals(prevContent)) return;
         prevContent = newContent;
         updateRichText.notifyChange();
         saveReply();
-    }
-
-    public void changeDemoMode() {
-        demoMode.set(!demoMode.get());
     }
 
     private void saveReply() {

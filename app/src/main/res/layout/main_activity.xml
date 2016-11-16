@@ -7,6 +7,7 @@
 		<variable
 			name="viewModel"
 			type="com.daquexian.chaoli.forum.viewmodel.MainActivityVM"/>
+		<import type="android.view.View"/>
 	</data>
 
 	<android.support.v4.widget.DrawerLayout
@@ -34,29 +35,49 @@
 						android:background="?attr/colorPrimary"
 						app:layout_scrollFlags="scroll|enterAlways" />
 				</android.support.design.widget.AppBarLayout>
-				<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-					android:background="@color/white"
-					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					app:isRefreshing="@{viewModel.isRefreshing}"
-					app:canRefresh="@{viewModel.canRefresh}"
+				<FrameLayout
 					app:layout_behavior="@string/appbar_scrolling_view_behavior"
-					android:id="@+id/conversationListRefreshLayout">
-					<android.support.v7.widget.RecyclerView
+					android:layout_width="match_parent"
+					android:layout_height="match_parent">
+
+					<RelativeLayout
+						android:clickable="@{viewModel.failed}"
+						android:onClick="@{() -> viewModel.login()}"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content"
-						android:orientation="vertical"
-						android:id="@+id/conversationList"
-						app:handler="@{viewModel}"
-						app:itemList="@{viewModel.conversationList}"
-						app:selector="@{viewModel.layoutSelector}"
-						app:position="@{viewModel.listPosition}"
-						android:dividerHeight="0dp"
-						android:layout_marginLeft="@dimen/conversationListMargin"
-						android:layout_marginStart="@dimen/conversationListMargin"
-						android:layout_marginRight="@dimen/conversationListMargin"
-						android:layout_marginEnd="@dimen/conversationListMargin"/>
-				</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+						android:layout_height="match_parent">
+						<TextView
+							android:textSize="25sp"
+							android:text="@string/network_error_click_to_retry_again"
+							android:gravity="center"
+							android:textColor="@color/gray"
+							android:layout_centerInParent="true"
+							android:layout_width="wrap_content"
+							android:layout_height="wrap_content" />
+					</RelativeLayout>
+					<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
+						android:visibility="@{viewModel.failed ? View.INVISIBLE : View.VISIBLE}"
+						android:background="@color/white"
+						android:layout_width="match_parent"
+						android:layout_height="match_parent"
+						app:isRefreshing="@{viewModel.isRefreshing}"
+						app:canRefresh="@{viewModel.canRefresh}"
+						android:id="@+id/conversationListRefreshLayout">
+						<android.support.v7.widget.RecyclerView
+							android:layout_width="match_parent"
+							android:layout_height="wrap_content"
+							android:orientation="vertical"
+							android:id="@+id/conversationList"
+							app:handler="@{viewModel}"
+							app:itemList="@{viewModel.conversationList}"
+							app:selector="@{viewModel.layoutSelector}"
+							app:position="@{viewModel.listPosition}"
+							android:dividerHeight="0dp"
+							android:layout_marginLeft="@dimen/conversationListMargin"
+							android:layout_marginStart="@dimen/conversationListMargin"
+							android:layout_marginRight="@dimen/conversationListMargin"
+							android:layout_marginEnd="@dimen/conversationListMargin"/>
+					</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+				</FrameLayout>
 				<android.support.design.widget.FloatingActionButton
 					android:id="@+id/postBtn"
 					android:layout_width="wrap_content"

@@ -146,6 +146,13 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
+		viewModel.failed.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				if (((ObservableBoolean) observable).get()) showToast(R.string.network_err);
+			}
+		});
+
 		/**
 		 * 根据登录状态更改侧栏菜单
 		 */

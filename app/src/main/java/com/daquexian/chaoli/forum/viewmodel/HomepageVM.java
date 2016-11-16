@@ -4,6 +4,8 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 
+import com.daquexian.chaoli.forum.data.Me;
+
 /**
  * Created by jianhao on 16-9-21.
  */
@@ -21,5 +23,10 @@ public class HomepageVM extends BaseViewModel {
         this.signature.set(signature);
         this.avatarSuffix.set(avatarSuffix);
         this.isSelf.set(isSelf);
+    }
+
+    public void updateSelfProfile() {
+        signature.set(Me.getMySignature());
+        avatarSuffix.set(Me.getAvatarSuffix());
     }
 }

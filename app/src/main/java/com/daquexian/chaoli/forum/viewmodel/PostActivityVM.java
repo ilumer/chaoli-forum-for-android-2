@@ -42,6 +42,7 @@ public class PostActivityVM extends BaseViewModel {
     public ObservableInt listPosition = new ObservableInt();
     public ObservableBoolean showToast = new ObservableBoolean(false);
     public ObservableField<String> toastContent = new ObservableField<>();
+    public ObservableBoolean updateToolbar = new ObservableBoolean();
 
     public ObservableBoolean goToReply = new ObservableBoolean(false);
     public ObservableBoolean goToQuote = new ObservableBoolean();
@@ -84,6 +85,12 @@ public class PostActivityVM extends BaseViewModel {
                 .enqueue(new retrofit2.Callback<PostListResult>() {
                     @Override
                     public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
+                        Log.d(TAG, "onResponse: " + conversationId);
+                        if (conversation == null) {
+                            conversation = response.body().getConversation();
+                            updateToolbar.notifyChange();
+                        }
+
                         List<Post> newPosts = response.body().getPosts();
                         callback.doWhenSuccess(newPosts);
                         removeCircle();
@@ -151,6 +158,11 @@ public class PostActivityVM extends BaseViewModel {
     public void reverse() {
         reversed = !reversed;
         firstLoad();
+    }
+
+    public void reverseBtnClick() {
+        if (conversation == null) return;
+        reverse();
     }
 
     public boolean hasFooterView() {

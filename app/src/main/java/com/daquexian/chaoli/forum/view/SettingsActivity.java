@@ -1,15 +1,21 @@
 package com.daquexian.chaoli.forum.view;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.daquexian.chaoli.forum.data.Me;
@@ -28,6 +34,10 @@ import com.daquexian.chaoli.forum.viewmodel.SettingsVM;
  */
 public class SettingsActivity extends BaseActivity implements AccountUtils.GetProfileObserver{
     private static final String TAG = "SettingsActivity";
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+
+    private final String IMAGE_TYPE = "image/*";
+    private final int IMAGE_CODE = 0;   //这里的IMAGE_CODE是自己任意定义的
 
     SettingsVM viewModel;
 
@@ -65,48 +75,18 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
                 goToAlbum();
             }
         });
+
+        viewModel.complete.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
     }
-
-    private final String IMAGE_TYPE = "image/*";
-    private final int IMAGE_CODE = 0;   //这里的IMAGE_CODE是自己任意定义的
-
-//使用intent调用系统提供的相册功能，使用startActivityForResult是为了获取用户选择的图片
-
-//重写onActivityResult以获得你需要的信息
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        /*if (resultCode != RESULT_OK) {        //此处的 RESULT_OK 是系统自定义得一个常量
-            Log.e("error","ActivityResult resultCode error");
-            return;
-        }
-
-        //Bitmap bm = null;
-
-        //外界的程序访问ContentProvider所提供数据 可以通过ContentResolver接口
-        ContentResolver resolver = getContentResolver();
-
-        //此处的用于判断接收的Activity是不是你想要的那个
-        if (requestCode == IMAGE_CODE) {
-            Uri originalUri = data.getData();        //获得图片的uri
-            Log.i("uri", originalUri.toString());
-            //bm = MediaStore.Images.Media.getBitmap(resolver, originalUri);        //显得到bitmap图片
-
-            String[] proj = {MediaStore.Images.Media.DATA};
-
-            //好像是android多媒体数据库的封装接口，具体的看Android文档
-            Cursor cursor = resolver.query(originalUri, proj, null, null, null);
-            //按我个人理解 这个是获得用户选择的图片的索引值
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            //将光标移至开头 ，这个很重要，不小心很容易引起越界
-            cursor.moveToFirst();
-            //最后根据索引值获取图片路径
-            String selectedImagePath = cursor.getString(column_index);
-            //Log.i("path", path);
-
-            viewModel.avatarFile = new File(selectedImagePath);
-            Glide.with(this).load(viewModel.avatarFile).into((ImageView)findViewById(R.id.iv_new_avatar));
-        }*/
         if (resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
             String selectedPath = getPath(selectedImage);
@@ -183,9 +163,69 @@ public class SettingsActivity extends BaseActivity implements AccountUtils.GetPr
     }
 
     public void goToAlbum() {
-        Intent getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
-        getAlbum.setType(IMAGE_TYPE);
-        startActivityForResult(Intent.createChooser(getAlbum, "Select Picture"), IMAGE_CODE);
+        //Intent getAlbum = new Intent(Intent.ACTION_GET_CONTENT);
+        //getAlbum.setType(IMAGE_TYPE);
+        //startActivityForResult(Intent.createChooser(getAlbum, "Select Picture"), IMAGE_CODE);
+        if (Build.VERSION.SDK_INT >= 23){
+            // Here, thisActivity is the current activity
+            if (ContextCompat.checkSelfPermission(SettingsActivity.this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(SettingsActivity.this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                    // Show an expanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+
+                } else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(SettingsActivity.this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                    // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
+            }else{
+                ActivityCompat.requestPermissions(SettingsActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            }
+        }else {
+
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, IMAGE_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, IMAGE_CODE);
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                break;
+        }
     }
 
     @Override

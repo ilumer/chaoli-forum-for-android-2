@@ -82,8 +82,9 @@ public class SFXParser3 {
 			spannable.setSpan(new ClickableSpan() {
 				@Override
 				public void onClick(View widget) {
-					if (site.startsWith("https://chaoli.club/index.php/")) // temporary
-						context.startActivity(new Intent(context, PostActivity.class).putExtra("a", site.substring(30)));
+					String prefix = "https://chaoli.club/index.php/";
+					if (site.startsWith(prefix)) // TODO: 16-11-16 change it
+						context.startActivity(new Intent(context, PostActivity.class).putExtra("conversationId", Integer.parseInt(site.substring(prefix.length()))));
 					else {
 						context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(site)));
 					}

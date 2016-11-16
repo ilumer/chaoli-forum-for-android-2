@@ -33,16 +33,16 @@ public class SignUpVM extends BaseViewModel {
     String signUpUrl;
     String token;
 
-    public ObservableField<String> username = new ObservableField<>();
-    public ObservableField<String> password = new ObservableField<>();
-    public ObservableField<String> confirm = new ObservableField<>();
-    public ObservableField<String> captcha = new ObservableField<>();
-    public ObservableField<String> email = new ObservableField<>();
-    public ObservableField<String> usernameError = new ObservableField<>();
-    public ObservableField<String> passwordError = new ObservableField<>();
-    public ObservableField<String> confirmError = new ObservableField<>();
-    public ObservableField<String> captchaError = new ObservableField<>();
-    public ObservableField<String> emailError = new ObservableField<>();
+    public ObservableField<String> username = new ObservableField<>("");
+    public ObservableField<String> password = new ObservableField<>("");
+    public ObservableField<String> confirm = new ObservableField<>("");
+    public ObservableField<String> captcha = new ObservableField<>("");
+    public ObservableField<String> email = new ObservableField<>("");
+    public ObservableField<String> usernameError = new ObservableField<>("");
+    public ObservableField<String> passwordError = new ObservableField<>("");
+    public ObservableField<String> confirmError = new ObservableField<>("");
+    public ObservableField<String> captchaError = new ObservableField<>("");
+    public ObservableField<String> emailError = new ObservableField<>("");
     public ObservableField<Drawable> captchaImg = new ObservableField<>();
 
     public ObservableInt showToast = new ObservableInt();

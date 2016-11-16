@@ -69,6 +69,9 @@ public class Constants
 	public static final String SETTINGS_SP = "settings";
 	public static final String CLICK_TWICE_TO_EXIT = "ctte";
 
+	public static final String GLOBAL = "global";
+	public static final String FIRST_ENTER_DEMO_MODE = "fedm";
+
 	public static final String conversationSP = "conversationList";
 	public static final String conversationSPKey = "listJSON";
 

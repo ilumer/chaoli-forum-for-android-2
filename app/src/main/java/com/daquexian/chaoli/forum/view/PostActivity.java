@@ -150,6 +150,13 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 		viewModel.firstLoad();
 
+		viewModel.updateToolbar.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				configToolbar(viewModel.conversation.getTitle());
+			}
+		});
+
 		this.viewModel.goToReply.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
@@ -255,7 +262,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				} else {
 					item.setTitle(R.string.ascend);
 				}
-				viewModel.reverse();
+				viewModel.reverseBtnClick();
 				break;
 			case menu_share:
 				share();

@@ -2,7 +2,6 @@ package com.daquexian.chaoli.forum.view;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActionBinding;
 import com.daquexian.chaoli.forum.meta.Channel;
@@ -31,8 +29,8 @@ public class PostAction extends BaseActivity implements IView {
 
     private static final String TAG = "PostAction";
 
-    public static final int MENU_POST = 1;
-    public static final int MENU_DEMO = 2;
+    public static final int MENU_POST = 2;
+    public static final int MENU_DEMO = 1;
 
     private PostActionVM viewModel;
     private PostActionBinding binding;
@@ -58,13 +56,23 @@ public class PostAction extends BaseActivity implements IView {
                 getString(R.string.channel_biology),getString(R.string.channel_tech), getString(R.string.channel_lang),
                 getString(R.string.channel_socsci)};
 
-        viewModel.updateRichText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+        viewModel.updateContentRichText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
                 int selectionStart = binding.content.getSelectionStart();
                 int selectionEnd = binding.content.getSelectionEnd();
                 binding.content.setText(SFXParser3.parse(getApplicationContext(), viewModel.content.get(), null));
                 binding.content.setSelection(selectionStart, selectionEnd);
+            }
+        });
+
+        viewModel.updateTitleRichText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                int selectionStart = binding.title.getSelectionStart();
+                int selectionEnd = binding.title.getSelectionEnd();
+                binding.title.setText(SFXParser3.parse(getApplicationContext(), viewModel.title.get(), null));
+                binding.title.setSelection(selectionStart, selectionEnd);
             }
         });
 
@@ -99,7 +107,7 @@ public class PostAction extends BaseActivity implements IView {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                viewModel.saveTitle(editable.toString());
+                viewModel.doAfterTitleChanged();
             }
         });
 
@@ -144,6 +152,20 @@ public class PostAction extends BaseActivity implements IView {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
                 showToast(viewModel.toastContent.get());
+            }
+        });
+
+        viewModel.showWelcome.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                new AlertDialog.Builder(mContext).setMessage(R.string.welcome_to_demo_mode)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        })
+                        .show();
             }
         });
     }

@@ -39,6 +39,8 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
     final int MENU_SETTING = 0;
     final int MENU_LOGOUT = 1;
 
+    final int SETTING_CODE = 0;
+
     AppBarLayout mAppBarLayout;
     ViewPager mViewPager;
     TabLayout mTabLayout;
@@ -47,7 +49,6 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
 
     HistoryFragment mHistoryFragment;
     StatisticFragment mStatisticFragment;
-    //NotificationFragment mNotificationFragment;
     HistoryFragment mNotificationFragment;
 
     HomepageVM viewModel;
@@ -193,7 +194,8 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
         super.onOptionsItemSelected(item);
         switch (item.getOrder()){
             case MENU_SETTING:
-                startActivity(new Intent(HomepageActivity.this, SettingsActivity.class));
+                //startActivity(new Intent(HomepageActivity.this, SettingsActivity.class));
+                startActivityForResult(new Intent(HomepageActivity.this, SettingsActivity.class), SETTING_CODE);
                 break;
             case MENU_LOGOUT:
                 LoginUtils.logout(new LoginUtils.LogoutObserver() {
@@ -213,6 +215,16 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case SETTING_CODE:
+                if (resultCode == RESULT_OK) viewModel.updateSelfProfile();
+                break;
+        }
     }
 
     @Override
