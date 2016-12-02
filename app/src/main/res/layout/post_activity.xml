@@ -11,7 +11,7 @@
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
 		android:background="@color/light_gray">
-		<android.support.design.widget.AppBarLayout
+        <com.daquexian.chaoli.forum.meta.MyAppBarLayout
 			android:id="@+id/appbar"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content">
@@ -22,7 +22,7 @@
 				android:layout_height="?attr/actionBarSize"
 				android:background="?attr/colorPrimary"
 				app:layout_scrollFlags="scroll|enterAlways" />
-		</android.support.design.widget.AppBarLayout>
+		</com.daquexian.chaoli.forum.meta.MyAppBarLayout>
 		<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
 			android:id="@+id/swipyRefreshLayout"
 			app:layout_behavior="@string/appbar_scrolling_view_behavior"

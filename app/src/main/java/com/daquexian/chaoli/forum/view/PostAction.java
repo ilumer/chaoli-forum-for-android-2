@@ -75,20 +75,12 @@ public class PostAction extends BaseActivity implements IView {
         viewModel.updateContentRichText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
-                int selectionStart = binding.content.getSelectionStart();
-                int selectionEnd = binding.content.getSelectionEnd();
-                binding.content.setText(SFXParser3.parse(getApplicationContext(), viewModel.content.get(), null));
-                binding.content.setSelection(selectionStart, selectionEnd);
             }
         });
 
         viewModel.updateTitleRichText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
-                int selectionStart = binding.title.getSelectionStart();
-                int selectionEnd = binding.title.getSelectionEnd();
-                binding.title.setText(SFXParser3.parse(getApplicationContext(), viewModel.title.get(), null));
-                binding.title.setSelection(selectionStart, selectionEnd);
             }
         });
 
@@ -127,16 +119,22 @@ public class PostAction extends BaseActivity implements IView {
             }
         });
 
-        View.OnClickListener onClickListener = new View.OnClickListener() {
+        View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
             @Override
-            public void onClick(View view) {
-                if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED || behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
-                }
+            public void onFocusChange(View view, boolean b) {
+                if (b) tryToShowSoftKeyboard(view);
             }
         };
 
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tryToShowSoftKeyboard(view);
+            }
+        };
+
+        binding.title.setOnFocusChangeListener(onFocusChangeListener);
+        binding.content.setOnFocusChangeListener(onFocusChangeListener);
         binding.title.setOnClickListener(onClickListener);
         binding.content.setOnClickListener(onClickListener);
 
@@ -225,6 +223,7 @@ public class PostAction extends BaseActivity implements IView {
                                 int end = Math.max(focusedET.getSelectionEnd(), 0);
                                 focusedET.getText().replace(Math.min(start, end), Math.max(start, end),
                                         Constants.iconStrs[j], 0, Constants.iconStrs[j].length());
+                                updateRichText();
                                 break;
                             }
                         }
@@ -258,6 +257,27 @@ public class PostAction extends BaseActivity implements IView {
                 }
             }
         });
+
+        binding.title.requestFocus();
+        tryToShowSoftKeyboard(binding.title);
+    }
+
+    private void updateRichText() {
+        int selectionStart = binding.content.getSelectionStart();
+        int selectionEnd = binding.content.getSelectionEnd();
+        binding.content.setText(SFXParser3.parse(getApplicationContext(), viewModel.content.get(), null));
+        binding.content.setSelection(selectionStart, selectionEnd);
+        selectionStart = binding.title.getSelectionStart();
+        selectionEnd = binding.title.getSelectionEnd();
+        binding.title.setText(SFXParser3.parse(getApplicationContext(), viewModel.title.get(), null));
+        binding.title.setSelection(selectionStart, selectionEnd);
+    }
+
+    private void tryToShowSoftKeyboard(View view) {
+        if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED || behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+        }
     }
 
     @Override

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#99FFFFFF"
+    android:background="#9FFF"
     android:orientation="vertical"
     android:layout_width="match_parent" android:layout_height="match_parent">
-
     <LinearLayout
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_weight="1"
         android:layout_height="0dp">

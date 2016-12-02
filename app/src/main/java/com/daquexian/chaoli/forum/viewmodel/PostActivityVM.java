@@ -213,10 +213,9 @@ public class PostActivityVM extends BaseViewModel {
 
     private void loadAfterward() {
         final int nextPage;
-        if (postList.size() >= (maxPage - minPage + 1) * Constants.POST_PER_PAGE)
-            nextPage = maxPage + 1;
-        else
-            nextPage = maxPage;
+        if (postList.size() >= (maxPage - minPage + 1) * Constants.POST_PER_PAGE) nextPage = maxPage + 1;
+        else nextPage = maxPage;
+
         showCircle();
         final int oldLen = postList.size();
         getList(nextPage, new SuccessCallback() {
@@ -224,7 +223,10 @@ public class PostActivityVM extends BaseViewModel {
             public void doWhenSuccess(List<Post> newPostList) {
                 //if (postList.size() > 0) postList.remove(postList.size() - 1);
                 Log.d(TAG, "doWhenSuccess: " + newPostList.size());
-                if (reversed) MyUtils.expandUnique(postList, newPostList, false, true);
+                if (reversed) {
+                    MyUtils.expandUnique(postList, MyUtils.reverse(newPostList), false, reversed);
+                    moveToPosition(0);
+                }
                 else MyUtils.expandUnique(postList, newPostList);
                 //if (!reversed) moveToPosition(oldLen);
                 maxPage = nextPage;

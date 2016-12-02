@@ -115,10 +115,7 @@ public class ReplyAction extends BaseActivity
 		binding.replyText.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED || behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
-				}
+				tryToShowSoftKeyboard(view);
 			}
 		});
 		viewModel.editComplete.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
@@ -138,10 +135,6 @@ public class ReplyAction extends BaseActivity
 		viewModel.updateRichText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				int selectionStart = binding.replyText.getSelectionStart();
-				int selectionEnd = binding.replyText.getSelectionEnd();
-				binding.replyText.setText(SFXParser3.parse(getApplicationContext(), viewModel.content.get(), null));
-				binding.replyText.setSelection(selectionStart, selectionEnd);
 			}
 		});
 
@@ -201,6 +194,7 @@ public class ReplyAction extends BaseActivity
 							int end = Math.max(binding.replyText.getSelectionEnd(), 0);
 							binding.replyText.getText().replace(Math.min(start, end), Math.max(start, end),
 									Constants.iconStrs[j], 0, Constants.iconStrs[j].length());
+							updateRichText();
 							break;
 						}
 					}
@@ -233,6 +227,23 @@ public class ReplyAction extends BaseActivity
 				}
 			}
 		});
+
+        binding.replyText.requestFocus();
+        tryToShowSoftKeyboard(binding.replyText);
+	}
+
+	private void updateRichText() {
+		int selectionStart = binding.replyText.getSelectionStart();
+		int selectionEnd = binding.replyText.getSelectionEnd();
+		binding.replyText.setText(SFXParser3.parse(getApplicationContext(), viewModel.content.get(), null));
+		binding.replyText.setSelection(selectionStart, selectionEnd);
+	}
+
+	private void tryToShowSoftKeyboard(View view) {
+		if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED || behavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
+		}
 	}
 
 	@Override

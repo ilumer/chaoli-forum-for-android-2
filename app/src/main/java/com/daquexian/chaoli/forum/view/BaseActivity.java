@@ -26,6 +26,10 @@ public abstract class BaseActivity extends AppCompatActivity implements IView {
             }
         });
     }
+
+    public Toolbar getToolbar() {
+        return (Toolbar) findViewById(R.id.tl_custom);
+    }
     public void configToolbar(int resId){
         configToolbar(getString(resId));
     }

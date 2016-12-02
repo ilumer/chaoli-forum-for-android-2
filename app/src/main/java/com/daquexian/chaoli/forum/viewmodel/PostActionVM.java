@@ -107,7 +107,7 @@ public class PostActionVM extends BaseViewModel {
         String newContent = content.get();
         if (newContent.equals(prevContent)) return;
         prevContent = newContent;
-        updateContentRichText.notifyChange();
+        //updateContentRichText.notifyChange();
         saveContent(newContent);
     }
 
@@ -115,7 +115,7 @@ public class PostActionVM extends BaseViewModel {
         String newTitle = title.get();
         if (newTitle.equals(prevTitle)) return;
         prevTitle = newTitle;
-        updateTitleRichText.notifyChange();
+        //updateTitleRichText.notifyChange();
         saveTitle(newTitle);
     }
 

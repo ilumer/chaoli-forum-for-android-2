@@ -55,6 +55,8 @@ public class HistoryFragmentVM extends BaseViewModel {
     public ObservableField<String> intendedConversationTitle = new ObservableField<>();
     public ObservableInt intendedConversationPage = new ObservableInt();
     public ObservableInt goToPost = new ObservableInt();
+    public ObservableBoolean showToast = new ObservableBoolean();
+    public String toastContent;
 
     private int userId;
     private String username;
@@ -94,7 +96,11 @@ public class HistoryFragmentVM extends BaseViewModel {
                         Matcher matcher = pattern.matcher(responseStr);
                         if (matcher.find()) {
                             intendedConversationId.set(Integer.parseInt(matcher.group(1)));
-                        } else throw new RuntimeException("Conversation id not found");
+                        } else {
+                            toastContent = getString(R.string.conversation_has_been_deleted);
+                            showToast.notifyChange();
+                            return;
+                        }
 
                         pattern = Pattern.compile("<h1 id='conversationTitle'>(.*?)</h1>");
                         matcher = pattern.matcher(responseStr);
@@ -103,7 +109,11 @@ public class HistoryFragmentVM extends BaseViewModel {
                             title = title.replaceAll("(^<(.*?)>)|(<(.*?)>$)", "");
                             //intent.putExtra("title", title);
                             intendedConversationTitle.set(title);
-                        } else throw new RuntimeException("Conversation title not found");
+                        } else {
+                            toastContent = getString(R.string.conversation_has_been_deleted);
+                            showToast.notifyChange();
+                            return;
+                        }
 
                         //if (v.equals(holder.content_tv)) {
                             pattern = Pattern.compile("\"startFrom\":(\\d+)");

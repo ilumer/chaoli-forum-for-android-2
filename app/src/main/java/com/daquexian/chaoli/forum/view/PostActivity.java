@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActivityBinding;
 import com.daquexian.chaoli.forum.meta.Constants;
+import com.daquexian.chaoli.forum.meta.MyAppBarLayout;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.network.MyOkHttp;
@@ -32,8 +33,7 @@ import com.daquexian.chaoli.forum.viewmodel.PostActivityVM;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
-public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver, AppBarLayout.OnOffsetChangedListener
-{
+public class PostActivity extends BaseActivity implements ConversationUtils.IgnoreAndStarConversationObserver, MyAppBarLayout.OnStateChangeListener, AppBarLayout.OnOffsetChangedListener {
 	public static final String TAG = "PostActivity";
 
 	private static final int POST_NUM_PER_PAGE = 20;
@@ -53,6 +53,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 
 	RecyclerView postListRv;
 	SwipyRefreshLayout swipyRefreshLayout;
+	MyAppBarLayout appBarLayout;
 
 	LinearLayoutManager mLinearLayoutManager;
 
@@ -71,7 +72,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		reply = binding.reply;
 		postListRv = binding.postList;
 		swipyRefreshLayout = binding.swipyRefreshLayout;
-		binding.appbar.addOnOffsetChangedListener(this);
+		appBarLayout = binding.appbar;
+		appBarLayout.addOnOffsetChangedListener(this);
+		appBarLayout.setOnStateChangeListener(this);
+		//appBarLayout.addOnOffsetChangedListener(this);
 		binding.postList.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
 			public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -93,7 +97,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				int lastPosition = recyclerView.getLayoutManager().getItemCount() - 1;
 				if(lastChildBottom <= recyclerBottom && lastVisiblePosition == lastPosition){
 					bottom = true;
-					viewModel.canRefresh.set(true);
+					if (appBarLayout.getState() == MyAppBarLayout.State.COLLAPSED) {
+						viewModel.canRefresh.set(true);
+						Log.d(TAG, "onScrolled: collapsed");
+					}
 				}else{
 					bottom = false;
 				}
@@ -131,6 +138,13 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		initUI();
 
 		configToolbar(mTitle);
+
+		getToolbar().setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				Log.d(TAG, "onClick: toolbar is clicked!");
+			}
+		});
 
 		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
@@ -317,13 +331,13 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
 	}
 
-	@Override
+	/*@Override
 	public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-		/**
-		 * verticalOffset == 0说明appbar已经是展开状态
-		 */
 		viewModel.canRefresh.set(verticalOffset == 0 || bottom);
-	}
+		Log.d(TAG, "onOffsetChanged: " + viewModel.canRefresh.get());
+	}*/
+
+
 
 	@Override
 	public void setViewModel(BaseViewModel viewModel) {
@@ -336,5 +350,20 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	protected void onDestroy() {
 		super.onDestroy();
 		MyOkHttp.getClient().dispatcher().cancelAll();
+	}
+
+	@Override
+	public void onStateChange(MyAppBarLayout.State state) {
+		Log.d(TAG, "onStateChange: " + state);
+		if (state == MyAppBarLayout.State.IDLE) viewModel.canRefresh.set(false);
+		else if (state == MyAppBarLayout.State.EXPANDED) {
+			viewModel.canRefresh.set(true);
+			Log.d(TAG, "onStateChange: expanded");
+		}
+	}
+
+	@Override
+	public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+		if (this.appBarLayout.getState() == MyAppBarLayout.State.IDLE) viewModel.canRefresh.set(false);
 	}
 }
