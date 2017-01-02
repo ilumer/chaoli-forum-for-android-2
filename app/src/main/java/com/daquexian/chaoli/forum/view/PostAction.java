@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActionBinding;
@@ -300,8 +299,8 @@ public class PostAction extends BaseActivity implements IView {
             case MENU_POST:
                 Log.d(TAG, "onOptionsItemSelected: ");
                 if (!LoginUtils.isLoggedIn()){
-                    Toast.makeText(this,this.getResources().getString(R.string.please_login),Toast.LENGTH_SHORT).show();
-                    return false;
+                    showToast(R.string.please_login);
+                    break;
                 }
                 viewModel.postConversation();
                 break;

@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.ReplyActionBinding;
@@ -266,8 +265,8 @@ public class ReplyAction extends BaseActivity
 				{
 					case FLAG_NORMAL:
 						if (!LoginUtils.isLoggedIn()){
-							Toast.makeText(this,this.getResources().getString(R.string.please_login),Toast.LENGTH_SHORT).show();
-							return false;
+							showToast(R.string.please_login);
+							break;
 						}
 						viewModel.reply();
 						break;
