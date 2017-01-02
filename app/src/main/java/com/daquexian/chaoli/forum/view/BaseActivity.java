@@ -1,6 +1,6 @@
 package com.daquexian.chaoli.forum.view;
 
-import android.support.design.widget.AppBarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -10,13 +10,15 @@ import com.daquexian.chaoli.forum.R;
 
 /**
  * Created by jianhao on 16-5-31.
+ * base class of all activity classes
  */
 public abstract class BaseActivity extends AppCompatActivity implements IView {
     public void configToolbar(String title){
         Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
         toolbar.setTitle(title);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
         setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

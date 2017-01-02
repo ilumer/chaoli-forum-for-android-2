@@ -17,11 +17,12 @@ import okhttp3.Call;
 import okhttp3.Response;
 
 public class LoginUtils {
+    @SuppressWarnings("unused")
     private static final String TAG = "LoginUtils";
-    public static final String LOGIN_SP_NAME = "username_and_password";
-    public static final String IS_LOGGED_IN = "is_logged_in";
-    public static final String SP_USERNAME_KEY = "username";
-    public static final String SP_PASSWORD_KEY = "password";
+    private static final String LOGIN_SP_NAME = "username_and_password";
+    private static final String IS_LOGGED_IN = "is_logged_in";
+    private static final String SP_USERNAME_KEY = "username";
+    private static final String SP_PASSWORD_KEY = "password";
     public static final int FAILED_AT_OPEN_LOGIN_PAGE = 0;
     public static final int FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE = 1;
     public static final int FAILED_AT_LOGIN = 2;
@@ -29,7 +30,7 @@ public class LoginUtils {
     public static final int FAILED_AT_OPEN_HOMEPAGE = 4;
     public static final int COOKIE_EXPIRED = 5;
     public static final int EMPTY_UN_OR_PW = 6;
-    public static final int ERROR_LOGIN_STATUS = 7;
+    public static final int ERROR_LOGIN_STATUS = 7; // TODO: 17-1-2 handle this error
 
     private static void setToken(String token) {
         LoginUtils.token = token;
@@ -60,7 +61,7 @@ public class LoginUtils {
         if( !sharedPreferences.getBoolean(IS_LOGGED_IN, false)){
             LoginUtils.username = username;
             LoginUtils.password = password;
-            pre_login(ChaoliApplication.getAppContext(), loginObserver);
+            pre_login(loginObserver);
         }else{
             //如果已经登录，先注销
             logout(new LogoutObserver() {
@@ -68,7 +69,7 @@ public class LoginUtils {
                 public void onLogoutSuccess() {
                     LoginUtils.username = username;
                     LoginUtils.password = password;
-                    pre_login(ChaoliApplication.getAppContext(), loginObserver);
+                    pre_login(loginObserver);
                 }
 
                 @Override
@@ -90,7 +91,7 @@ public class LoginUtils {
         password = sharedPreferences.getString(SP_PASSWORD_KEY, "");
 
         if(is_logged_in){
-            getNewToken(ChaoliApplication.getAppContext(), loginObserver);
+            getNewToken(loginObserver);
             //username = password = COOKIE_UN_AND_PW;
             return;
         }
@@ -105,7 +106,7 @@ public class LoginUtils {
         begin_login(username, password, loginObserver);
     }
 
-    private static void pre_login(final Context context, final LoginObserver loginObserver){//获取登录页面的token
+    private static void pre_login(final LoginObserver loginObserver){//获取登录页面的token
         new MyOkHttp.MyOkHttpClient()
                 .get(Constants.LOGIN_URL)
                 .enqueue(new Callback() {
@@ -122,7 +123,7 @@ public class LoginUtils {
                         Matcher matcher = pattern.matcher(responseStr);
                         if (matcher.find()) {
                             setToken(matcher.group(1));
-                            login(context, loginObserver);
+                            login(loginObserver);
                         } else {
                             //Log.e("regex_error", "regex_error");
                             loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
@@ -131,7 +132,7 @@ public class LoginUtils {
                 });
     }
 
-    private static void login(final Context context, final LoginObserver loginObserver){ //发送请求登录
+    private static void login(final LoginObserver loginObserver){ //发送请求登录
         new MyOkHttp.MyOkHttpClient()
                 .add("username", username)
                 .add("password", password)
@@ -175,7 +176,7 @@ public class LoginUtils {
                 });
     }
 
-    private static void getNewToken(final Context context, final LoginObserver loginObserver){ //得到新的token
+    private static void getNewToken(final LoginObserver loginObserver){ //得到新的token
         new MyOkHttp.MyOkHttpClient().get(Constants.HOMEPAGE_URL)
                 .enqueue(new Callback() {
                     @Override
@@ -221,6 +222,7 @@ public class LoginUtils {
                 .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
+                        logoutObserver.onLogoutFailure(0);
                     }
 
                     @Override
@@ -262,16 +264,6 @@ public class LoginUtils {
 
     public static Boolean isLoggedIn(){
         return sharedPreferences.getBoolean(IS_LOGGED_IN, false);
-    }
-
-    @Deprecated
-    public static void saveUsernameAndPassword(Context context, String username, String password){
-        sharedPreferences = ChaoliApplication.getAppContext().getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(SP_USERNAME_KEY, username);
-        // TODO: 16-3-11 1915 Encrypt saved password
-        editor.putString(SP_PASSWORD_KEY, password);
-        editor.apply();
     }
 
     public static void saveUsernameAndPassword(String username, String password) {

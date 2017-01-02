@@ -158,7 +158,6 @@ public class MainActivityVM extends BaseViewModel {
     }
 
     public void onClickAvatar(View view) {
-        Log.d(TAG, "onClickAvatar() called with: view = [" + view + "]");
         if (hasLoggedIn.get()) {
             goToHomepage.notifyChange();
         } else {
@@ -257,6 +256,8 @@ public class MainActivityVM extends BaseViewModel {
                         notificationHandler.sendEmptyMessage(0);
                     }
                 };
+                // TODO: 17-1-2 imporve code here
+                //noinspection EmptyCatchBlock
                 try {
                     timer.schedule(task, Constants.getNotificationInterval * 1000, Constants.getNotificationInterval * 1000);
                 } catch (Exception e) {

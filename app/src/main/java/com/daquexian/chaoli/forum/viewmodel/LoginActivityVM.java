@@ -63,6 +63,9 @@ public class LoginActivityVM extends BaseViewModel {
                         case LoginUtils.EMPTY_UN_OR_PW:
                             toastContent = getString(R.string.login_err_empty);
                             break;
+                        case LoginUtils.ERROR_LOGIN_STATUS:
+                            toastContent = getString(R.string.try_again);
+                            break;
                     }
                     showToast.notifyChange();
                     LoginUtils.clear(ChaoliApplication.getAppContext());

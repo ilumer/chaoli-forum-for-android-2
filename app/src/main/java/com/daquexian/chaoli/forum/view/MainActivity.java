@@ -3,7 +3,6 @@ package com.daquexian.chaoli.forum.view;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
@@ -11,6 +10,7 @@ import android.databinding.ObservableInt;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,7 +22,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.R;
@@ -44,9 +43,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
 	public Toolbar toolbar;
 	public DrawerLayout mDrawerLayout;
-
-	public SharedPreferences sp;
-	public SharedPreferences.Editor e;
 
 	private Context mContext = this;
 
@@ -248,7 +244,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		final NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
 		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 			@Override
-			public boolean onNavigationItemSelected(MenuItem item) {
+			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 				selectItem(item.getOrder());
 				item.setChecked(true);
 				return true;
@@ -388,11 +384,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	public void dismissLoginProcessDialog() {
 		loginProgressDialog.dismiss();
 	}
-
-	public void smoothScrollToPosition(int pos) {
-		l.smoothScrollToPosition(pos);
-	}
-
 
 	@Override
 	public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {

@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 
 /**
  * Created by jianhao on 16-9-3.
+ * Manage and store data about user himself.
  */
 public class Me {
     private static User me = new User();
@@ -33,6 +34,7 @@ public class Me {
         return me.getAvatarSuffix();
     }
 
+    @SuppressWarnings("unused")
     public static String getMyAvatarURL(){
         return Constants.avatarURL + "avatar_" + getMyUserId() + "." + getMyAvatarSuffix();
     }
@@ -73,6 +75,7 @@ public class Me {
         me.setUsername(username);
     }
 
+    @SuppressWarnings("unused")
     public static void setPreferences(User.Preferences preferences){
         me.setPreferences(preferences);
     }
@@ -116,7 +119,7 @@ public class Me {
         editor.apply();
     }
 
-    public static void setInstanceFromJSONStr(Context context, String jsonStr){
+    private static void setInstanceFromJSONStr(Context context, String jsonStr){
         User user2 = new Gson().fromJson(jsonStr, User.class);
         user2.setUserId(me.getUserId());
         user2.setUsername(me.getUsername());

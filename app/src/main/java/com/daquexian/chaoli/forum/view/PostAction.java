@@ -35,6 +35,7 @@ import java.util.List;
 
 /**
  * Created by jianhao on 16-5-31.
+ * Activity for start a new conversation
  */
 public class PostAction extends BaseActivity implements IView {
 
@@ -162,6 +163,7 @@ public class PostAction extends BaseActivity implements IView {
                 new AlertDialog.Builder(mContext).setTitle("选择板块").setItems(channelArr, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //noinspection ConstantConditions
                         viewModel.setChannelId(Channel.getChannel(channelArr[which]).getChannelId());
                     }
                 }).setCancelable(false).show();
