@@ -26,6 +26,7 @@ import com.daquexian.chaoli.forum.databinding.PostActionBinding;
 import com.daquexian.chaoli.forum.meta.Channel;
 import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.meta.SFXParser3;
+import com.daquexian.chaoli.forum.utils.LoginUtils;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.PostActionVM;
 
@@ -297,6 +298,10 @@ public class PostAction extends BaseActivity implements IView {
         {
             case MENU_POST:
                 Log.d(TAG, "onOptionsItemSelected: ");
+                if (!LoginUtils.isLoggedIn()){
+                    showToast(R.string.please_login);
+                    break;
+                }
                 viewModel.postConversation();
                 break;
             case MENU_DEMO:

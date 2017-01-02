@@ -16,16 +16,15 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.ReplyActionBinding;
 import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.meta.SFXParser3;
+import com.daquexian.chaoli.forum.utils.LoginUtils;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.ReplyActionVM;
 
@@ -265,6 +264,10 @@ public class ReplyAction extends BaseActivity
 				switch (viewModel.flag.get())
 				{
 					case FLAG_NORMAL:
+						if (!LoginUtils.isLoggedIn()){
+							showToast(R.string.please_login);
+							break;
+						}
 						viewModel.reply();
 						break;
 					case FLAG_EDIT:
