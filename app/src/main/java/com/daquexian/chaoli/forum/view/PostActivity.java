@@ -27,6 +27,7 @@ import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.utils.ConversationUtils;
 import com.daquexian.chaoli.forum.meta.DividerItemDecoration;
+import com.daquexian.chaoli.forum.utils.LoginUtils;
 import com.daquexian.chaoli.forum.utils.PostUtils;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.PostActivityVM;
@@ -292,6 +293,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 				break;
 			case menu_star:
 				// TODO: 16-3-28 2201 Star light
+				if (!LoginUtils.isLoggedIn()){
+                    Toast.makeText(this,this.getResources().getString(R.string.please_login),Toast.LENGTH_SHORT).show();
+                    return false;
+                }
 				ConversationUtils.starConversation(this, viewModel.conversationId, this);
 				break;
 		}
