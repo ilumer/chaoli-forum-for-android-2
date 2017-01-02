@@ -197,7 +197,7 @@ public class LoginUtils {
 
                             setToken(matcher.group(2));
 
-                            saveUsernameAndPassword(context, username, password);
+                            saveUsernameAndPassword(username, password);
                             //CookieUtils.setCookies(CookieUtils.getCookie(context));
                             setSPIsLoggedIn(true);
                             Me.setUsername(username);
@@ -218,7 +218,7 @@ public class LoginUtils {
         Me.clear();
         new MyOkHttp.MyOkHttpClient()
                 .get(logoutURL)
-                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                     }
