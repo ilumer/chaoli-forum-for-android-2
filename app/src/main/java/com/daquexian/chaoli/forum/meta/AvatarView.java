@@ -2,7 +2,9 @@ package com.daquexian.chaoli.forum.meta;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.ViewGroup;
@@ -26,12 +28,7 @@ public class AvatarView extends RelativeLayout
 	RelativeLayout v;
 	TextView t;
 	ImageView i;
-	/*public AvatarView(final Context context, final String imagePath, int userId, String username, float scale){
-		this(context, null);
-		update(context, imagePath, userId, username);
-		setScaleX(scale);
-		setScaleY(scale);
-	}*/
+
 	public AvatarView(final Context context, final String imagePath, int userId, String username)
 	{
 		this(context, null);
@@ -51,9 +48,6 @@ public class AvatarView extends RelativeLayout
 		mImagePath = imagePath;
 		mUserId = userId;
 		mUsername = username;
-		/*if(firstLoad) {
-			init(context);
-		}*/
 
 		if (Constants.NONE.equals(imagePath) || imagePath == null)
 		{
@@ -66,7 +60,10 @@ public class AvatarView extends RelativeLayout
 		}
 		else
 		{
-			Glide.with(mContext).load(Constants.avatarURL + "avatar_" + userId + "." + imagePath).into(i);
+			Glide.with(mContext)
+					.load(Constants.avatarURL + "avatar_" + userId + "." + imagePath)
+                    .placeholder(new ColorDrawable(ContextCompat.getColor(mContext,android.R.color.darker_gray)))
+                    .into(i);
 			t.setVisibility(INVISIBLE);
 			i.setVisibility(VISIBLE);
 		}
@@ -78,7 +75,10 @@ public class AvatarView extends RelativeLayout
      */
 	public void update(File file) {
 		setVisibility(VISIBLE);
-		Glide.with(mContext).load(file).into(i);
+		Glide.with(mContext)
+                .load(file)
+                .placeholder(new ColorDrawable(ContextCompat.getColor(mContext,android.R.color.darker_gray)))
+                .into(i);
 		t.setVisibility(INVISIBLE);
 		i.setVisibility(VISIBLE);
 	}
@@ -96,7 +96,10 @@ public class AvatarView extends RelativeLayout
 	public void setLoginImage(Context context){
 		setVisibility(VISIBLE);
 		if(firstLoad) init(context);
-		Glide.with(context).load(R.drawable.ic_account_plus_white_48dp).into(i);
+		Glide.with(context)
+                .load(R.drawable.ic_account_plus_white_48dp)
+                .placeholder(new ColorDrawable(ContextCompat.getColor(context,android.R.color.darker_gray)))
+                .into(i);
 		t.setVisibility(INVISIBLE);
 	}
 

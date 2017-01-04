@@ -1,6 +1,8 @@
 package com.daquexian.chaoli.forum.meta;
 
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
+import android.support.v4.content.ContextCompat;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
@@ -68,7 +70,6 @@ public class PostContentView extends LinearLayout {
         int quoteStartPos, quoteEndPos = 0;
         String piece, quote;
         Matcher quoteMatcher = QUOTE_START_PATTERN.matcher(content);
-        //while ((quoteStartPos = content.indexOf(QUOTE_START_TAG, quoteEndPos)) >= 0) {
         while (quoteEndPos != -1 && quoteMatcher.find(quoteEndPos)) {
             quoteStartPos = quoteMatcher.start();
 
@@ -97,7 +98,10 @@ public class PostContentView extends LinearLayout {
             if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
                 String url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
                 ImageView imageView = new ImageView(mContext);
-                Glide.with(mContext).load(url).asBitmap().into(imageView);
+                Glide.with(mContext)
+                        .load(url)
+                        .placeholder(new ColorDrawable(ContextCompat.getColor(mContext,android.R.color.darker_gray)))
+                        .into(imageView);
                 addView(imageView);
             }
         }
@@ -142,18 +146,6 @@ public class PostContentView extends LinearLayout {
         mContext = context;
         removeAllViews();
     }
-
-    /*
-    /**
-     * Override it to react to long click
-     * @param ev motion event
-     * @return true
-     */
-    /*
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
-    }*/
 
     public int getConversationId() {
         return mConversationId;

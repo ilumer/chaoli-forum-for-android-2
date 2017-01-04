@@ -2,8 +2,9 @@ package com.daquexian.chaoli.forum.meta;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.opengl.ETC1;
+import android.support.v4.content.ContextCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
@@ -189,34 +190,11 @@ public class OnlineImgImpl {
         final int finalType = formula.type;
         final int finalStart = formula.start;
         final int finalEnd = formula.end;
-
-
-
-		/*new MyOkHttp.MyOkHttpClient().get(formula.url)
-				.enqueue(new MyOkHttp.Callback1() {
-					@Override
-					public void onFailure(Call call, IOException e) {
-						e.printStackTrace();
-						retrieveFormulaOnlineImg(builder, i + 1);
-					}
-
-					@Override
-					public void onResponse(Call call, Response response) throws IOException {
-						String responseStr = response.body().string();
-						Bitmap resource = BitmapFactory.decodeByteArray(responseStr.getBytes(), 0, responseStr.getBytes().length);
-						response.body().close();
-						if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG) builder.setSpan(new ImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-						else builder.setSpan(new CenteredImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-						new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
-							@Override
-							public void run() {
-								setText(builder);
-							}
-						});
-						retrieveFormulaOnlineImg(builder, i + 1);
-					}
-				});*/
-        Glide.with(((View)mView).getContext()).load(formula.url).asBitmap().into(new SimpleTarget<Bitmap>()
+        Glide.with(((View)mView).getContext())
+                .load(formula.url)
+                .asBitmap()
+                .placeholder(new ColorDrawable(ContextCompat.getColor(((View)mView).getContext(),android.R.color.darker_gray)))
+                .into(new SimpleTarget<Bitmap>()
         {
             @Override
             public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
@@ -253,6 +231,7 @@ public class OnlineImgImpl {
                 e.printStackTrace();
                 retrieveFormulaOnlineImg(builder, i + 1);
             }
+
         });
     }
 
