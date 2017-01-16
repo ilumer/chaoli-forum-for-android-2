@@ -49,6 +49,8 @@ public class PostContentView extends LinearLayout {
         init(context);
     }
 
+
+
     public void setPost(Post post) {
         removeAllViews();
         mPost = post;
@@ -98,14 +100,19 @@ public class PostContentView extends LinearLayout {
             if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
                 String url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
                 ImageView imageView = new ImageView(mContext);
+                imageView.setLayoutParams(new ViewGroup.LayoutParams(600,300));
                 Glide.with(mContext)
                         .load(url)
+                        .centerCrop()
+                        .override(600,300)
                         .placeholder(new ColorDrawable(ContextCompat.getColor(mContext,android.R.color.darker_gray)))
                         .into(imageView);
                 addView(imageView);
             }
         }
     }
+
+
 
     private int pairedQuote(String str, int from) {
         int times = 0;
