@@ -4,6 +4,9 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableField;
 import android.databinding.ObservableList;
 
+import com.daquexian.chaoli.forum.ChaoliApplication;
+import com.daquexian.chaoli.forum.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,9 @@ public class BusinessQuestion {
         multiAnswer = Boolean.valueOf(item.multi_answer);
         options = new ObservableArrayList<>();
         options.addAll(item.options);
+        while (options.size() < 4) {
+            options.add(ChaoliApplication.getAppContext().getString(R.string.useless_option));
+        }
     }
 
     public static ArrayList<BusinessQuestion> fromList(List<Question> questionList) {

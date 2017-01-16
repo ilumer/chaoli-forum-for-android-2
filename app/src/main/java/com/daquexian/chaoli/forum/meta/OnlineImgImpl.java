@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import retrofit2.http.HEAD;
+
 /**
  * Created by jianhao on 16-10-22.
  */
@@ -52,19 +54,18 @@ public class OnlineImgImpl {
     private static final String TAG = "OnlineImgImpl";
 
     public OnlineImgImpl(IOnlineImgView view) {
-        maxWidthPixels = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.9);
+        maxWidthPixels = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.8);
         mView = view;
     }
 
     public void setText(String text){
-        if (text == null) text = "这是一个凑数的选项";//其它选项都是中文这里也直接用中文，所以注释掉了原来的ChaoliApplication.getAppContext().getString(R.string.useless_option);
+        //if (text == null) text = "这是一个凑数的选项";//其它选项都是中文这里也直接用中文，所以注释掉了原来的ChaoliApplication.getAppContext().getString(R.string.useless_option);
         text = removeNewlineInFormula(text);
-        //Log.d(TAG, "setText: text = " + text);
         text += '\n';
-        //Log.d(TAG, "setText: " + text);
+
         mText = text;
         SpannableStringBuilder builder = SFXParser3.parse(((View) mView).getContext(), text, mAttachmentList);
-        //SpannableStringBuilder builder = new SpannableStringBuilder(text);
+
         if (mView instanceof EditText) {
             EditText editText = (EditText) mView;
             int selectionStart = editText.getSelectionStart();
@@ -81,6 +82,7 @@ public class OnlineImgImpl {
     public void setView(IOnlineImgView view) {
         mView = view;
     }
+
     /**
      * 此操作是异步的，注意
      * @param builder 包含公式的文本，以SpannableStringBuilder身份传入
@@ -199,6 +201,7 @@ public class OnlineImgImpl {
             @Override
             public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
             {
+                final int HEIGHT_THRESHOLD = 60;
                 // post to avoid ConcurrentModificationException, from https://github.com/bumptech/glide/issues/375
                 ((View)mView).post(new Runnable() {
                     @Override
@@ -210,8 +213,14 @@ public class OnlineImgImpl {
                         } else {
                             newImage = resource;
                         }
-                        if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG) builder.setSpan(new ImageSpan(((View)mView).getContext(), newImage), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        else builder.setSpan(new CenteredImageSpan(((View)mView).getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+                        Log.d(TAG, "run: height of image is " + newImage.getHeight());
+                        if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG || newImage.getHeight() > HEIGHT_THRESHOLD) {
+                            builder.setSpan(new ImageSpan(((View)mView).getContext(), newImage), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                        } else {
+                            builder.setSpan(new CenteredImageSpan(((View)mView).getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                        }
+
                         if (mView instanceof EditText) {
                             EditText editText = (EditText) mView;
                             int selectionStart = editText.getSelectionStart();
@@ -228,9 +237,7 @@ public class OnlineImgImpl {
             @Override
             public void onLoadFailed(Exception e, Drawable errorDrawable) {
                 super.onLoadFailed(e, errorDrawable);
-                if (e!=null) {
-                    e.printStackTrace();
-                }
+                if (e != null) e.printStackTrace();
                 retrieveFormulaOnlineImg(builder, i + 1);
             }
 

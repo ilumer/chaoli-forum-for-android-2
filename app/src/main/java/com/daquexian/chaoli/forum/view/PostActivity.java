@@ -143,7 +143,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		getToolbar().setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Log.d(TAG, "onClick: toolbar is clicked!");
+                new AlertDialog.Builder(PostActivity.this)
+                        .setMessage(mTitle)
+						.setPositiveButton(android.R.string.ok, null)
+						.show();
 			}
 		});
 
@@ -236,7 +239,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		super.onCreateOptionsMenu(menu);
 		menu.add(Menu.NONE, Menu.NONE, menu_reverse, R.string.descend).setIcon(R.drawable.ic_sort_black_24dp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		menu.add(Menu.NONE, Menu.NONE, menu_share, R.string.share).setIcon(R.drawable.ic_share_black_24dp);//.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add(Menu.NONE, Menu.NONE, menu_star, R.string.star).setIcon(R.drawable.ic_menu_star);
+		// menu.add(Menu.NONE, Menu.NONE, menu_star, R.string.star).setIcon(R.drawable.ic_menu_star);
 		menu.add(Menu.NONE, Menu.NONE, menu_settings, R.string.settings).setIcon(android.R.drawable.ic_menu_manage);
 		menu.add(Menu.NONE, Menu.NONE, menu_author_only, viewModel.isAuthorOnly() ? R.string.cancel_author_only : R.string.author_only).setIcon(android.R.drawable.ic_menu_view);
 		return true;

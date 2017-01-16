@@ -195,7 +195,15 @@ public class SFXParser3 {
 					from++;
 					continue;
 				}
-				spannable.setSpan(new ImageSpan(context, icons[j]), from, from + iconStr.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+				/**
+				 * only show icons when iconStr is surrounded by spaces
+				 */
+				if (iconStr.equals("/^^")) Log.d(TAG, "parse: " + str.trim().length() + ", " + iconStr.length() + ", " + (from + iconStr.length()) + ", " + str.length());
+				if (str.trim().length() == iconStr.length() ||
+						((from == 0 || ' ' == str.charAt(from - 1)) && (from + iconStr.length() == str.length() || ' ' == str.charAt(from + iconStr.length()) || '\n' == str.charAt(from + iconStr.length())))) {
+					spannable.setSpan(new ImageSpan(context, icons[j]), from, from + iconStr.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+				}
 				from += iconStr.length();
 			}
 		}

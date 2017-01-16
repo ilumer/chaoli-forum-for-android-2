@@ -1,8 +1,10 @@
 package com.daquexian.chaoli.forum.view;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
+import android.databinding.ObservableBoolean;
 import android.support.v7.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -29,6 +31,8 @@ public class AnswerQuestionsActivity extends BaseActivity {
     Boolean isFirst = true;
 
     AnswerQuestionsVM viewModel;
+
+    private ProgressDialog mProcessDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +69,14 @@ public class AnswerQuestionsActivity extends BaseActivity {
                 })
                 .show();
 
+        viewModel.showDialog.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (((ObservableBoolean) observable).get()) mProcessDialog = ProgressDialog.show(AnswerQuestionsActivity.this, "", getString(R.string.just_a_sec));
+                else mProcessDialog.dismiss();
+            }
+        });
+
         viewModel.pass.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
@@ -81,24 +93,25 @@ public class AnswerQuestionsActivity extends BaseActivity {
         viewModel.fail.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable observable, int i) {
-                if(Integer.valueOf(viewModel.code) == SignUpUtils.ANSWERS_WRONG){
-                    Dialog dialog = new AlertDialog.Builder(mContext).setMessage(R.string.you_dont_answer_enough_quesitions_correctly)
-                            .setPositiveButton(R.string.try_again, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    isFirst = false;
-                                    init();
-                                }
-                            }).setNegativeButton(R.string.dont_try_again, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    ((Activity)mContext).finish();
-                                }
-                            }).create();
-                    dialog.show();
-                }else{
+                // if(Integer.valueOf(viewModel.code) == SignUpUtils.ANSWERS_WRONG){
+                new AlertDialog.Builder(mContext).setMessage(R.string.you_dont_answer_enough_quesitions_correctly)
+                        .setPositiveButton(R.string.try_again, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                isFirst = false;
+                                init();
+                            }
+                        }).setNegativeButton(R.string.dont_try_again, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ((Activity)mContext).finish();
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+                /* }else{
                     Log.e("error", viewModel.code);
-                }
+                } */
             }
         });
     }

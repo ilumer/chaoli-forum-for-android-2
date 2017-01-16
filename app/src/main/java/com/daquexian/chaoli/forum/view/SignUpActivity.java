@@ -41,8 +41,6 @@ public class SignUpActivity extends BaseActivity {
         if("".equals(inviteCode)){
             Toast.makeText(getApplicationContext(), R.string.you_can_only_sign_up_with_an_invite_code, Toast.LENGTH_SHORT).show();
             finish();
-        }else{
-            Toast.makeText(mContext, inviteCode, Toast.LENGTH_LONG).show();
         }
 
         setViewModel(new SignUpVM(inviteCode));
