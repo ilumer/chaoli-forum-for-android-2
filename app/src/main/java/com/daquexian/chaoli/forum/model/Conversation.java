@@ -5,7 +5,6 @@ import android.databinding.Bindable;
 import android.databinding.PropertyChangeRegistry;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.daquexian.chaoli.forum.BR;
 import com.daquexian.chaoli.forum.binding.DiffItem;
@@ -249,7 +248,6 @@ public class Conversation extends BaseObservable implements DiffItem, Comparable
 
 	@Bindable
 	public String getUnread() {
-		Log.d(TAG, "getUnread() called, unread = " + unread);
 		return unread;
 	}
 

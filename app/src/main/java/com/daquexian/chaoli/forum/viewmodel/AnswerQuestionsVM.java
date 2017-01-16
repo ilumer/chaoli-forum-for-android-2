@@ -19,6 +19,7 @@ public class AnswerQuestionsVM extends BaseViewModel {
     public ObservableBoolean pass = new ObservableBoolean(false);
     public String code;     // inviting code for passing or status code for failing
     public ObservableBoolean fail = new ObservableBoolean(false);
+    public ObservableBoolean showDialog = new ObservableBoolean(false);
 
     public void getQuestions(String subject) {
         SignUpUtils.getQuestionObjList(new SignUpUtils.GetQuestionObserver() {
@@ -31,16 +32,19 @@ public class AnswerQuestionsVM extends BaseViewModel {
     }
 
     public void submit() {
+        showDialog.set(true);
         SignUpUtils.submitAnswers(questions, new SignUpUtils.SubmitObserver() {
             @Override
             public void onAnswersPass(String code) {
                 AnswerQuestionsVM.this.code = code;
+                showDialog.set(false);
                 pass.notifyChange();
             }
 
             @Override
             public void onFailure(int statusCode) {
                 AnswerQuestionsVM.this.code = String.valueOf(statusCode);
+                showDialog.set(false);
                 fail.notifyChange();
             }
         });

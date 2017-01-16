@@ -28,7 +28,7 @@ public class QuestionLayoutSelector extends LayoutSelector<BusinessQuestion> {
 
     @Override
     int getType(BusinessQuestion item) {
-        if((item.choice.equals("false"))) return EDIT_TEXT_ITEM_TYPE;
+        if((!item.choice)) return EDIT_TEXT_ITEM_TYPE;
         return item.multiAnswer ? CHECK_BTN_ITEM_TYPE : RADIO_BTN_ITEM_TYPE;
     }
 }

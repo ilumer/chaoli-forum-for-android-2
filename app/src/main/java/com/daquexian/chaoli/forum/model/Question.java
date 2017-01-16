@@ -40,7 +40,7 @@ public class Question {
         _id.$id = businessQuestion.id;
         choice = String.valueOf(businessQuestion.choice);
         multi_answer = String.valueOf(businessQuestion.multiAnswer);
-        if (businessQuestion.choice.equals("false")) answers.add(businessQuestion.answer.get());
+        if (choice.equals("false")) answers.add(businessQuestion.answer.get());
         else {
             for (int i = 0; i < businessQuestion.isChecked.size(); i++) {
                 if (businessQuestion.isChecked.get(i)) answers.add(String.valueOf(i));

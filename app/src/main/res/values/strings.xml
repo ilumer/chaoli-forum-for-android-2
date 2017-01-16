@@ -154,7 +154,7 @@
 	<string name="reply_hint">Please enter your reply here.</string>
 	<string name="modified_successfully">Modified successfully</string>
 	<string name="fail_on_modifying">Fail on modifying, please try again later.</string>
-	<string name="useless_option">This is a useless option.</string>
+	<string name="useless_option" translatable="false">这是一个凑数的选项</string>
 	<string name="content_cannot_be_null">Content cannot be null</string>
 	<string name="descend">Descend</string>
 	<string name="ascend">Ascend</string>
