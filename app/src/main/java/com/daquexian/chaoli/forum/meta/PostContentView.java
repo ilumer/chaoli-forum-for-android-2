@@ -53,7 +53,7 @@ public class PostContentView extends LinearLayout {
         mAttachmentList = post.getAttachments();
         List<Post.Attachment> attachmentList = new ArrayList<>(post.getAttachments());
         String content = post.getContent();
-
+        content = content.replaceAll("\u00AD", "");
         Matcher attachmentMatcher = ATTACHMENT_PATTERN.matcher(content);
         while (attachmentMatcher.find()) {
             String id = attachmentMatcher.group(1);
