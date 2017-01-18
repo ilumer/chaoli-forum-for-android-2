@@ -113,9 +113,9 @@ public class PostContentView extends LinearLayout {
             if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
                 String url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
                 ImageView imageView = new ImageView(mContext);
-                // imageView.setLayoutParams(new ViewGroup.LayoutParams(600,300));
                 imageView.setMaxWidth(Constants.MAX_IMAGE_WIDTH);
                 imageView.setAdjustViewBounds(true);
+                imageView.setPadding(0, 0, 0, 10);
                 Glide.with(mContext)
                         .load(url)
                         .placeholder(new ColorDrawable(ContextCompat.getColor(mContext,android.R.color.darker_gray)))
