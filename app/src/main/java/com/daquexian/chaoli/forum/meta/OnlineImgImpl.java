@@ -39,8 +39,6 @@ public class OnlineImgImpl {
 
     private IOnlineImgView mView;
 
-    private int maxWidthPixels;	//图片的最大宽度
-
     public static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{220}";
 
     private static final Pattern PATTERN1 = Pattern.compile("(?i)\\$\\$?((.|\\n)+?)\\$\\$?");
@@ -54,7 +52,7 @@ public class OnlineImgImpl {
     private static final String TAG = "OnlineImgImpl";
 
     public OnlineImgImpl(IOnlineImgView view) {
-        maxWidthPixels = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.8);
+        //maxWidthPixels = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.8);
         mView = view;
     }
 
@@ -207,14 +205,13 @@ public class OnlineImgImpl {
                     @Override
                     public void run() {
                         Bitmap newImage;
-                        if (resource.getWidth() > maxWidthPixels) {
-                            int newHeight = resource.getHeight() * maxWidthPixels / resource.getWidth();
-                            newImage = Bitmap.createScaledBitmap(resource, maxWidthPixels, newHeight, true);
+                        if (resource.getWidth() > Constants.MAX_IMAGE_WIDTH) {
+                            int newHeight = resource.getHeight() * Constants.MAX_IMAGE_WIDTH / resource.getWidth();
+                            newImage = Bitmap.createScaledBitmap(resource, Constants.MAX_IMAGE_WIDTH, newHeight, true);
                         } else {
                             newImage = resource;
                         }
 
-                        Log.d(TAG, "run: height of image is " + newImage.getHeight());
                         if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG || newImage.getHeight() > HEIGHT_THRESHOLD) {
                             builder.setSpan(new ImageSpan(((View)mView).getContext(), newImage), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         } else {
