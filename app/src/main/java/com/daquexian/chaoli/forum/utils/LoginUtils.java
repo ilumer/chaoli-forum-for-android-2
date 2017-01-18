@@ -6,8 +6,10 @@ import android.util.Log;
 import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.meta.Constants;
+import com.daquexian.chaoli.forum.model.TokenResult;
 import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.network.MyOkHttp.Callback;
+import com.daquexian.chaoli.forum.network.MyRetrofit;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -107,7 +109,20 @@ public class LoginUtils {
     }
 
     private static void pre_login(final LoginObserver loginObserver){//获取登录页面的token
-        new MyOkHttp.MyOkHttpClient()
+        MyRetrofit.getService().getToken()
+                .enqueue(new retrofit2.Callback<TokenResult>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<TokenResult> call, retrofit2.Response<TokenResult> response) {
+                        setToken(response.body().getToken());
+                        login(loginObserver);
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<TokenResult> call, Throwable t) {
+                        loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
+                    }
+                });
+        /* new MyOkHttp.MyOkHttpClient()
                 .get(Constants.LOGIN_URL)
                 .enqueue(new Callback() {
                     @Override
@@ -130,6 +145,7 @@ public class LoginUtils {
                         }
                     }
                 });
+                */
     }
 
     private static void login(final LoginObserver loginObserver){ //发送请求登录
