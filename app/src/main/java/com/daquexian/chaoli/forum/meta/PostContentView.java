@@ -1,15 +1,27 @@
 package com.daquexian.chaoli.forum.meta;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.support.v4.content.ContextCompat;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.daquexian.chaoli.forum.model.Post;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -47,6 +59,8 @@ public class PostContentView extends LinearLayout {
         init(context);
     }
 
+
+
     public void setPost(Post post) {
         removeAllViews();
         mPost = post;
@@ -68,7 +82,6 @@ public class PostContentView extends LinearLayout {
         int quoteStartPos, quoteEndPos = 0;
         String piece, quote;
         Matcher quoteMatcher = QUOTE_START_PATTERN.matcher(content);
-        //while ((quoteStartPos = content.indexOf(QUOTE_START_TAG, quoteEndPos)) >= 0) {
         while (quoteEndPos != -1 && quoteMatcher.find(quoteEndPos)) {
             quoteStartPos = quoteMatcher.start();
 
@@ -93,15 +106,52 @@ public class PostContentView extends LinearLayout {
             piece = content.substring(quoteEndPos);
             addLaTeXView(piece);
         }
+
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+
         for (Post.Attachment attachment : attachmentList) {
             if (attachment.getFilename().endsWith(".jpg") || attachment.getFilename().endsWith(".png")) {
                 String url = Constants.ATTACHMENT_IMAGE_URL + attachment.getAttachmentId() + attachment.getSecret();
                 ImageView imageView = new ImageView(mContext);
-                Glide.with(mContext).load(url).asBitmap().into(imageView);
+                imageView.setMaxWidth(Constants.MAX_IMAGE_WIDTH);
+                imageView.setAdjustViewBounds(true);
+                imageView.setPadding(0, 0, 0, 10);
+                Glide.with(mContext)
+                        .load(url)
+                        .placeholder(new ColorDrawable(ContextCompat.getColor(mContext,android.R.color.darker_gray)))
+                        .into(imageView);
                 addView(imageView);
+            } else {
+                try {
+                    final String finalUrl = "https://chaoli.club/index.php/attachment/" + attachment.getAttachmentId() + "_" + URLEncoder.encode(attachment.getFilename(), "UTF-8");
+                    int start = builder.length();
+                    builder.append(attachment.getFilename());
+                    builder.setSpan(new ClickableSpan() {
+                        @Override
+                        public void onClick(View view) {
+                            Log.d(TAG, "onClick() called with: view = [" + view + "]");
+                            mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(finalUrl)));
+                        }
+                    }, start, start + attachment.getFilename().length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    builder.append("\n\n");
+                } catch (UnsupportedEncodingException e) {
+                    Log.w(TAG, "parse: ", e);
+                }
             }
         }
+
+        if (builder.length() > 0) {
+            TextView textView = new TextView(mContext);
+            textView.setText(builder);
+            /**
+             * make links clickable
+             */
+            textView.setMovementMethod(LinkMovementMethod.getInstance());
+            addView(textView);
+        }
     }
+
+
 
     private int pairedQuote(String str, int from) {
         int times = 0;
@@ -123,6 +173,9 @@ public class PostContentView extends LinearLayout {
         onlineImgTextView = new OnlineImgTextView(mContext, mAttachmentList);
         onlineImgTextView.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         onlineImgTextView.setText(content);
+        /**
+         * make links clickable
+         */
         onlineImgTextView.setMovementMethod(LinkMovementMethod.getInstance());
         addView(onlineImgTextView);
         //laTeXtView.setOnLongClickListener();
@@ -142,18 +195,6 @@ public class PostContentView extends LinearLayout {
         mContext = context;
         removeAllViews();
     }
-
-    /*
-    /**
-     * Override it to react to long click
-     * @param ev motion event
-     * @return true
-     */
-    /*
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
-    }*/
 
     public int getConversationId() {
         return mConversationId;

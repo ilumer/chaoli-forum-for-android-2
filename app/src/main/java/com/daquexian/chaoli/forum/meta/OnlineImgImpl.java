@@ -2,8 +2,10 @@ package com.daquexian.chaoli.forum.meta;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.opengl.ETC1;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.util.ArrayMap;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
@@ -23,22 +25,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import retrofit2.http.HEAD;
+
 /**
+ * The class implements almost all method about retrieve images from web
  * Created by jianhao on 16-10-22.
  */
 
-public class OnlineImgImpl {
-    public List<Post.Attachment> mAttachmentList;
-    public String mText;
+class OnlineImgImpl {
+    List<Post.Attachment> mAttachmentList;
     private List<Formula> mFormulaList;
+    private ArrayMap<Formula, ImageSpan> placeHolders = new ArrayMap<>();
 
     private OnCompleteListener mListener;
 
     private IOnlineImgView mView;
 
-    private int maxWidthPixels;	//图片的最大宽度
-
-    public static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{220}";
+    private static final String SITE = "http://latex.codecogs.com/gif.latex?\\dpi{220}";
 
     private static final Pattern PATTERN1 = Pattern.compile("(?i)\\$\\$?((.|\\n)+?)\\$\\$?");
     private static final Pattern PATTERN2 = Pattern.compile("(?i)\\\\[(\\[]((.|\\n)*?)\\\\[\\])]");
@@ -50,17 +53,15 @@ public class OnlineImgImpl {
 
     private static final String TAG = "OnlineImgImpl";
 
-    public OnlineImgImpl(IOnlineImgView view) {
-        maxWidthPixels = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.8);
+    OnlineImgImpl(IOnlineImgView view) {
+        //maxWidthPixels = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * 0.8);
         mView = view;
     }
 
     public void setText(String text){
-        //if (text == null) text = "这是一个凑数的选项";//其它选项都是中文这里也直接用中文，所以注释掉了原来的ChaoliApplication.getAppContext().getString(R.string.useless_option);
         text = removeNewlineInFormula(text);
         text += '\n';
 
-        mText = text;
         SpannableStringBuilder builder = SFXParser3.parse(((View) mView).getContext(), text, mAttachmentList);
 
         if (mView instanceof EditText) {
@@ -89,6 +90,7 @@ public class OnlineImgImpl {
 
         mFormulaList = getAllFormulas(text);
 
+        showPlaceHolder(builder);
         retrieveFormulaOnlineImg(builder, 0);
     }
 
@@ -173,6 +175,24 @@ public class OnlineImgImpl {
     }
 
     /**
+     * show placeholder on attachment images
+     * @param builder SpannableStringBuilder in which placeholder shows
+     */
+    private void showPlaceHolder(final SpannableStringBuilder builder) {
+        for (Formula formula : mFormulaList) {
+            Log.d(TAG, "showPlaceHolder: " + formula.content + ", " + formula.type);
+            if (formula.type == Formula.TYPE_ATT || formula.type == Formula.TYPE_IMG) {
+                final ColorDrawable colorDrawable = new ColorDrawable(ContextCompat.getColor(((View) mView).getContext(), android.R.color.darker_gray));
+                colorDrawable.setBounds(0, 0, 600, 300);
+                final ImageSpan imageSpan = new ImageSpan(colorDrawable);
+                placeHolders.put(formula, imageSpan);
+                builder.setSpan(imageSpan, formula.start, formula.end, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            }
+        }
+        mView.setText(builder);
+    }
+
+    /**
      * 获取特定的公式渲染出的图片，结束时会调用回调函数（假如存在listener的话）
      * @param builder 包含公式的builder
      * @param i 公式在mFormulaList中的下标
@@ -184,39 +204,16 @@ public class OnlineImgImpl {
             }
             return;
         }
-        Formula formula = mFormulaList.get(i);
+        final Formula formula = mFormulaList.get(i);
         Log.d(TAG, "retrieveFormulaOnlineImg: " + formula.url);
         final int finalType = formula.type;
         final int finalStart = formula.start;
         final int finalEnd = formula.end;
-
-
-
-		/*new MyOkHttp.MyOkHttpClient().get(formula.url)
-				.enqueue(new MyOkHttp.Callback1() {
-					@Override
-					public void onFailure(Call call, IOException e) {
-						e.printStackTrace();
-						retrieveFormulaOnlineImg(builder, i + 1);
-					}
-
-					@Override
-					public void onResponse(Call call, Response response) throws IOException {
-						String responseStr = response.body().string();
-						Bitmap resource = BitmapFactory.decodeByteArray(responseStr.getBytes(), 0, responseStr.getBytes().length);
-						response.body().close();
-						if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG) builder.setSpan(new ImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-						else builder.setSpan(new CenteredImageSpan(getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-						new Handler(ChaoliApplication.getAppContext().getMainLooper()).post(new Runnable() {
-							@Override
-							public void run() {
-								setText(builder);
-							}
-						});
-						retrieveFormulaOnlineImg(builder, i + 1);
-					}
-				});*/
-        Glide.with(((View)mView).getContext()).load(formula.url).asBitmap().into(new SimpleTarget<Bitmap>()
+        Glide.with(((View)mView).getContext())
+                .load(formula.url)
+                .asBitmap()
+                .placeholder(new ColorDrawable(ContextCompat.getColor(((View)mView).getContext(),android.R.color.darker_gray)))
+                .into(new SimpleTarget<Bitmap>()
         {
             @Override
             public void onResourceReady(final Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation)
@@ -227,15 +224,18 @@ public class OnlineImgImpl {
                     @Override
                     public void run() {
                         Bitmap newImage;
-                        if (resource.getWidth() > maxWidthPixels) {
-                            int newHeight = resource.getHeight() * maxWidthPixels / resource.getWidth();
-                            newImage = Bitmap.createScaledBitmap(resource, maxWidthPixels, newHeight, true);
+                        if (resource.getWidth() > Constants.MAX_IMAGE_WIDTH) {
+                            int newHeight = resource.getHeight() * Constants.MAX_IMAGE_WIDTH / resource.getWidth();
+                            newImage = Bitmap.createScaledBitmap(resource, Constants.MAX_IMAGE_WIDTH, newHeight, true);
                         } else {
                             newImage = resource;
                         }
 
-                        Log.d(TAG, "run: height of image is " + newImage.getHeight());
                         if(finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG || newImage.getHeight() > HEIGHT_THRESHOLD) {
+                            if (finalType == Formula.TYPE_ATT || finalType == Formula.TYPE_IMG) {
+                                builder.removeSpan(placeHolders.get(formula));
+                                placeHolders.remove(formula);
+                            }
                             builder.setSpan(new ImageSpan(((View)mView).getContext(), newImage), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         } else {
                             builder.setSpan(new CenteredImageSpan(((View)mView).getContext(), resource), finalStart, finalEnd, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -260,6 +260,7 @@ public class OnlineImgImpl {
                 if (e != null) e.printStackTrace();
                 retrieveFormulaOnlineImg(builder, i + 1);
             }
+
         });
     }
 
