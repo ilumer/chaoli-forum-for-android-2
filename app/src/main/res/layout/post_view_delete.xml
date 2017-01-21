@@ -8,14 +8,15 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FF808080">
+        android:background="?attr/deleteItemColor">
         <TextView
             android:id="@+id/floor"
             android:text="@{String.valueOf(item.floor)}"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:textSize="18sp"
-            android:textColor="@color/contentColor"
+            android:textColor="?attr/contentColor"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <LinearLayout
@@ -32,7 +33,7 @@
                 android:textSize="16sp"
                 android:layout_marginLeft="15dp"
                 android:layout_marginStart="15dp"
-                android:textColor="@color/black"
+                android:textColor="?attr/titleColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"/>

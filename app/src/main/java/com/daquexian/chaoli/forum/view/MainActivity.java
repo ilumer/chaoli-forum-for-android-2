@@ -16,6 +16,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -182,6 +183,11 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	}
 
 	public void selectItem(int position) {
+        if (position>12){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            recreate();
+            return;
+        }
 		viewModel.setChannel(viewModel.getChannelByPosition(position));
 		viewModel.refresh();
 		mDrawerLayout.closeDrawers();
@@ -245,7 +251,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-				selectItem(item.getOrder());
+                selectItem(item.getOrder());
 				item.setChecked(true);
 				return true;
 			}

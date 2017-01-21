@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MainActivityTheme" parent="AppTheme">
+        <item name="nameColor">#9e9e9e</item>
+        <item name="contentColor">#9e9e9e</item>
+        <item name="titleColor">#000000</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

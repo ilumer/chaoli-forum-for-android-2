@@ -10,4 +10,8 @@
     <color name="colorPrimaryDark">#0070BA</color>
     <color name="colorAccent">#0099FF</color>
     <color name="contentColor">#9e9e9e</color>
+
+    <color name="nightColorPrimary">#37474F</color>
+    <color name="nightColorPrimaryDark">#263238</color>
+    <color name="nightColorAccent">#607D8B</color>
 </resources>

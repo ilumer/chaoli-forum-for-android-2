@@ -51,7 +51,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="300dp">
 				<include android:id="@+id/expressions"
-					layout="@layout/expressions"/>
+					layout="@layout/expressions" />
 			</android.support.v4.widget.NestedScrollView>
 		</LinearLayout>
 	</android.support.design.widget.CoordinatorLayout>
