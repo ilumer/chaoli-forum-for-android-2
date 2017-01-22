@@ -3,6 +3,7 @@ package com.daquexian.chaoli.forum.utils;
 import android.content.Context;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
+import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.network.MyOkHttp;
 
@@ -21,10 +22,10 @@ public class PostUtils
 		new MyOkHttp.MyOkHttpClient()
 				.add("conversationId", String.valueOf(conversationId))
 				.add("content", content)
-				.add("userId", String.valueOf(LoginUtils.getUserId()))
+				.add("userId", String.valueOf(Me.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.replyURL + conversationId)
-				.enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+				.enqueue(new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onReplyFailure(-1);
@@ -43,10 +44,10 @@ public class PostUtils
 		new MyOkHttp.MyOkHttpClient()
 				.add("content", content)
 				.add("save", "true")
-				.add("userId", String.valueOf(LoginUtils.getUserId()))
+				.add("userId", String.valueOf(Me.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.editURL + postId)
-				.enqueue(ChaoliApplication.getAppContext(), new MyOkHttp.Callback() {
+				.enqueue(new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onEditFailure(-1);
@@ -60,66 +61,13 @@ public class PostUtils
 				});
 	}
 
-	/*@Deprecated
-	public static void preQuote(final Context context, int postId)
-	{
-		CookieUtils.saveCookie(client, context);
-		RequestParams param = new RequestParams();
-		param.put("userId", LoginUtils.getUserId());
-		param.put("token", LoginUtils.getToken());
-		client.get(context, Constants.preQuoteURL + postId, param, new AsyncHttpResponseHandler()
-		{
-			@Override
-			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
-			{
-				Toast.makeText(context, "Pre Quote success. " + new String(responseBody), Toast.LENGTH_SHORT).show();
-			}
-
-			@Override
-			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
-			{
-				Toast.makeText(context, "Pre Quote fail: " + statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
-				Log.d(TAG, "onFailure: " + new String(responseBody));
-			}
-		});
-	}
-
-	@Deprecated
-	public static void quote(final Context context, int conversationId, String content, final QuoteObserver observer)
-	{
-		CookieUtils.saveCookie(client, context);
-		RequestParams param = new RequestParams();
-		param.put("conversationId", conversationId);
-		param.put("content", content);
-		param.put("userId", LoginUtils.getUserId());
-		param.put("token", LoginUtils.getToken());
-		Log.d(TAG, "quote: " + Constants.quoteURL+ conversationId);
-		client.post(context, Constants.quoteURL + conversationId, param, new AsyncHttpResponseHandler()
-		{
-			@Override
-			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
-			{
-				Toast.makeText(context, "Quote success.", Toast.LENGTH_SHORT).show();
-				Log.d(TAG, "onSuccess: " + new String(responseBody));
-				observer.onQuoteSuccess();
-			}
-
-			@Override
-			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
-			{
-				Toast.makeText(context, "Quote failed: " + statusCode + new String(responseBody), Toast.LENGTH_SHORT).show();
-				observer.onQuoteFailure(statusCode);
-			}
-		});
-	}*/
-
-	public static void delete(final Context context, int postId, final DeleteObserver observer)
+	public static void delete(int postId, final DeleteObserver observer)
 	{
 		new MyOkHttp.MyOkHttpClient()
-				.add("userId", String.valueOf(LoginUtils.getUserId()))
+				.add("userId", String.valueOf(Me.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.deleteURL + postId)		// Or get?
-				.enqueue(context, new MyOkHttp.Callback() {
+				.enqueue(new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onDeleteFailure(-1);
@@ -133,13 +81,13 @@ public class PostUtils
 				});
 	}
 
-	public static void restore(final Context context, int postId, final RestoreObserver observer)
+	public static void restore(int postId, final RestoreObserver observer)
 	{
 		new MyOkHttp.MyOkHttpClient()
-				.add("userId", String.valueOf(LoginUtils.getUserId()))
+				.add("userId", String.valueOf(Me.getUserId()))
 				.add("token", LoginUtils.getToken())
 				.post(Constants.deleteURL + postId)		// Or get?
-				.enqueue(context, new MyOkHttp.Callback() {
+				.enqueue(new MyOkHttp.Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
 						observer.onRestoreFailure(-1);

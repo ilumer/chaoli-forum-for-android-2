@@ -27,7 +27,7 @@ public class AvatarViewBA {
         avatarView.scale(length);
     }
 
-    @BindingAdapter("bind:login")
+    @BindingAdapter("bind:isLoggedIn")
     public static void loadLoginImage(AvatarView avatarView, Boolean login) {
         if (!login) avatarView.setLoginImage(avatarView.getContext());
     }

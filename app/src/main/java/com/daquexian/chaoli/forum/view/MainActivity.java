@@ -48,7 +48,8 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
 	private ProgressDialog loginProgressDialog;
 
-	private int POST_CONVERSATION_CODE = 1;
+	private final int POST_CONVERSATION_CODE = 1;
+	private final int LOGIN_CODE = 2;
 
 	/**
 	 * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -99,13 +100,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
-		/*viewModel.listPosition.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-			@Override
-			public void onPropertyChanged(Observable observable, int i) {
-				smoothScrollToPosition(((ObservableInt) observable).get());
-			}
-		});*/
-
 		viewModel.notificationsNum.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
@@ -135,6 +129,13 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
+		viewModel.toFirstLoadConversation.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				selectItem(0, false);
+			}
+		});
+
 		viewModel.goToPost.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
@@ -152,17 +153,17 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		/**
 		 * 根据登录状态更改侧栏菜单
 		 */
-		viewModel.hasLoggedIn.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		viewModel.isLoggedIn.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				binding.navigationView.getMenu().clear();
-				binding.navigationView.inflateMenu(viewModel.hasLoggedIn.get() ? R.menu.menu_navigation : R.menu.menu_navigation_no_login);
+				binding.navigationView.inflateMenu(viewModel.isLoggedIn.get() ? R.menu.menu_navigation : R.menu.menu_navigation_no_login);
 			}
 		});
 
 		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
 		viewModel.setChannel("all");
-		viewModel.login();
+		viewModel.startUp();
 
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
 		{
@@ -182,9 +183,15 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	}
 
 	public void selectItem(int position) {
+		selectItem(position, true);
+	}
+
+	public void selectItem(int position, boolean closeDrawers) {
 		viewModel.setChannel(viewModel.getChannelByPosition(position));
 		viewModel.refresh();
-		mDrawerLayout.closeDrawers();
+		if (closeDrawers) {
+			mDrawerLayout.closeDrawers();
+		}
 	}
 
 	public void initUI() {
@@ -324,10 +331,23 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == POST_CONVERSATION_CODE) {
-			if (resultCode == RESULT_OK) {
-				viewModel.refresh();
-			}
+
+		switch (requestCode) {
+			case POST_CONVERSATION_CODE:
+				if (resultCode == RESULT_OK) {
+					viewModel.refresh();
+				}
+				break;
+			case LOGIN_CODE:
+				if (resultCode == RESULT_OK) {
+					viewModel.refresh();
+					viewModel.getProfile();
+					viewModel.loginComplete.set(true);
+					viewModel.isLoggedIn.set(true);
+					viewModel.myUsername.set(getString(R.string.loading));
+					viewModel.mySignature.set(getString(R.string.loading));
+				}
+				break;
 		}
 	}
 
@@ -343,7 +363,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
 	public void goToMyHomePage() {
 		Log.d(TAG, "goToMyHomePage: " + Me.isEmpty());
-		if(viewModel.hasLoggedIn.get()){
+		if(viewModel.isLoggedIn.get()){
 			if(!Me.isEmpty()) {
 				Intent intent = new Intent(this, HomepageActivity.class);
 				Bundle bundle = new Bundle();
@@ -359,7 +379,8 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	}
 
 	public void goToLogin() {
-		startActivity(new Intent(this, LoginActivity.class));
+		// startActivity(new Intent(this, LoginActivity.class));
+		startActivityForResult(new Intent(this, LoginActivity.class), LOGIN_CODE);
 	}
 
 	public void goToPostAction() {

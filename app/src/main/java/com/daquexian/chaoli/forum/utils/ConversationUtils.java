@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
+import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.network.MyOkHttp.Callback;
@@ -68,10 +69,10 @@ public class ConversationUtils {
         String url = Constants.SET_CHANNEL_URL + String.valueOf(conversationId);
         new MyOkHttp.MyOkHttpClient()
                 .add("channel", String.valueOf(channel))
-                .add("userId", String.valueOf(LoginUtils.getUserId()))
+                .add("userId", String.valueOf(Me.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(url)
-                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         observer.onSetChannelFailure(-3);
@@ -101,10 +102,10 @@ public class ConversationUtils {
         String url = Constants.ADD_MEMBER_URL + String.valueOf(conversationId);
         new MyOkHttp.MyOkHttpClient()
                 .add("member", member)
-                .add("userId", String.valueOf(LoginUtils.getUserId()))
+                .add("userId", String.valueOf(Me.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(url)
-                .enqueue(ChaoliApplication.getAppContext(), new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         observer.onAddMemberFailure(-3);
@@ -142,7 +143,7 @@ public class ConversationUtils {
         String url = Constants.REMOVE_MEMBER_URL + String.valueOf(conversationId);
         new MyOkHttp.MyOkHttpClient()
                 .add("member", String.valueOf(userId))
-                .add("userId", String.valueOf(LoginUtils.getUserId()))
+                .add("userId", String.valueOf(Me.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(url)
                 .enqueue(context, new Callback() {
@@ -177,7 +178,7 @@ public class ConversationUtils {
         new MyOkHttp.MyOkHttpClient()
                 .add("title", title)
                 .add("content", content)
-                .add("userId", String.valueOf(LoginUtils.getUserId()))
+                .add("userId", String.valueOf(Me.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .post(Constants.POST_CONVERSATION_URL)
                 .enqueue(new Callback() {
@@ -214,7 +215,7 @@ public class ConversationUtils {
         String url = Constants.GET_MEMBERS_ALLOWED_URL + "?p=conversation/membersAllowed.ajax/" + conId;
         new MyOkHttp.MyOkHttpClient()
                 .add("token", LoginUtils.getToken())
-                .add("userId", String.valueOf(LoginUtils.getUserId()))
+                .add("userId", String.valueOf(Me.getUserId()))
                 .get(url)
                 .enqueue(context, new Callback() {
                     @Override
@@ -235,8 +236,8 @@ public class ConversationUtils {
                             }
 
                             //返回的数据中，若可见用户只有自己，则返回自己的id，若有其他人，则不包含自己的id，所以要加上自己的id
-                            if (memberList.size() > 1 || (memberList.size() == 1 && memberList.get(0) != LoginUtils.getUserId())) {
-                                memberList.add(LoginUtils.getUserId());
+                            if (memberList.size() > 1 || (memberList.size() == 1 && memberList.get(0) != Me.getUserId())) {
+                                memberList.add(Me.getUserId());
                             }
                             observer.onGetMembersAllowedSuccess(memberList);
                         }
@@ -251,7 +252,7 @@ public class ConversationUtils {
                                           final IgnoreAndStarConversationObserver observer){
         String url = Constants.IGNORE_CONVERSATION_URL + conversationId;
         new MyOkHttp.MyOkHttpClient()
-                .add("userId", String.valueOf(LoginUtils.getUserId()))
+                .add("userId", String.valueOf(Me.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .get(url)
                 .enqueue(context, new Callback() {
@@ -283,10 +284,10 @@ public class ConversationUtils {
                                         final IgnoreAndStarConversationObserver observer) {
         String url = Constants.STAR_CONVERSATION_URL + conversationId;
         new MyOkHttp.MyOkHttpClient()
-                .add("userId", String.valueOf(LoginUtils.getUserId()))
+                .add("userId", String.valueOf(Me.getUserId()))
                 .add("token", LoginUtils.getToken())
                 .get(url)
-                .enqueue(context, new Callback() {
+                .enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         observer.onStarConversationFailure(-3);

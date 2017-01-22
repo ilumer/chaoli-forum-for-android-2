@@ -23,8 +23,8 @@
             app:imageSuffix="@{viewModel.myAvatarSuffix}"
             app:userId="@{viewModel.myUserId}"
             app:username="@{viewModel.myUsername}"
-            app:login="@{viewModel.hasLoggedIn}"
-            android:clickable="true"
+            app:isLoggedIn="@{viewModel.isLoggedIn}"
+            android:clickable="@{viewModel.loginComplete}"
             android:onClick="@{viewModel.onClickAvatar}"
             android:id="@+id/avatar"/>
         <RelativeLayout
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/loginHWndUsername"
-                android:text="@{viewModel.hasLoggedIn ? viewModel.myUsername : @string/click_login}"
+                android:text="@{viewModel.isLoggedIn ? viewModel.myUsername : @string/click_login}"
                 android:textSize="14sp"
                 android:textColor="#FFFFFF"/>
             <TextView

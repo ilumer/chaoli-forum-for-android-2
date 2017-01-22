@@ -7,12 +7,14 @@ import com.daquexian.chaoli.forum.model.TokenResult;
 import com.daquexian.chaoli.forum.model.User;
 import com.daquexian.chaoli.forum.model.ConversationListResult;
 import com.daquexian.chaoli.forum.model.PostListResult;
+import com.daquexian.chaoli.forum.model.UserIdAndTokenResult;
 import com.google.common.annotations.GwtCompatible;
 
 import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -28,9 +30,11 @@ public interface ChaoliService {
     @GET("index.php/conversations/index.json/{channel}")
     Observable<ConversationListResult> listConversations(@Path("channel") String channel, @Query("search") String search);
     @GET("index.php/user/login.json")
-    Call<TokenResult> getToken();
-    @POST("index.php/user/login?return=%2F")
-    Observable<String> login(@Field("username") String username, @Field("password") String password, @Field("token") String token);
+    Call<UserIdAndTokenResult> getUserIdAndToken();
+    @POST("index.php/user/login")
+    @FormUrlEncoded
+    Call<UserIdAndTokenResult> login(@Field("username") String username, @Field("password") String password,
+                             @Field("token") String token, @Field("return") String returnLocation, @Field("login") String login);
     @GET("index.php/settings/general.json")
     Call<User> getProfile();
     @POST("index.php/?p=settings/notificationCheck.ajax")

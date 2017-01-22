@@ -52,7 +52,12 @@ public class MainActivityVM extends BaseViewModel {
     public ObservableField<String> myAvatarSuffix = new ObservableField<>();
     public ObservableField<String> mySignature = new ObservableField<>();
 
-    public ObservableBoolean hasLoggedIn = new ObservableBoolean(false);
+    /**
+     * isLoggedIn is only used to determine whether there are available username, signature etc to show
+     * To check account status, please use LoginUtils.isLoggedIn() or Me.isEmpty()
+     */
+    public ObservableBoolean isLoggedIn = new ObservableBoolean(false);
+    public ObservableBoolean loginComplete = new ObservableBoolean(false);
 
     public ObservableInt listPosition = new ObservableInt();
 
@@ -62,6 +67,7 @@ public class MainActivityVM extends BaseViewModel {
     public Conversation clickedConversation;
     public ObservableInt notificationsNum = new ObservableInt(0);
     public ObservableBoolean showLoginProcessDialog = new ObservableBoolean(false);
+    public ObservableBoolean toFirstLoadConversation = new ObservableBoolean();
     public ObservableInt selectedItem = new ObservableInt(-1);
     public ObservableInt goToPost = new ObservableInt();
     public ObservableBoolean failed = new ObservableBoolean();
@@ -120,7 +126,7 @@ public class MainActivityVM extends BaseViewModel {
                         } else {
                             MyUtils.expandUnique(conversationList, newConversationList);
                         }
-                        //conversationList.add(new Conversation());
+
                         canAutoLoad = true;
                         removeCircle();
                         if (refresh) {
@@ -158,7 +164,7 @@ public class MainActivityVM extends BaseViewModel {
     }
 
     public void onClickAvatar(View view) {
-        if (hasLoggedIn.get()) {
+        if (isLoggedIn.get()) {
             goToHomepage.notifyChange();
         } else {
             goToLogin.notifyChange();
@@ -211,74 +217,86 @@ public class MainActivityVM extends BaseViewModel {
             }
         }
     };
-    public void login() {
-        showLoginProcessDialog.set(true);
+    public void startUp() {
+        Log.d(TAG, "startUp() called");
+        isRefreshing.set(true);
+
+        if (LoginUtils.hasSavedData()) {
+            isLoggedIn.set(true);   // isLoggedIn is only to determine whether there are available username, signature etc to show
+
+            Me.setInstanceFromSharedPreference(ChaoliApplication.getAppContext(), LoginUtils.getSavedUsername());
+            if (!Me.isEmpty()) {
+                myUsername.set(LoginUtils.getSavedUsername());
+                myAvatarSuffix.set(Me.getMyAvatarSuffix());
+                mySignature.set(Me.getMySignature());
+            } else {
+                myUsername.set(getString(R.string.loading));
+                mySignature.set(getString(R.string.loading));
+            }
+        }
+
         LoginUtils.begin_login(new LoginUtils.LoginObserver() {
             @Override
             public void onLoginSuccess(int userId, String token) {
                 failed.set(false);
-                showLoginProcessDialog.set(false);
-                hasLoggedIn.set(true);
-                /*navigationView.getMenu().clear();
-                navigationView.inflateMenu(R.menu.menu_navigation);*/
-                String username = ChaoliApplication.getAppContext().getSharedPreferences("username_and_password", MODE_PRIVATE).getString("username", "");
-                //((TextView) ((Activity) mContext).findViewById(R.id.loginHWndUsername)).setText(username);
-                Me.setInstanceFromSharedPreference(ChaoliApplication.getAppContext(), username);
-                if (!Me.isEmpty()) {
-                    Log.d(TAG, "onLoginSuccess: " + Me.getMyUserId() + ", " + Me.getMyUsername() + Me.getMyAvatarSuffix() + Me.getMySignature());
-                    myUserId.set(Me.getMyUserId());
-                    myUsername.set(Me.getMyUsername());
-                    myAvatarSuffix.set(Me.getMyAvatarSuffix());
-                    mySignature.set(Me.getMySignature());
-                } else {
-                    myUsername.set(getString(R.string.loading));
-                    mySignature.set(getString(R.string.loading));
+                isLoggedIn.set(true);
+                loginComplete.set(true);
+
+                Log.d(TAG, "onLoginSuccess: success");
+                getProfile();
+
+                if (channel.equals("") || channel.equals("all")) {
+                    toFirstLoadConversation.notifyChange();   // update conversations
                 }
-                AccountUtils.getProfile(new AccountUtils.GetProfileObserver() {
-                    @Override
-                    public void onGetProfileSuccess() {
-                        myUserId.set(Me.getMyUserId());
-                        myUsername.set(Me.getMyUsername());
-                        myAvatarSuffix.set(Me.getMyAvatarSuffix());
-                        mySignature.set(Me.getMySignature());
-                    }
 
-                    @Override
-                    public void onGetProfileFailure() {
-
-                    }
-                });
-
-                timer = new Timer();
-                task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        notificationHandler.sendEmptyMessage(0);
-                    }
-                };
                 // TODO: 17-1-2 imporve code here
                 //noinspection EmptyCatchBlock
                 try {
+                    timer = new Timer();
+                    task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            notificationHandler.sendEmptyMessage(0);
+                        }
+                    };
                     timer.schedule(task, Constants.getNotificationInterval * 1000, Constants.getNotificationInterval * 1000);
                 } catch (Exception e) {
-
                 }
-                //view.selectItem(0);
-                selectedItem.set(0);
             }
 
             @Override
             public void onLoginFailure(int statusCode) {
-                showLoginProcessDialog.set(false);
                 if (statusCode == LoginUtils.EMPTY_UN_OR_PW) {
                     selectedItem.set(0);
+                    failed.set(false);
+                    isLoggedIn.set(false);
+                    loginComplete.set(true);
                     selectedItem.notifyChange();
-                }
-                else {
+                } else {
                     failed.set(true);
-
+                    isLoggedIn.set(false);
+                    toastContent = getString(R.string.network_err);
+                    showToast.notifyChange();
                 }
                 Log.d(TAG, "onLoginFailure: " + statusCode);
+            }
+        });
+    }
+
+    public void getProfile() {
+        Log.d(TAG, "getProfile() called, username = " + myUsername.get() + ", " + Me.getMyUsername());
+        AccountUtils.getProfile(new AccountUtils.GetProfileObserver() {
+            @Override
+            public void onGetProfileSuccess() {
+                myUserId.set(Me.getMyUserId());
+                myUsername.set(Me.getMyUsername());
+                myAvatarSuffix.set(Me.getMyAvatarSuffix());
+                mySignature.set(Me.getMySignature());
+            }
+
+            @Override
+            public void onGetProfileFailure() {
+
             }
         });
     }

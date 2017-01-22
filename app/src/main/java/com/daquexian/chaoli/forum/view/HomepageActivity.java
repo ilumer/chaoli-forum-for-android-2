@@ -198,20 +198,24 @@ public class HomepageActivity extends BaseActivity implements AppBarLayout.OnOff
                 startActivityForResult(new Intent(HomepageActivity.this, SettingsActivity.class), SETTING_CODE);
                 break;
             case MENU_LOGOUT:
-                LoginUtils.logout(new LoginUtils.LogoutObserver() {
-                    @Override
-                    public void onLogoutSuccess() {
-                    }
-
-                    @Override
-                    public void onLogoutFailure(int statusCode) {
-                    }
-                });
-                // whether logout succeeds or not, the data in app will be wiped, so we can think it always succeed
+                // showProcessDialog(getString(R.string.just_a_sec));
                 Toast.makeText(getApplicationContext(), R.string.logout_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(HomepageActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                LoginUtils.logout(new LoginUtils.LogoutObserver() {
+                    @Override
+                    public void onLogoutSuccess() {
+                        // dismissProcessDialog();
+                    }
+
+                    @Override
+                    public void onLogoutFailure(int statusCode) {
+                        dismissProcessDialog();
+                        showToast(R.string.network_err);
+                    }
+                });
+
                 break;
         }
         return true;

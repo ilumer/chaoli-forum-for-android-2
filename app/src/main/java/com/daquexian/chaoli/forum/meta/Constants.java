@@ -15,7 +15,9 @@ public class Constants
 	public static final String BASE_BASE_URL = "https://chaoli.club/";
 	public static final String BASE_URL = BASE_BASE_URL + "index.php/";
 	public static final String GET_TOKEN_URL = BASE_URL + "user/login.json";
-	public static final String LOGIN_URL = BASE_URL + "user/login?return=%2F";
+	// index.php/member/name.json/我是大缺弦
+	public static final String GET_USER_ID_URL = BASE_URL + "member/name.json/";
+	public static final String LOGIN_URL = BASE_URL + "user/login";
 	public static final String HOMEPAGE_URL = BASE_URL;
 	public static final String LOGOUT_PRE_URL = BASE_URL + "user/logout?token=";
 	public static final String GET_CAPTCHA_URL = BASE_URL + "mscaptcha";

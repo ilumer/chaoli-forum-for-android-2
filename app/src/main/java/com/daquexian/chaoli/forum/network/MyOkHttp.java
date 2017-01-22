@@ -2,6 +2,7 @@ package com.daquexian.chaoli.forum.network;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
 
@@ -18,6 +19,7 @@ import okhttp3.Call;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -41,6 +43,15 @@ public class MyOkHttp {
         }
         for (Call call : okHttpClient.dispatcher().runningCalls()) {
             if (tag.equals(call.request().tag())) call.cancel();
+        }
+    }
+
+    private static class MyInterceptor implements Interceptor {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Response response = chain.proceed(chain.request());
+            Log.w("Retrofit@Response", response.body().string());
+            return response;
         }
     }
 
@@ -78,6 +89,7 @@ public class MyOkHttp {
                     .cookieJar(mCookiesManager)
                     .connectTimeout(15, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
+                    //.addInterceptor(new MyInterceptor())
                     //.connectTimeout(5, TimeUnit.SECONDS)
                     //.readTimeout(5, TimeUnit.SECONDS)
                     .build();
@@ -86,7 +98,9 @@ public class MyOkHttp {
     }
 
     public synchronized static void clearCookie(){
-        mCookiesManager.clear();
+        if (mCookiesManager != null) {
+            mCookiesManager.clear();
+        }
     }
 
     public static class MyOkHttpClient {

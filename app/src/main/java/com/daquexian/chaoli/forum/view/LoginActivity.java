@@ -47,9 +47,11 @@ public class LoginActivity extends BaseActivity
 		viewModel.goToMainActivity.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+				/* Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
+				startActivity(intent); */
+				setResult(RESULT_OK);
+				finish();
 			}
 		});
 
