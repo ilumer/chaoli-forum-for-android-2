@@ -24,7 +24,7 @@
 				android:layout_alignParentEnd="true"
 				android:layout_alignParentRight="true"
 				android:textSize="18sp"
-				android:textColor="@color/contentColor"
+				android:textColor="?attr/contentColor"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content" />
 			<ImageButton
@@ -62,7 +62,7 @@
 					android:textSize="16sp"
 					android:layout_marginLeft="15dp"
 					android:layout_marginStart="15dp"
-					android:textColor="@color/black"
+					android:textColor="?android:attr/textColorPrimary"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:maxLines="1"/>

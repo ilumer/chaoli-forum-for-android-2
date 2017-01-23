@@ -168,5 +168,5 @@
 	<string name="reply_successfully">Reply successfully</string>
 	<string name="conversation_has_been_deleted">Oops, conversation has been deleted</string>
 	<string name="please_login">Please Login</string>
-
+	<string name="night_mode">night_mode</string>
 </resources>

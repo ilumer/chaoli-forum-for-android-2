@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single"
+        android:orderInCategory="11">
         <item android:id="@+id/channelAll"
             android:orderInCategory="0"
             android:title="@string/channel.all"
@@ -36,4 +38,9 @@
             android:orderInCategory="11"
             android:title="@string/channel.lang"/>
     </group>
+
+    <item
+        android:id="@+id/nightMode"
+        android:title="@string/night_mode"
+        android:orderInCategory="13" />
 </menu>

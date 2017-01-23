@@ -1,10 +1,10 @@
 package com.daquexian.chaoli.forum.meta;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,7 +28,7 @@ public class QuoteView extends LinearLayout {
     Context mContext;
 
     private static final String TAG = "QuoteView";
-    private static final int BG_COLOR = Color.rgb(241, 241, 241);
+    private static int BG_COLOR ;
     //private static final int BUTTON_TEXT_SIZE = 10;
 
     public QuoteView(Context context, List<Post.Attachment> attachmentList) {
@@ -126,6 +126,9 @@ public class QuoteView extends LinearLayout {
     }
 
     private void init(Context context, List<Post.Attachment> attachmentList) {
+        TypedValue value = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.QuoteViewBackground,value,true);
+        BG_COLOR = value.data;
         mContext = context;
         mCollapsed = false;
         mTextView = new OnlineImgTextView(context, attachmentList);

@@ -39,6 +39,7 @@
 			android:screenOrientation="portrait"/>
 		<activity
 			android:name="com.daquexian.chaoli.forum.view.PostActivity"
+			android:theme="@style/PostActivityTheme"
 			android:screenOrientation="portrait"/>
 		<activity
 			android:name="com.daquexian.chaoli.forum.view.ReplyAction"

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="rvBackground" format="color"/>
+    <attr name="contentColor" format="color"/>
+    <attr name="signatureColor" format="color"/>
+    <attr name="nameColor" format="color"/>
+    <attr name="titleColor" format="color"/>
+    <attr name="deleteItemColor" format="color"/>
+    <declare-styleable name="QuoteView">
+        <attr name="QuoteViewBackground" format="color"/>
+    </declare-styleable>
+    <attr name="alpha" format="float"/>
+</resources>

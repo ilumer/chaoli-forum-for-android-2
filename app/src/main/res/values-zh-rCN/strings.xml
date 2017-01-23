@@ -165,4 +165,5 @@
 	<string name="reply_successfully">回复成功</string>
 	<string name="conversation_has_been_deleted">帖子可能已经被删啦</string>
 	<string name="please_login">请登录</string>
+	<string name="night_mode">夜间模式</string>
 </resources>

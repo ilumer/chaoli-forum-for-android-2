@@ -1,10 +1,12 @@
 package com.daquexian.chaoli.forum.viewmodel;
 
 import android.content.SharedPreferences;
+import android.databinding.BindingAdapter;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.util.Log;
+import android.view.View;
 
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.meta.Constants;
@@ -126,6 +128,11 @@ public class ReplyActionVM extends BaseViewModel {
 
     private void clearSaved() {
         e.clear().apply();
+    }
+
+    @BindingAdapter("alpha")
+    public static void setAlpha(View view,float alpha){
+        view.setAlpha(alpha);
     }
 }
 
