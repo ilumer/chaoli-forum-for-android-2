@@ -245,6 +245,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		return true;
 	}
 
+	public static void MenuItemTint(){
+
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{

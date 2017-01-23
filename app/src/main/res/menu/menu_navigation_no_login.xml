@@ -35,13 +35,12 @@
             android:orderInCategory="10"
             android:title="@string/channel.socsci"/>
         <item android:id="@+id/channelLang"
-            android:orderInCategory="12"
+            android:orderInCategory="11"
             android:title="@string/channel.lang"/>
     </group>
+
     <item
         android:id="@+id/nightMode"
         android:title="@string/night_mode"
-        android:orderInCategory="13"
-        app:actionLayout="@layout/menu_switch"/>
-
+        android:orderInCategory="13" />
 </menu>

@@ -21,6 +21,7 @@
 				android:layout_width="match_parent"
 				android:layout_height="?attr/actionBarSize"
 				android:background="?attr/colorPrimary"
+				android:theme="@style/PostActivityTheme"
 				app:layout_scrollFlags="scroll|enterAlways" />
 		</com.daquexian.chaoli.forum.meta.MyAppBarLayout>
 		<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
@@ -37,7 +38,7 @@
 				app:selector="@{viewModel.layoutSelector}"
 				app:handler="@{viewModel}"
 				app:position="@{viewModel.listPosition}"
-				android:background="?attr/rvBackground"
+				android:background="?android:attr/windowBackground"
 				android:id="@+id/postList"/>
 		</com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 		<android.support.design.widget.FloatingActionButton

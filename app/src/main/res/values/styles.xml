@@ -54,7 +54,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="rvBackground">@color/white</item>
     </style>
 
     <style name="MainActivityTheme" parent="AppTheme">
@@ -66,10 +65,13 @@
     <style name="PostActivityTheme" parent="AppTheme">
         <item name="contentColor">@color/contentColor</item>
         <item name="signatureColor">@color/black</item>
-        <item name="rvBackground">@color/white</item>
         <item name="deleteItemColor">#FF808080</item>
         <item name="QuoteViewBackground">#F1F1F1</item>
         <item name="titleColor">#000000</item>
+    </style>
+    
+    <style name="HomepageActivityTheme" parent="AppTheme">
+
     </style>
 
     <style name="Widget.MyApp.ActionBar" parent="AppBaseTheme">

@@ -34,7 +34,7 @@
             android:layout_toRightOf="@id/avatar"
             android:layout_toEndOf="@id/avatar"
             android:textSize="15sp"
-            android:textColor="@color/black"
+            android:textColor="?android:attr/textColorPrimary"
             android:maxLines="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -48,7 +48,7 @@
             android:maxLines="4"
             android:minLines="3"
             android:ellipsize="end"
-            android:textColor="@color/black"
+            android:textColor="?android:attr/textColorPrimary"
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
             android:layout_width="wrap_content"

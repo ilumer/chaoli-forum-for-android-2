@@ -14,22 +14,24 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.daquexian.chaoli.forum.data.Me;
+import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
+import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.databinding.MainActivityBinding;
 import com.daquexian.chaoli.forum.databinding.NavigationHeaderBinding;
-import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.meta.Constants;
+import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.MainActivityVM;
 import com.google.android.gms.appindexing.Action;
@@ -56,6 +58,8 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	 * See https://g.co/AppIndexing/AndroidStudio for more information.
 	 */
 	private GoogleApiClient client;
+
+	private SwitchCompat switchCompat;
 
 	RecyclerView l;
 
@@ -183,14 +187,15 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	}
 
 	public void selectItem(int position) {
-        if (position>12){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            recreate();
-            return;
-        }
-		viewModel.setChannel(viewModel.getChannelByPosition(position));
-		viewModel.refresh();
-		mDrawerLayout.closeDrawers();
+		if (position<=12) {
+			viewModel.setChannel(viewModel.getChannelByPosition(position));
+			viewModel.refresh();
+			mDrawerLayout.closeDrawers();
+		}else if (position>12){
+
+			setNightMode(true);
+			return;
+		}
 	}
 
 	public void initUI() {
@@ -256,6 +261,17 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 				return true;
 			}
 		});
+	}
+
+	public void setNightMode(boolean flag){
+		if (flag){
+			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+			ChaoliApplication.getDayNightHelper().setNight();
+		}else {
+			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+			ChaoliApplication.getDayNightHelper().setDay();
+		}
+		recreate();
 	}
 
 	@Override
