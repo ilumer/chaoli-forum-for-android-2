@@ -21,12 +21,13 @@ import android.widget.Toast;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.databinding.PostActivityBinding;
 import com.daquexian.chaoli.forum.meta.Constants;
+import com.daquexian.chaoli.forum.meta.DividerItemDecoration;
 import com.daquexian.chaoli.forum.meta.MyAppBarLayout;
+import com.daquexian.chaoli.forum.meta.NightModeHelper;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.utils.ConversationUtils;
-import com.daquexian.chaoli.forum.meta.DividerItemDecoration;
 import com.daquexian.chaoli.forum.utils.LoginUtils;
 import com.daquexian.chaoli.forum.utils.PostUtils;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
@@ -237,7 +238,11 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		super.onCreateOptionsMenu(menu);
-		menu.add(Menu.NONE, Menu.NONE, menu_reverse, R.string.descend).setIcon(R.drawable.ic_sort_black_24dp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		if (NightModeHelper.IsDay(PostActivity.this)) {
+			menu.add(Menu.NONE, Menu.NONE, menu_reverse, R.string.descend).setIcon(R.drawable.ic_sort_black_24dp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		}else {
+			menu.add(Menu.NONE, Menu.NONE, menu_reverse, R.string.descend).setIcon(R.drawable.ic_sort_white_24dp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		}
 		menu.add(Menu.NONE, Menu.NONE, menu_share, R.string.share).setIcon(R.drawable.ic_share_black_24dp);//.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		// menu.add(Menu.NONE, Menu.NONE, menu_star, R.string.star).setIcon(R.drawable.ic_menu_star);
 		menu.add(Menu.NONE, Menu.NONE, menu_settings, R.string.settings).setIcon(android.R.drawable.ic_menu_manage);
@@ -245,9 +250,6 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		return true;
 	}
 
-	public static void MenuItemTint(){
-
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)

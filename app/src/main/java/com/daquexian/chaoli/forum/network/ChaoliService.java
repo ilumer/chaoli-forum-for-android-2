@@ -1,14 +1,12 @@
 package com.daquexian.chaoli.forum.network;
 
+import com.daquexian.chaoli.forum.model.ConversationListResult;
 import com.daquexian.chaoli.forum.model.HistoryResult;
 import com.daquexian.chaoli.forum.model.NotificationList;
-import com.daquexian.chaoli.forum.model.Question;
-import com.daquexian.chaoli.forum.model.TokenResult;
-import com.daquexian.chaoli.forum.model.User;
-import com.daquexian.chaoli.forum.model.ConversationListResult;
 import com.daquexian.chaoli.forum.model.PostListResult;
+import com.daquexian.chaoli.forum.model.Question;
+import com.daquexian.chaoli.forum.model.User;
 import com.daquexian.chaoli.forum.model.UserIdAndTokenResult;
-import com.google.common.annotations.GwtCompatible;
 
 import java.util.ArrayList;
 

@@ -11,13 +11,11 @@ import com.daquexian.chaoli.forum.meta.NightModeHelper;
  */
 public class ChaoliApplication extends Application {
     private static Context appContext;
-    private static NightModeHelper nightModeHelper;
     @Override
     public void onCreate() {
         super.onCreate();
         ChaoliApplication.appContext = getApplicationContext();
-        nightModeHelper = new NightModeHelper(getApplicationContext());
-        if (nightModeHelper.IsDay()){
+        if (NightModeHelper.IsDay(getApplicationContext())){
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -26,9 +24,5 @@ public class ChaoliApplication extends Application {
 
     public static Context getAppContext() {
         return appContext;
-    }
-
-    public static NightModeHelper getDayNightHelper(){
-        return nightModeHelper;
     }
 }

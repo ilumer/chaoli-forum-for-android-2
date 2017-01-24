@@ -33,8 +33,6 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static android.content.Context.MODE_PRIVATE;
-
 /**
  * ViewModel of MainActivity
  * Created by jianhao on 16-9-19.
@@ -86,6 +84,14 @@ public class MainActivityVM extends BaseViewModel {
 
     public MainActivityVM() {
         //conversationList.add(new Conversation());
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
     }
 
     private void getList(final int page) {

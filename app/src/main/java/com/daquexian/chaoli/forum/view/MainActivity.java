@@ -1,15 +1,18 @@
 package com.daquexian.chaoli.forum.view;
 
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
+import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -19,18 +22,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.daquexian.chaoli.forum.ChaoliApplication;
 import com.daquexian.chaoli.forum.R;
 import com.daquexian.chaoli.forum.data.Me;
 import com.daquexian.chaoli.forum.databinding.MainActivityBinding;
 import com.daquexian.chaoli.forum.databinding.NavigationHeaderBinding;
 import com.daquexian.chaoli.forum.meta.Constants;
+import com.daquexian.chaoli.forum.meta.NightModeHelper;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.MainActivityVM;
@@ -42,10 +44,16 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 
 public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener
 {
+	private static final String CONVERSATIONLIST_KEY = "conversationList";
+	private static final String CHANNEL_KEY = "chanel";
+	private static final String LAYOUTMANAGER＿STATE = "layoutManager";
+	private static final String PAGE_NUMBER = "pageState";
 	public static final String TAG = "MainActivity";
 
 	public Toolbar toolbar;
 	public DrawerLayout mDrawerLayout;
+	public LinearLayoutManager layoutManager;
+	public Parcelable layoutManagerState = null;
 
 	private Context mContext = this;
 
@@ -60,8 +68,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	 */
 	private GoogleApiClient client;
 
-	private SwitchCompat switchCompat;
-
 	RecyclerView l;
 
 	public SwipyRefreshLayout swipyRefreshLayout;
@@ -75,6 +81,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	boolean needTwoClick = false;
 	boolean clickedOnce = false;	//点击Back键两次退出
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -167,8 +174,16 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		});
 
 		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
-		viewModel.setChannel("all");
-		viewModel.startUp();
+
+		if (savedInstanceState==null) {
+			viewModel.setChannel("all");
+			viewModel.startUp();
+		}else {
+			viewModel.setChannel(savedInstanceState.getString(CHANNEL_KEY));
+			viewModel.setPage(savedInstanceState.getInt(PAGE_NUMBER));
+			viewModel.conversationList=(ObservableArrayList)savedInstanceState.getParcelableArrayList(CONVERSATIONLIST_KEY);
+			layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(LAYOUTMANAGER＿STATE));
+		}
 
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
 		{
@@ -218,7 +233,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
 
 		l = binding.conversationList;
-		final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
+		layoutManager = new LinearLayoutManager(mContext);
 		l.setLayoutManager(layoutManager);
 		l.addItemDecoration(new android.support.v7.widget.DividerItemDecoration(mContext, android.support.v7.widget.DividerItemDecoration.VERTICAL));
 
@@ -257,8 +272,20 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                selectItem(item.getOrder());
-				item.setChecked(true);
+				if (item.getItemId()==R.id.nightMode){
+					mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+						@Override
+						public void onDrawerClosed(View drawerView) {
+							setNightMode(NightModeHelper.IsDay(MainActivity.this));
+							getWindow().setWindowAnimations(R.style.modechange);
+							recreate();
+						}
+					});
+					mDrawerLayout.closeDrawers();
+				}else {
+					selectItem(item.getOrder());
+					item.setChecked(true);
+				}
 				return true;
 			}
 		});
@@ -267,12 +294,11 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	public void setNightMode(boolean flag){
 		if (flag){
 			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-			ChaoliApplication.getDayNightHelper().setNight();
+			NightModeHelper.setNight(MainActivity.this);
 		}else {
 			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-			ChaoliApplication.getDayNightHelper().setDay();
+			NightModeHelper.setDay(MainActivity.this);
 		}
-		recreate();
 	}
 
 	@Override
@@ -292,6 +318,15 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		outState.putParcelableArrayList(CONVERSATIONLIST_KEY,viewModel.conversationList);
+		outState.putParcelable(LAYOUTMANAGER＿STATE,layoutManager.onSaveInstanceState());
+		outState.putString(CHANNEL_KEY,viewModel.getChannel());
+		outState.putInt(PAGE_NUMBER,viewModel.getPage());
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		viewModel.destory();
@@ -300,6 +335,9 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	@Override
 	protected void onResume() {
 		super.onResume();
+		if (layoutManagerState!=null){
+			layoutManager.onRestoreInstanceState(layoutManagerState);
+		}
 		viewModel.resume();
 		needTwoClick = getSharedPreferences(Constants.SETTINGS_SP, MODE_PRIVATE).getBoolean(Constants.CLICK_TWICE_TO_EXIT, false);
 	}

@@ -78,4 +78,9 @@
         <item name="android:background">?attr/colorPrimary</item>
         <item name="toolbarStyle">@style/Widget.AppCompat.Toolbar</item>
     </style>
+    
+    <style name="modechange">
+        <item name="android:windowEnterAnimation">@anim/fade_in</item>
+        <item name="android:windowExitAnimation">@anim/fade_out</item>
+    </style>
 </resources>

@@ -18,7 +18,7 @@
         <item name="contentColor">@color/contentColor</item>
         <item name="signatureColor">@color/white</item>
         <item name="deleteItemColor">#FF808080</item>
-        <item name="QuoteViewBackground">#F1F1F1</item>
+        <item name="QuoteViewBackground">#FF808080</item>
         <item name="titleColor">@color/white</item>
     </style>
 

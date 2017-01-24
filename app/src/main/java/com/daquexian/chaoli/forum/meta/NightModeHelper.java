@@ -13,24 +13,24 @@ public class NightModeHelper{
     private static final String MODE = "night_mode";
     private static final String NIGHT = "night";
     private static final String DAY = "day";
-    private SharedPreferences sharedPreferences;
-    public NightModeHelper(Context context) {
-        sharedPreferences = context.getSharedPreferences(MODE,MODE_PRIVATE);
+
+    public static SharedPreferences getSp(Context context){
+        return context.getSharedPreferences(MODE,MODE_PRIVATE);
     }
 
-    public final boolean IsDay(){
-        String temp = sharedPreferences.getString(MODE,DAY);
+    public static boolean IsDay(Context context){
+        String temp = getSp(context).getString(MODE,DAY);
         return temp.equals(DAY);
     }
 
-    public final void setNight(){
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    public static void setNight(Context context){
+        SharedPreferences.Editor editor = getSp(context).edit();
         editor.putString(MODE,NIGHT);
         editor.apply();
     }
 
-    public final void setDay(){
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+    public static void setDay(Context context){
+        SharedPreferences.Editor editor = getSp(context).edit();
         editor.putString(MODE,DAY);
         editor.apply();
     }
