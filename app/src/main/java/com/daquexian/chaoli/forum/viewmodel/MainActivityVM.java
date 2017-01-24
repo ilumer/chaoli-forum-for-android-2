@@ -57,7 +57,7 @@ public class MainActivityVM extends BaseViewModel {
     public ObservableBoolean isLoggedIn = new ObservableBoolean(false);
     public ObservableBoolean loginComplete = new ObservableBoolean(false);
 
-    public ObservableInt listPosition = new ObservableInt();
+    public ObservableBoolean smoothToFirst = new ObservableBoolean(false);
 
     public ObservableInt goToHomepage = new ObservableInt();
     public ObservableInt goToLogin = new ObservableInt();
@@ -136,8 +136,7 @@ public class MainActivityVM extends BaseViewModel {
                         canAutoLoad = true;
                         removeCircle();
                         if (refresh) {
-                            listPosition.set(0);
-                            listPosition.notifyChange();
+                            smoothToFirst.notifyChange();
                         }
                         MainActivityVM.this.page = page;
                     }
