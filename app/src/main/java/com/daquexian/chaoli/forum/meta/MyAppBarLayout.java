@@ -13,6 +13,7 @@ public class MyAppBarLayout extends AppBarLayout
         implements AppBarLayout.OnOffsetChangedListener {
 
     private State state;
+    private int offset;
     private OnStateChangeListener onStateChangeListener;
 
     public MyAppBarLayout(Context context) {
@@ -52,6 +53,11 @@ public class MyAppBarLayout extends AppBarLayout
             }
             state = State.IDLE;
         }
+        offset = verticalOffset;
+    }
+
+    public int getOffset() {
+        return offset;
     }
 
     public void setOnStateChangeListener(OnStateChangeListener listener) {

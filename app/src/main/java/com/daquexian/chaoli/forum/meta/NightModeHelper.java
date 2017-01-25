@@ -21,7 +21,7 @@ public class NightModeHelper{
     private static boolean shouldClear;
     private static BaseViewModel mViewModel;
 
-    public static SharedPreferences getSp(){
+    private static SharedPreferences getSp(){
         return ChaoliApplication.getSp(MODE,MODE_PRIVATE);
     }
 

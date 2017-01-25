@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -48,6 +49,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	private static final String CHANNEL_KEY = "chanel";
 	private static final String LAYOUTMANAGER＿STATE = "layoutManager";
 	private static final String PAGE_NUMBER = "pageState";
+	private static final String TOOLBAR_OFFSET = "toolbar_offset";
 	public static final String TAG = "MainActivity";
 
 	public Toolbar toolbar;
@@ -83,10 +85,8 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		// outState.putParcelableArrayList(CONVERSATIONLIST_KEY,viewModel.conversationList);
 		outState.putParcelable(LAYOUTMANAGER＿STATE,layoutManager.onSaveInstanceState());
-		// outState.putString(CHANNEL_KEY,viewModel.getChannel());
-		// outState.putInt(PAGE_NUMBER,viewModel.getPage());
+		outState.putInt(TOOLBAR_OFFSET, binding.appbar.getOffset());
 		super.onSaveInstanceState(outState);
 	}
 
@@ -252,11 +252,18 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		l.setLayoutManager(layoutManager);
 		if (NightModeHelper.getViewModel() != null) {
 			layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(LAYOUTMANAGER＿STATE));
-			NightModeHelper.removeViewModel();
 		}
 
 		swipyRefreshLayout = binding.conversationListRefreshLayout;
 
+		if (NightModeHelper.getViewModel() != null) {
+			CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) binding.appbar.getLayoutParams();
+			AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) layoutParams.getBehavior();
+			if (behavior != null) {
+				behavior.setTopAndBottomOffset(savedInstanceState.getInt(TOOLBAR_OFFSET));
+				behavior.onNestedPreScroll(binding.cl, binding.appbar, null, 0, 1, new int[2]);
+			}
+		}
 		binding.appbar.addOnOffsetChangedListener(this);
 		binding.conversationList.addOnScrollListener(new RecyclerView.OnScrollListener() {
 			@Override
@@ -310,6 +317,8 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 				return true;
 			}
 		});
+
+		NightModeHelper.removeViewModel();
 	}
 
 	@Override
