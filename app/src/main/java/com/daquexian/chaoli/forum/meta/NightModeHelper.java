@@ -21,7 +21,7 @@ public class NightModeHelper{
     private static BaseViewModel mViewModel;
 
     private static SharedPreferences getSp(){
-        return ChaoliApplication.getSp(MODE,MODE_PRIVATE);
+        return ChaoliApplication.getSp();
     }
 
     public static boolean isDay(){

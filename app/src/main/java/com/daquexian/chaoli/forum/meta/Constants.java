@@ -4,6 +4,7 @@ import android.content.res.Resources;
 
 public class Constants
 {
+	public static final String APP_NAME = "chaoli";		// for shared preference
 	public static final int paddingLeft = 16;
 	public static final int paddingTop = 16;
 	public static final int paddingRight = 16;
@@ -74,6 +75,7 @@ public class Constants
 	public static final String STAR_CONVERSATION_URL = BASE_URL + "?p=conversation/star.json/";
 
 	public static final String SETTINGS_SP = "settings";
+	public static final String INVITING_CODE_SP = "icsp";
 	public static final String NIGHT_MODE = "nightMode";
 	public static final String CLICK_TWICE_TO_EXIT = "ctte";
 
