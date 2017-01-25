@@ -2,6 +2,10 @@ package com.daquexian.chaoli.forum.meta;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v7.app.AppCompatDelegate;
+
+import com.daquexian.chaoli.forum.ChaoliApplication;
+import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -14,23 +18,50 @@ public class NightModeHelper{
     private static final String NIGHT = "night";
     private static final String DAY = "day";
 
-    public static SharedPreferences getSp(Context context){
-        return context.getSharedPreferences(MODE,MODE_PRIVATE);
+    private static boolean shouldClear;
+    private static BaseViewModel mViewModel;
+
+    public static SharedPreferences getSp(){
+        return ChaoliApplication.getSp(MODE,MODE_PRIVATE);
     }
 
-    public static boolean IsDay(Context context){
-        String temp = getSp(context).getString(MODE,DAY);
+    public static boolean isDay(){
+        String temp = getSp().getString(MODE,DAY);
         return temp.equals(DAY);
     }
 
-    public static void setNight(Context context){
-        SharedPreferences.Editor editor = getSp(context).edit();
+    public static void changeMode(BaseViewModel viewModel) {
+        if (isDay()) {
+            setNight();
+        } else {
+            setDay();
+        }
+        mViewModel = viewModel;
+        shouldClear = true;
+    }
+
+    public static BaseViewModel getViewModel() {
+        return mViewModel;
+    }
+
+    public static void removeViewModel() {
+        if (shouldClear) {
+            mViewModel = null;
+        } else {
+            shouldClear = true;
+        }
+    }
+
+    private static void setNight(){
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        SharedPreferences.Editor editor = getSp().edit();
         editor.putString(MODE,NIGHT);
         editor.apply();
     }
 
-    public static void setDay(Context context){
-        SharedPreferences.Editor editor = getSp(context).edit();
+    private static void setDay(){
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        SharedPreferences.Editor editor = getSp().edit();
         editor.putString(MODE,DAY);
         editor.apply();
     }

@@ -81,15 +81,31 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	boolean needTwoClick = false;
 	boolean clickedOnce = false;	//点击Back键两次退出
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// outState.putParcelableArrayList(CONVERSATIONLIST_KEY,viewModel.conversationList);
+		outState.putParcelable(LAYOUTMANAGER＿STATE,layoutManager.onSaveInstanceState());
+		// outState.putString(CHANNEL_KEY,viewModel.getChannel());
+		// outState.putInt(PAGE_NUMBER,viewModel.getPage());
+		super.onSaveInstanceState(outState);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		viewModel = new MainActivityVM();
-		setViewModel(viewModel);
+		if (NightModeHelper.getViewModel() == null) {
+			viewModel = new MainActivityVM();
+			setViewModel(viewModel);
+			viewModel.setChannel("all");
+			viewModel.startUp();
+		} else {
+			viewModel = (MainActivityVM) NightModeHelper.getViewModel();	// remove the reference to ViewModel in NightModeHelper later in initUI
+			setViewModel(viewModel);
+		}
 
-		initUI();
+		initUI(savedInstanceState);
 
 		viewModel.goToLogin.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
@@ -175,16 +191,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
 		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
 
-		if (savedInstanceState==null) {
-			viewModel.setChannel("all");
-			viewModel.startUp();
-		}else {
-			viewModel.setChannel(savedInstanceState.getString(CHANNEL_KEY));
-			viewModel.setPage(savedInstanceState.getInt(PAGE_NUMBER));
-			viewModel.conversationList=(ObservableArrayList)savedInstanceState.getParcelableArrayList(CONVERSATIONLIST_KEY);
-			layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(LAYOUTMANAGER＿STATE));
-		}
-
 		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
 		{
 			@Override
@@ -214,7 +220,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		}
 	}
 
-	public void initUI() {
+	public void initUI(Bundle savedInstanceState) {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.tl_custom);
 		configToolbar(R.string.app_name);
 
@@ -233,9 +239,14 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
 
 		l = binding.conversationList;
+		l.addItemDecoration(new android.support.v7.widget.DividerItemDecoration(mContext, android.support.v7.widget.DividerItemDecoration.VERTICAL));
+
 		layoutManager = new LinearLayoutManager(mContext);
 		l.setLayoutManager(layoutManager);
-		l.addItemDecoration(new android.support.v7.widget.DividerItemDecoration(mContext, android.support.v7.widget.DividerItemDecoration.VERTICAL));
+		if (NightModeHelper.getViewModel() != null) {
+			layoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(LAYOUTMANAGER＿STATE));
+			NightModeHelper.removeViewModel();
+		}
 
 		swipyRefreshLayout = binding.conversationListRefreshLayout;
 
@@ -273,15 +284,18 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			@Override
 			public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 				if (item.getItemId()==R.id.nightMode){
-					mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+					NightModeHelper.changeMode(viewModel);
+					getWindow().setWindowAnimations(R.style.modechange);
+					recreate();
+					/*mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 						@Override
 						public void onDrawerClosed(View drawerView) {
-							setNightMode(NightModeHelper.IsDay(MainActivity.this));
+							NightModeHelper.changeMode();
 							getWindow().setWindowAnimations(R.style.modechange);
 							recreate();
 						}
-					});
-					mDrawerLayout.closeDrawers();
+					});*/
+					// mDrawerLayout.closeDrawers();
 				}else {
 					selectItem(item.getOrder());
 					item.setChecked(true);
@@ -289,16 +303,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 				return true;
 			}
 		});
-	}
-
-	public void setNightMode(boolean flag){
-		if (flag){
-			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-			NightModeHelper.setNight(MainActivity.this);
-		}else {
-			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-			NightModeHelper.setDay(MainActivity.this);
-		}
 	}
 
 	@Override
@@ -315,15 +319,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 				}
 			}, 2500);
 		}
-	}
-
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		outState.putParcelableArrayList(CONVERSATIONLIST_KEY,viewModel.conversationList);
-		outState.putParcelable(LAYOUTMANAGER＿STATE,layoutManager.onSaveInstanceState());
-		outState.putString(CHANNEL_KEY,viewModel.getChannel());
-		outState.putInt(PAGE_NUMBER,viewModel.getPage());
-		super.onSaveInstanceState(outState);
 	}
 
 	@Override

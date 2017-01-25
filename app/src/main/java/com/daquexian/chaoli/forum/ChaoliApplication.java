@@ -2,6 +2,7 @@ package com.daquexian.chaoli.forum;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.daquexian.chaoli.forum.meta.NightModeHelper;
@@ -15,7 +16,7 @@ public class ChaoliApplication extends Application {
     public void onCreate() {
         super.onCreate();
         ChaoliApplication.appContext = getApplicationContext();
-        if (NightModeHelper.IsDay(getApplicationContext())){
+        if (NightModeHelper.isDay()){
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -24,5 +25,9 @@ public class ChaoliApplication extends Application {
 
     public static Context getAppContext() {
         return appContext;
+    }
+
+    public static SharedPreferences getSp(String name, int mode) {
+        return appContext.getSharedPreferences(name, mode);
     }
 }

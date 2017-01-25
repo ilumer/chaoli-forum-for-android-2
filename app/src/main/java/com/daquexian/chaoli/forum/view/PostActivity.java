@@ -238,7 +238,7 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		super.onCreateOptionsMenu(menu);
-		if (NightModeHelper.IsDay(PostActivity.this)) {
+		if (NightModeHelper.isDay()) {
 			menu.add(Menu.NONE, Menu.NONE, menu_reverse, R.string.descend).setIcon(R.drawable.ic_sort_black_24dp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		}else {
 			menu.add(Menu.NONE, Menu.NONE, menu_reverse, R.string.descend).setIcon(R.drawable.ic_sort_white_24dp).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
