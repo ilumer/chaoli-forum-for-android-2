@@ -24,7 +24,7 @@
             app:userId="@{viewModel.myUserId}"
             app:username="@{viewModel.myUsername}"
             app:isLoggedIn="@{viewModel.isLoggedIn}"
-            android:clickable="@{viewModel.loginComplete}"
+            android:clickable="@{viewModel.loginComplete &amp;&amp; !viewModel.failed}"
             android:onClick="@{viewModel.onClickAvatar}"
             android:id="@+id/avatar"/>
         <RelativeLayout

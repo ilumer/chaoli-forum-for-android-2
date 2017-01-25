@@ -79,6 +79,11 @@ public class LoginUtils {
                 .enqueue(new retrofit2.Callback<UserIdAndTokenResult>() {
                     @Override
                     public void onResponse(retrofit2.Call<UserIdAndTokenResult> call, retrofit2.Response<UserIdAndTokenResult> response) {
+                        if (response.body() == null) {
+                            onFailure(call, new RuntimeException("poor network"));
+                            return;
+                        }
+
                         if (response.body().getUserId() == 0) {
                             setToken(response.body().getToken());
                             login(loginObserver);
@@ -92,7 +97,7 @@ public class LoginUtils {
 
                     @Override
                     public void onFailure(retrofit2.Call<UserIdAndTokenResult> call, Throwable t) {
-
+                            loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
                     }
                 });
     }

@@ -279,8 +279,13 @@ public class MainActivityVM extends BaseViewModel {
                     isLoggedIn.set(false);
                     loginComplete.set(true);
                 } else {
+                    /**
+                     * show error screen here
+                     */
                     failed.set(true);
-                    isLoggedIn.set(false);
+                    isRefreshing.set(false);
+                    // no isLoggedIn.set(false) here, show name, signature in drawer
+                    loginComplete.set(true);
                     toastContent = getString(R.string.network_err);
                     showToast.notifyChange();
                 }

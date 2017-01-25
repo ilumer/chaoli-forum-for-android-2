@@ -56,7 +56,7 @@
 							android:layout_height="wrap_content" />
 					</RelativeLayout>
 					<com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout
-						android:visibility="@{viewModel.failed ? View.INVISIBLE : View.VISIBLE}"
+						android:visibility="@{viewModel.failed &amp;&amp; !viewModel.isRefreshing ? View.INVISIBLE : View.VISIBLE}"
 						android:background="@color/white"
 						android:layout_width="match_parent"
 						android:layout_height="match_parent"

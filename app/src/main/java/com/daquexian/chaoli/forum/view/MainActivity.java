@@ -157,6 +157,13 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
+		DataBindingUtils.addCallback(this, viewModel.showToast, new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showToast(viewModel.toastContent);
+			}
+		});
+
 		DataBindingUtils.addCallback(this, viewModel.selectedItem, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
