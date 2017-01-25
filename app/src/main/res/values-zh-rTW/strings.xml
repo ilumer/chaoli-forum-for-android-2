@@ -165,7 +165,7 @@
     <string name="reply_successfully">回复成功</string>
     <string name="conversation_has_been_deleted">帖子可能已經被刪啦</string>
     <string name="please_login">請登錄</string>
-    <string name="night_mode">夜间模式</string>
+    <string name="night_mode">夜间模式 (實驗性功能)</string>
     <string name="exist_inviting_code_message">看起來您已經成功答題了壹次但是沒有完成註冊，您要繼續註冊嗎？</string>
     <string name="exist_inviting_code_message_2">確定嗎？這可能會讓您需要重新答題。</string>
 </resources>
