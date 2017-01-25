@@ -272,11 +272,12 @@ public class MainActivityVM extends BaseViewModel {
             @Override
             public void onLoginFailure(int statusCode) {
                 if (statusCode == LoginUtils.EMPTY_UN_OR_PW) {
-                    selectedItem.set(0);
+                    if (channel.equals("") || channel.equals("all")) {
+                        toFirstLoadConversation.notifyChange();   // update conversations
+                    }
                     failed.set(false);
                     isLoggedIn.set(false);
                     loginComplete.set(true);
-                    selectedItem.notifyChange();
                 } else {
                     failed.set(true);
                     isLoggedIn.set(false);

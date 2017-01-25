@@ -39,8 +39,10 @@
             android:title="@string/channel.lang"/>
     </group>
 
-    <item
-        android:id="@+id/nightMode"
-        android:title="@string/night_mode"
-        android:orderInCategory="13" />
+    <group android:id="@+id/nav_footer">
+        <item
+            android:id="@+id/nightMode"
+            android:title="@string/night_mode"
+            android:orderInCategory="13" />
+    </group>
 </menu>

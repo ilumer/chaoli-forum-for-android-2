@@ -6,6 +6,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 
 /**
+ * Extended AppBarLayout, add getOffset and getState method and so on.
  * Created by daquexian on 16-12-2.
  */
 

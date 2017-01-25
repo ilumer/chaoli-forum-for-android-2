@@ -168,5 +168,11 @@
 	<string name="reply_successfully">Reply successfully</string>
 	<string name="conversation_has_been_deleted">Oops, conversation has been deleted</string>
 	<string name="please_login">Please Login</string>
-	<string name="night_mode">night_mode</string>
+<<<<<<< Updated upstream
+	<string name="night_mode">night mode</string>
+=======
+	<string name="night_mode">night mode (experimental)</string>
+	<string name="exist_inviting_code_message">Hi, it seems that you have already passed the quiz but not signed up yet. Would you like to sign up directly?</string>
+	<string name="exist_inviting_code_message_2">Are you sure? Maybe you have to answer questions again.</string>
+>>>>>>> Stashed changes
 </resources>
