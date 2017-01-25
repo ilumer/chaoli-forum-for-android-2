@@ -178,6 +178,13 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
+		viewModel.smoothToFirst.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable sender, int propertyId) {
+				l.smoothScrollToPosition(0);
+			}
+		});
+
 		/**
 		 * 根据登录状态更改侧栏菜单
 		 */
