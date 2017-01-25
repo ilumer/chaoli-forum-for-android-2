@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
-import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.net.Uri;
@@ -17,10 +16,11 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.DrawableUtils;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -35,6 +35,7 @@ import com.daquexian.chaoli.forum.databinding.NavigationHeaderBinding;
 import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.meta.NightModeHelper;
 import com.daquexian.chaoli.forum.model.Conversation;
+import com.daquexian.chaoli.forum.utils.DataBindingUtils;
 import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import com.daquexian.chaoli.forum.viewmodel.MainActivityVM;
 import com.google.android.gms.appindexing.Action;
@@ -45,10 +46,7 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 
 public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetChangedListener
 {
-	private static final String CONVERSATIONLIST_KEY = "conversationList";
-	private static final String CHANNEL_KEY = "chanel";
 	private static final String LAYOUTMANAGER＿STATE = "layoutManager";
-	private static final String PAGE_NUMBER = "pageState";
 	private static final String TOOLBAR_OFFSET = "toolbar_offset";
 	public static final String TAG = "MainActivity";
 
@@ -78,6 +76,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 
 	MainActivityVM viewModel;
 	MainActivityBinding binding;
+	private ArrayMap<Observable, Observable.OnPropertyChangedCallback> mCallbackMap;
 
 	boolean bottom = true;	//是否滚到底部
 	boolean needTwoClick = false;
@@ -98,37 +97,45 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		if (NightModeHelper.getViewModel() == null) {
 			viewModel = new MainActivityVM();
 			setViewModel(viewModel);
+			addCallbacks();
 			viewModel.setChannel("all");
 			viewModel.startUp();
 		} else {
 			viewModel = (MainActivityVM) NightModeHelper.getViewModel();	// remove the reference to ViewModel in NightModeHelper later in initUI
 			setViewModel(viewModel);
+			addCallbacks();
 		}
 
 		initUI(savedInstanceState);
 
-		viewModel.goToLogin.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		// ATTENTION: This was auto-generated to implement the App Indexing API.
+		// See https://g.co/AppIndexing/AndroidStudio for more information.
+		client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+	}
+
+	private void addCallbacks() {
+		DataBindingUtils.addCallback(this, viewModel.goToLogin, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				goToLogin();
 			}
 		});
 
-		viewModel.goToHomepage.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.goToHomepage, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				goToMyHomePage();
 			}
 		});
 
-		viewModel.goToConversation.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.goToConversation, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				goToConversation(viewModel.clickedConversation);
 			}
 		});
 
-		viewModel.notificationsNum.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.notificationsNum, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				if (((ObservableInt) observable).get() > 0) {
@@ -139,7 +146,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
-		viewModel.showLoginProcessDialog.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.showLoginProcessDialog, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				if (((ObservableBoolean) observable).get()) {
@@ -150,35 +157,35 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
-		viewModel.selectedItem.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.selectedItem, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				selectItem(((ObservableInt) observable).get());
 			}
 		});
 
-		viewModel.toFirstLoadConversation.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.toFirstLoadConversation, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				selectItem(0, false);
 			}
 		});
 
-		viewModel.goToPost.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.goToPost, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				goToPostAction();
 			}
 		});
 
-		viewModel.failed.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.failed, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				if (((ObservableBoolean) observable).get()) showToast(R.string.network_err);
 			}
 		});
 
-		viewModel.smoothToFirst.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.smoothToFirst, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable sender, int propertyId) {
 				l.smoothScrollToPosition(0);
@@ -188,7 +195,7 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 		/**
 		 * 根据登录状态更改侧栏菜单
 		 */
-		viewModel.isLoggedIn.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+		DataBindingUtils.addCallback(this, viewModel.isLoggedIn, new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
 				binding.navigationView.getMenu().clear();
@@ -196,23 +203,6 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 			}
 		});
 
-		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
-
-		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
-		{
-			@Override
-			public void onRefresh(SwipyRefreshLayoutDirection direction)
-			{
-				if (direction == SwipyRefreshLayoutDirection.TOP) {
-					viewModel.refresh();
-				} else {
-					viewModel.loadMore();
-				}
-			}
-		});
-		// ATTENTION: This was auto-generated to implement the App Indexing API.
-		// See https://g.co/AppIndexing/AndroidStudio for more information.
-		client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
 	}
 
 	public void selectItem(int position) {
@@ -301,20 +291,26 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 					NightModeHelper.changeMode(viewModel);
 					getWindow().setWindowAnimations(R.style.modechange);
 					recreate();
-					/*mDrawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
-						@Override
-						public void onDrawerClosed(View drawerView) {
-							NightModeHelper.changeMode();
-							getWindow().setWindowAnimations(R.style.modechange);
-							recreate();
-						}
-					});*/
-					// mDrawerLayout.closeDrawers();
 				}else {
 					selectItem(item.getOrder());
 					item.setChecked(true);
 				}
 				return true;
+			}
+		});
+
+		swipyRefreshLayout.setDirection(SwipyRefreshLayoutDirection.BOTH);
+
+		swipyRefreshLayout.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener()
+		{
+			@Override
+			public void onRefresh(SwipyRefreshLayoutDirection direction)
+			{
+				if (direction == SwipyRefreshLayoutDirection.TOP) {
+					viewModel.refresh();
+				} else {
+					viewModel.loadMore();
+				}
 			}
 		});
 
@@ -340,6 +336,8 @@ public class MainActivity extends BaseActivity implements AppBarLayout.OnOffsetC
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		Log.d(TAG, "onDestroy() called");
+		DataBindingUtils.removeCallbacks(this);
 		viewModel.destory();
 	}
 

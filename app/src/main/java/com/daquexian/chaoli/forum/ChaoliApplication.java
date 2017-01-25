@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatDelegate;
 
+import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.meta.NightModeHelper;
 
 /**
@@ -27,7 +28,11 @@ public class ChaoliApplication extends Application {
         return appContext;
     }
 
-    public static SharedPreferences getSp(String name, int mode) {
-        return appContext.getSharedPreferences(name, mode);
+    /**
+     * get the app-wide shared preference.
+     * @return app-wide shared preference
+     */
+    public static SharedPreferences getSp() {
+        return appContext.getSharedPreferences(Constants.APP_NAME, MODE_PRIVATE);
     }
 }

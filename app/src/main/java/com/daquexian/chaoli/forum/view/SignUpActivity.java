@@ -7,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.Observable;
 import android.databinding.ObservableBoolean;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.daquexian.chaoli.forum.R;

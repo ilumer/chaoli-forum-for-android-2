@@ -147,16 +147,16 @@ public class SignUpVM extends BaseViewModel {
                 .enqueue(new MyOkHttp.Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        showToast.set(showToast.get() + 1);
                         toastContent.set(getString(R.string.network_err));
+                        showToast.notifyChange();
                         getAndShowCaptchaImage();
                     }
 
                     @Override
                     public void onResponse(Call call, Response response, String responseStr) throws IOException {
                         if (response.code() != 200){
-                            showToast.notifyChange();
                             toastContent.set(getString(R.string.network_err));
+                            showToast.notifyChange();
                             getAndShowCaptchaImage();
                             showProcessDialog.set(false);
                         }
@@ -169,7 +169,11 @@ public class SignUpVM extends BaseViewModel {
                             } else if (responseStr.contains(WRONG_CAPTCHA)) {
                                 captchaError.set(getString(R.string.wrong_captcha));
                             } else {
+                                /**
+                                 * success
+                                 */
                                 Log.d(TAG, "onResponse: " + responseStr);
+                                ChaoliApplication.getSp().edit().remove(Constants.INVITING_CODE_SP).apply();
                                 LoginUtils.saveUsernameAndPassword(username.get(), password.get());
                                 signUpSuccess.notifyChange();
                             }

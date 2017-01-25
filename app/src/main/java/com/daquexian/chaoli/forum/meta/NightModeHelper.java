@@ -1,6 +1,5 @@
 package com.daquexian.chaoli.forum.meta;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatDelegate;
 
@@ -10,6 +9,7 @@ import com.daquexian.chaoli.forum.viewmodel.BaseViewModel;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
+ * The helper to night mode
  * Created by root on 1/22/17.
  */
 
@@ -18,11 +18,10 @@ public class NightModeHelper{
     private static final String NIGHT = "night";
     private static final String DAY = "day";
 
-    private static boolean shouldClear;
     private static BaseViewModel mViewModel;
 
     private static SharedPreferences getSp(){
-        return ChaoliApplication.getSp(MODE,MODE_PRIVATE);
+        return ChaoliApplication.getSp();
     }
 
     public static boolean isDay(){
@@ -37,7 +36,6 @@ public class NightModeHelper{
             setDay();
         }
         mViewModel = viewModel;
-        shouldClear = true;
     }
 
     public static BaseViewModel getViewModel() {
@@ -45,11 +43,7 @@ public class NightModeHelper{
     }
 
     public static void removeViewModel() {
-        if (shouldClear) {
             mViewModel = null;
-        } else {
-            shouldClear = true;
-        }
     }
 
     private static void setNight(){
