@@ -338,9 +338,11 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 	}
 
 	private void share() {
+		String shareContent =  viewModel.conversation.getTitle() + "\n" + Constants.BASE_URL + viewModel.conversationId
+				+ "\n\n" + getString(R.string.share_message);
 		Intent shareIntent = new Intent();
 		shareIntent.setAction(Intent.ACTION_SEND);
-		shareIntent.putExtra(Intent.EXTRA_TEXT, Constants.postListURL + viewModel.conversationId);
+		shareIntent.putExtra(Intent.EXTRA_TEXT, shareContent);
 		shareIntent.setType("text/plain");
 		startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
 	}

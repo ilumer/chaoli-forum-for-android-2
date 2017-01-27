@@ -168,4 +168,5 @@
 	<string name="night_mode">夜间模式 (实验性功能)</string>
 	<string name="exist_inviting_code_message">看起来您已经成功答题了一次但是没有完成注册，您要继续注册吗？</string>
 	<string name="exist_inviting_code_message_2">确定吗？这可能会让您需要重新答题。</string>
+	<string name="share_message">分享自超理论坛</string>
 </resources>
