@@ -169,4 +169,5 @@
     <string name="exist_inviting_code_message">看起來您已經成功答題了壹次但是沒有完成註冊，您要繼續註冊嗎？</string>
     <string name="exist_inviting_code_message_2">確定嗎？這可能會讓您需要重新答題。</string>
     <string name="share_message">分享自超理論壇</string>
+    <string name="not_support_temporarily">暫不支持該類型的鏈接，請從瀏覽器打開</string>
 </resources>

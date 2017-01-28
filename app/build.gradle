@@ -10,8 +10,8 @@ android {
         applicationId "com.daquexian.chaoli.forum"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 32
-        versionName "0.99.981-beta"
+        versionCode 33
+        versionName "0.99.985-beta"
     }
     buildTypes {
         release {

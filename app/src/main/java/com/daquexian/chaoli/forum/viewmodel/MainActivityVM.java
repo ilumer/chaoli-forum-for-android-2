@@ -200,16 +200,6 @@ public class MainActivityVM extends BaseViewModel {
             if(!Me.isEmpty()) {
                 AccountUtils.checkNotification(new AccountUtils.MessageObserver() {
                     @Override
-                    public void onGetUpdateSuccess(Boolean hasUpdate) {
-
-                    }
-
-                    @Override
-                    public void onGetUpdateFailure(int statusCode) {
-
-                    }
-
-                    @Override
                     public void onCheckNotificationSuccess(NotificationList notificationList) {
                         notificationsNum.set(notificationList.count);
                     }

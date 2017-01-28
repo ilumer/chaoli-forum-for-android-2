@@ -13,18 +13,10 @@
 		android:label="@string/app_name"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
-		<activity android:name="com.daquexian.chaoli.forum.view.Splash"
-			android:screenOrientation="portrait">
-		</activity>
 		<activity
 			android:name="com.daquexian.chaoli.forum.view.MainActivity"
 			android:screenOrientation="portrait"
-			android:label="@string/app_name"
 			android:theme="@style/MainActivityTheme">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
 		</activity>
 		<activity android:name="com.daquexian.chaoli.forum.view.SettingsActivity"
 			android:screenOrientation="portrait">
@@ -48,7 +40,30 @@
 			android:screenOrientation="portrait">
 		</activity>
 		<activity android:name="com.daquexian.chaoli.forum.view.PostAction"
-			android:screenOrientation="portrait"/><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+			android:screenOrientation="portrait"/>
+		<activity android:name=".view.EntryPointActivity"
+			android:launchMode="singleInstance"
+			android:noHistory="true"
+			android:theme="@style/AppTheme"
+			android:screenOrientation="portrait">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.BROWSABLE"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+				<data android:scheme="https"
+					android:host="chaoli.club"
+					android:pathPattern="/.*"/>
+				<data android:scheme="https"
+					android:host="www.chaoli.club"
+					android:pathPattern="/.*"/>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"/>
+				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+		</activity>
+
+		<!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
 		<meta-data
 			android:name="com.google.android.gms.version"

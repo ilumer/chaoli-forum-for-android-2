@@ -126,11 +126,10 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 			viewModel = new PostActivityVM(mConversation);
 		} else {
 			mConversationId = data.getInt("conversationId");
-			mTitle = data.getString("conversationTitle");
+			mTitle = data.getString("conversationTitle", getString(R.string.app_name));
 			viewModel = new PostActivityVM(mConversationId, mTitle);
 		}
 		setTitle(mTitle);
-		//viewModel.setTitle(mTitle);
 		mPage = data.getInt("page", 1);
 		setViewModel(viewModel);
 		viewModel.setPage(mPage);
@@ -172,7 +171,9 @@ public class PostActivity extends BaseActivity implements ConversationUtils.Igno
 		viewModel.updateToolbar.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
-				configToolbar(viewModel.conversation.getTitle());
+				mTitle = viewModel.conversation.getTitle();
+				configToolbar(mTitle);
+				setTitle(mTitle);
 			}
 		});
 
