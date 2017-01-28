@@ -88,16 +88,14 @@ public class LoginUtils {
                             setToken(response.body().getToken());
                             login(loginObserver);
                         } else {
-                            Me.setUserId(response.body().getUserId());
-                            Me.setUsername(sUsername);
-                            setToken(response.body().getToken());
+                            saveUserInfo(response.body().getUserId(), sUsername, response.body().getToken());
                             loginObserver.onLoginSuccess(Me.getMyUserId(), getToken());
                         }
                     }
 
                     @Override
                     public void onFailure(retrofit2.Call<UserIdAndTokenResult> call, Throwable t) {
-                            loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
+                        loginObserver.onLoginFailure(FAILED_AT_GET_TOKEN_ON_LOGIN_PAGE);
                     }
                 });
     }
@@ -108,12 +106,9 @@ public class LoginUtils {
                 .enqueue(new retrofit2.Callback<UserIdAndTokenResult>() {
                     @Override
                     public void onResponse(retrofit2.Call<UserIdAndTokenResult> call, retrofit2.Response<UserIdAndTokenResult> response) {
-                        Me.setUsername(sUsername);
-                        Me.setUserId(response.body().getUserId());
-                        setToken(response.body().getToken());
-                        sIsLoggedIn = true;
+                        saveUserInfo(response.body().getUserId(), sUsername, response.body().getToken());
 
-                        saveUsernameAndPassword(sUsername, sPassword);
+                        saveUsernameAndPasswordToSp(sUsername, sPassword);
 
                         loginObserver.onLoginSuccess(Me.getMyUserId(), getToken());
                     }
@@ -172,7 +167,7 @@ public class LoginUtils {
         return sSharedPreferences.getString(SP_USERNAME_KEY, "");
     }
 
-    public static void saveUsernameAndPassword(String username, String password) {
+    public static void saveUsernameAndPasswordToSp(String username, String password) {
         sSharedPreferences = ChaoliApplication.getAppContext().getSharedPreferences(LOGIN_SP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sSharedPreferences.edit();
         editor.putString(SP_USERNAME_KEY, username);
@@ -181,6 +176,12 @@ public class LoginUtils {
         editor.apply();
     }
 
+    private static void saveUserInfo(int userId, String username, String token) {
+        Me.setUserId(userId);
+        Me.setUsername(username);
+        setToken(token);
+        sIsLoggedIn = true;
+    }
     public interface LoginObserver
     {
         void onLoginSuccess(int userId, String token);

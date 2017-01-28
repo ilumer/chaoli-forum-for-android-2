@@ -174,7 +174,7 @@ public class SignUpVM extends BaseViewModel {
                                  */
                                 Log.d(TAG, "onResponse: " + responseStr);
                                 ChaoliApplication.getSp().edit().remove(Constants.INVITING_CODE_SP).apply();
-                                LoginUtils.saveUsernameAndPassword(username.get(), password.get());
+                                LoginUtils.saveUsernameAndPasswordToSp(username.get(), password.get());
                                 signUpSuccess.notifyChange();
                             }
                             showProcessDialog.set(false);
