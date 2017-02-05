@@ -36,7 +36,7 @@ public interface ChaoliService {
     @GET("index.php/settings/general.json")
     Call<User> getProfile();
     @POST("index.php/?p=settings/notificationCheck.ajax")
-    Call<NotificationList> checkNotification();
+    Observable<NotificationList> checkNotification();
     @GET("index.php/member/activity.json/{userId}/{page}")
     Call<HistoryResult> getHistory(@Path("userId") int userId, @Path("page")int page);
     @GET("reg-exam/get-q.php")

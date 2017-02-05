@@ -30,7 +30,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
@@ -76,6 +75,7 @@ public class MainActivityVM extends BaseViewModel {
 
     public LayoutSelector<Conversation> layoutSelector = new ConversationLayoutSelector();
 
+    private static int RETURN_ERROR = -1;
     private CompositeSubscription subscription;
     private String channel;
     private int page;
@@ -285,22 +285,31 @@ public class MainActivityVM extends BaseViewModel {
                     public Boolean call(Long aLong) {
                         return !Me.isEmpty();
                     }
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<Long>() {
+                }).flatMap(new Func1<Long, Observable<NotificationList>>() {
                     @Override
-                    public void call(Long aLong) {
-                        AccountUtils.checkNotification(new AccountUtils.MessageObserver() {
-                            @Override
-                            public void onCheckNotificationSuccess(NotificationList notificationList) {
-                                notificationsNum.set(notificationList.count);
-                            }
+                    public Observable<NotificationList> call(Long aLong) {
+                        return MyRetrofit.getService().checkNotification();
+                    }
+                }).filter(new Func1<NotificationList, Boolean>() {
+                    @Override
+                    public Boolean call(NotificationList notificationList) {
+                        return notificationList != null;
+                    }
+                }).subscribeOn(Schedulers.io())
+                .subscribe(new Observer<NotificationList>() {
+                    @Override
+                    public void onCompleted() {
+                        notificationsNum.set(RETURN_ERROR);
+                    }
 
-                            @Override
-                            public void onCheckNotificationFailure(int statusCode) {
+                    @Override
+                    public void onError(Throwable e) {
+                        notificationsNum.set(RETURN_ERROR);
+                    }
 
-                            }
-                        });
+                    @Override
+                    public void onNext(NotificationList notificationList) {
+                        notificationsNum.set(notificationList.count);
                     }
                 }));
     }
@@ -338,7 +347,7 @@ public class MainActivityVM extends BaseViewModel {
             //timer.cancel();
             mySignature.set(Me.getMySignature());
             myAvatarSuffix.set(Me.getAvatarSuffix());
-            //TODO:rxjava.interval
+            intervalSend();
         }
     }
 

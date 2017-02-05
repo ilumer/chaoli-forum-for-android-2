@@ -23,8 +23,6 @@ public class AccountUtils {
     @SuppressWarnings("unused")
     private static final String TAG = "AccountUtils";
 
-    private static int RETURN_ERROR = -1;
-
     public static void getProfile(final GetProfileObserver observer){
         MyRetrofit.getService().getProfile()
                 .enqueue(new Callback<User>() {
@@ -37,26 +35,6 @@ public class AccountUtils {
                     @Override
                     public void onFailure(Call<User> call, Throwable t) {
                         observer.onGetProfileFailure();
-                    }
-                });
-    }
-
-    public static void checkNotification(final MessageObserver observer){
-        MyRetrofit.getService().checkNotification()
-                .enqueue(new Callback<NotificationList>() {
-                    @Override
-                    public void onResponse(Call<NotificationList> call, Response<NotificationList> response) {
-                        NotificationList notificationList = response.body();
-                        if (notificationList != null) {
-                            observer.onCheckNotificationSuccess(notificationList);
-                        } else {
-                            observer.onCheckNotificationFailure(RETURN_ERROR);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<NotificationList> call, Throwable t) {
-                        observer.onCheckNotificationFailure(RETURN_ERROR);
                     }
                 });
     }
