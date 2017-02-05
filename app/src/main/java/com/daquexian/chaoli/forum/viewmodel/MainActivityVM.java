@@ -4,8 +4,6 @@ import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 
@@ -26,12 +24,16 @@ import com.daquexian.chaoli.forum.utils.LoginUtils;
 import com.daquexian.chaoli.forum.utils.MyUtils;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * ViewModel of MainActivity
@@ -74,16 +76,15 @@ public class MainActivityVM extends BaseViewModel {
 
     public LayoutSelector<Conversation> layoutSelector = new ConversationLayoutSelector();
 
+    private CompositeSubscription subscription;
     private String channel;
     private int page;
-
-    private Timer timer;
-    private TimerTask task;
 
     private Boolean canAutoLoad = false;
 
     public MainActivityVM() {
         //conversationList.add(new Conversation());
+        subscription = new CompositeSubscription();
     }
 
     public int getPage() {
@@ -99,16 +100,22 @@ public class MainActivityVM extends BaseViewModel {
     }
     private void getList(final int page, final Boolean refresh)
     {
-        showCircle();
         Log.d(TAG, "getList() called with: page = [" + page + "]");
-        MyRetrofit.getService()
+        subscription.add(MyRetrofit.getService()
                 .listConversations(channel, "#第 " + page + " 页")
                 .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
+                    @Override
+                    public void call() {
+                        showCircle();
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<ConversationListResult>() {
                     @Override
                     public void onCompleted() {
-
+                        removeCircle();
                     }
 
                     @Override
@@ -132,15 +139,13 @@ public class MainActivityVM extends BaseViewModel {
                         } else {
                             MyUtils.expandUnique(conversationList, newConversationList);
                         }
-
                         canAutoLoad = true;
-                        removeCircle();
                         if (refresh) {
                             smoothToFirst.notifyChange();
                         }
                         MainActivityVM.this.page = page;
                     }
-                });
+                }));
     }
 
     public void refresh(){
@@ -193,25 +198,6 @@ public class MainActivityVM extends BaseViewModel {
         }
     }
 
-    private Handler notificationHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if(!Me.isEmpty()) {
-                AccountUtils.checkNotification(new AccountUtils.MessageObserver() {
-                    @Override
-                    public void onCheckNotificationSuccess(NotificationList notificationList) {
-                        notificationsNum.set(notificationList.count);
-                    }
-
-                    @Override
-                    public void onCheckNotificationFailure(int statusCode) {
-
-                    }
-                });
-            }
-        }
-    };
     public void startUp() {
         Log.d(TAG, "startUp() called");
         isRefreshing.set(true);
@@ -243,20 +229,7 @@ public class MainActivityVM extends BaseViewModel {
                 if (channel.equals("") || channel.equals("all")) {
                     toFirstLoadConversation.notifyChange();   // update conversations
                 }
-
-                // TODO: 17-1-2 imporve code here
-                //noinspection EmptyCatchBlock
-                try {
-                    timer = new Timer();
-                    task = new TimerTask() {
-                        @Override
-                        public void run() {
-                            notificationHandler.sendEmptyMessage(0);
-                        }
-                    };
-                    timer.schedule(task, Constants.getNotificationInterval * 1000, Constants.getNotificationInterval * 1000);
-                } catch (Exception e) {
-                }
+                intervalSend();
             }
 
             @Override
@@ -302,6 +275,36 @@ public class MainActivityVM extends BaseViewModel {
         });
     }
 
+
+    private void intervalSend(){
+        subscription.add(Observable.interval(Constants.getNotificationInterval,
+                Constants.getNotificationInterval,
+                TimeUnit.SECONDS)
+                .filter(new Func1<Long, Boolean>() {
+                    @Override
+                    public Boolean call(Long aLong) {
+                        return !Me.isEmpty();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        AccountUtils.checkNotification(new AccountUtils.MessageObserver() {
+                            @Override
+                            public void onCheckNotificationSuccess(NotificationList notificationList) {
+                                notificationsNum.set(notificationList.count);
+                            }
+
+                            @Override
+                            public void onCheckNotificationFailure(int statusCode) {
+
+                            }
+                        });
+                    }
+                }));
+    }
+
     public String getChannel() {
         return channel;
     }
@@ -335,20 +338,12 @@ public class MainActivityVM extends BaseViewModel {
             //timer.cancel();
             mySignature.set(Me.getMySignature());
             myAvatarSuffix.set(Me.getAvatarSuffix());
-            if (task != null) task.cancel();
-            task = new TimerTask() {
-                @Override
-                public void run() {
-                    notificationHandler.sendEmptyMessage(0);
-                }
-            };
-            timer = new Timer();
-            timer.schedule(task, 0, Constants.getNotificationInterval * 1000);
+            //TODO:rxjava.interval
         }
     }
 
     public void destory() {
-        if (timer != null) timer.cancel();
         MyOkHttp.getClient().dispatcher().cancelAll();
+        subscription.clear();
     }
 }
