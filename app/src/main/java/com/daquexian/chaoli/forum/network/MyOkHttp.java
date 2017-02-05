@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.daquexian.chaoli.forum.ChaoliApplication;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,6 +90,7 @@ public class MyOkHttp {
                     .cookieJar(mCookiesManager)
                     .connectTimeout(15, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
+                    .addNetworkInterceptor(new StethoInterceptor())
                     //.addInterceptor(new MyInterceptor())
                     //.connectTimeout(5, TimeUnit.SECONDS)
                     //.readTimeout(5, TimeUnit.SECONDS)
