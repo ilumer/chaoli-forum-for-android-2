@@ -13,11 +13,17 @@ import com.daquexian.chaoli.forum.meta.Constants;
 import com.daquexian.chaoli.forum.model.Conversation;
 import com.daquexian.chaoli.forum.model.Post;
 import com.daquexian.chaoli.forum.model.PostListResult;
-import com.daquexian.chaoli.forum.network.MyOkHttp;
 import com.daquexian.chaoli.forum.network.MyRetrofit;
 import com.daquexian.chaoli.forum.utils.MyUtils;
 
 import java.util.List;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by jianhao on 16-9-21.
@@ -79,40 +85,41 @@ public class PostActivityVM extends BaseViewModel {
         getList(page, false);
     }*/
 
-    private void getList(final int page, final SuccessCallback callback) {
-        MyRetrofit.getService()
-                .listPosts(conversationId, page)
-                .enqueue(new retrofit2.Callback<PostListResult>() {
+    private Observable<List<Post>> getList(int page){
+        return MyRetrofit.getService()
+                .listPosts(conversationId,page)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Action0() {
                     @Override
-                    public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
-                        Log.d(TAG, "onResponse: " + conversationId);
-                        if (conversation == null) {
-                            conversation = response.body().getConversation();
+                    public void call() {
+                        showCircle();
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<PostListResult, List<Post>>() {
+                    @Override
+                    public List<Post> call(PostListResult postListResult) {
+                        if (conversation == null){
+                            conversation = postListResult.getConversation();
                             updateToolbar.notifyChange();
                         }
-
-                        List<Post> newPosts = response.body().getPosts();
-                        callback.doWhenSuccess(newPosts);
                         removeCircle();
+                        List<Post> newPosts = postListResult.getPosts();
                         if (newPosts.size() == Constants.POST_PER_PAGE) canAutoLoad = true;
-                        //moveToPosition(firstLoad ? 0 : oldLen);
-                        //isRefreshing.set(false);
-
-                        //PostActivityVM.this.page = page;
-                    }
-
-                    @Override
-                    public void onFailure(retrofit2.Call<PostListResult> call, Throwable t) {
-                        isRefreshing.set(false);
-                        if (call.isCanceled()) return;
-                        if (t.getMessage().contains("CANCEL")) return;
-                        toastContent.set(ChaoliApplication.getAppContext().getString(R.string.network_err));
-                        showToast.notifyChange();
-                        t.printStackTrace();
-                        //postList.get(postList.size() - 1).content = getString(R.string.error_click_to_retry);
+                        return newPosts;
                     }
                 });
     }
+
+    private Action1<Throwable> errorAction = new Action1<Throwable>() {
+        @Override
+        public void call(Throwable throwable) {
+            isRefreshing.set(false);
+            toastContent.set(ChaoliApplication.getAppContext().getString(R.string.network_err));
+            showToast.notifyChange();
+        }
+    };
 
     public void tryToLoadFromBottom() {
         if (canAutoLoad) {
@@ -120,41 +127,7 @@ public class PostActivityVM extends BaseViewModel {
             pullFromBottom();
         }
     }
-    /*private void getList(final int page, final Boolean refresh) {
-        MyRetrofit.getService()
-                .listPosts(conversationId, page)
-                .enqueue(new retrofit2.Callback<PostListResult>() {
-                    @Override
-                    public void onResponse(retrofit2.Call<PostListResult> call, retrofit2.Response<PostListResult> response) {
-                        Log.d(TAG, "onResponse: " + call.request().url().toString());
-                        int oldLen = postList.size();
-                        List<Post> newPostList = response.body().getPosts();
-                        if (!reversed)
-                            MyUtils.expandUnique(postList, newPostList);
-                        else
-                            postList.addAll(MyUtils.reverse(newPostList));
-                        moveToPosition(refresh ? 0 : oldLen);
-                        isRefreshing.set(false);
 
-                        PostActivityVM.this.page = page;
-
-                        //direction.set(SwipyRefreshLayoutDirection.BOTTOM);
-                    }
-
-                    @Override
-                    public void onFailure(retrofit2.Call<PostListResult> call, Throwable t) {
-                        isRefreshing.set(false);
-                        toastContent.set(ChaoliApplication.getAppContext().getString(R.string.network_err));
-                        showToast.notifyChange();
-                        t.printStackTrace();
-                    }
-                });
-    }*/
-
-    /*private Call<PostListResult> getList(int page) {
-        return MyRetrofit.getService().listPosts(conversationId, page);
-    }
-*/
     public void reverse() {
         reversed = !reversed;
         firstLoad();
@@ -170,23 +143,18 @@ public class PostActivityVM extends BaseViewModel {
     }
 
     public void firstLoad() {
-        //direction.set(SwipyRefreshLayoutDirection.BOTH);
-        showCircle();
-        //postList.clear();
         maxPage = minPage = reversed ? (int) Math.ceil((conversation.getReplies() + 1) / 20.0) : 1;
-        getList(maxPage, new SuccessCallback() {
-            @Override
-            public void doWhenSuccess(List<Post> newPostList) {
-                //if (preview) {
-                postList.clear();
-                preview = false;
-                //}
-                //if (hasFooterView()) postList.remove(postList.size() - 1);
-                if (reversed) postList.addAll(MyUtils.reverse(newPostList));
-                else postList.addAll(newPostList);
-            //    postList.add(new Post());
-            }
-        });
+        getList(maxPage)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<Post>>() {
+                    @Override
+                    public void call(List<Post> posts) {
+                        postList.clear();
+                        preview = false;
+                        if (reversed) postList.addAll(MyUtils.reverse(posts));
+                        else postList.addAll(posts);
+                    }
+                }, errorAction);
 
     }
 
@@ -216,23 +184,21 @@ public class PostActivityVM extends BaseViewModel {
         if (postList.size() >= (maxPage - minPage + 1) * Constants.POST_PER_PAGE) nextPage = maxPage + 1;
         else nextPage = maxPage;
 
-        showCircle();
         final int oldLen = postList.size();
-        getList(nextPage, new SuccessCallback() {
-            @Override
-            public void doWhenSuccess(List<Post> newPostList) {
-                //if (postList.size() > 0) postList.remove(postList.size() - 1);
-                Log.d(TAG, "doWhenSuccess: " + newPostList.size());
-                if (reversed) {
-                    MyUtils.expandUnique(postList, MyUtils.reverse(newPostList), false, reversed);
-                    moveToPosition(0);
-                }
-                else MyUtils.expandUnique(postList, newPostList);
-                //if (!reversed) moveToPosition(oldLen);
-                maxPage = nextPage;
-                //postList.add(new Post());
-            }
-        });
+
+        getList(nextPage)
+                .subscribe(new Action1<List<Post>>() {
+                    @Override
+                    public void call(List<Post> posts) {
+                        Log.d(TAG, "doWhenSuccess: " + posts.size());
+                        if (reversed) {
+                            MyUtils.expandUnique(postList, MyUtils.reverse(posts), false, reversed);
+                            moveToPosition(0);
+                        }
+                        else MyUtils.expandUnique(postList, posts);
+                        maxPage = nextPage;
+                    }
+                });
     }
 
     private void loadBackward() {
@@ -241,20 +207,16 @@ public class PostActivityVM extends BaseViewModel {
             return;
         }
         final int nextPage = minPage - 1;
-        showCircle();
-        //getList(nextPage);
         final int oldLen = postList.size();
-        getList(nextPage, new SuccessCallback() {
-            @Override
-            public void doWhenSuccess(List<Post> newPostList) {
-                //if (postList.size() > 0) postList.remove(postList.size() - 1);
-                if (reversed) postList.addAll(MyUtils.reverse(newPostList));
-                else MyUtils.expandUnique(postList, newPostList, false);
-                //if (reversed) moveToPosition(oldLen);
-                minPage = nextPage;
-                //postList.add(new Post());
-            }
-        });
+        getList(nextPage)
+                .subscribe(new Action1<List<Post>>() {
+                    @Override
+                    public void call(List<Post> posts) {
+                        if (reversed) postList.addAll(MyUtils.reverse(posts));
+                        else MyUtils.expandUnique(postList, posts, false);
+                        minPage = nextPage;
+                    }
+                }, errorAction);
     }
 
     /**

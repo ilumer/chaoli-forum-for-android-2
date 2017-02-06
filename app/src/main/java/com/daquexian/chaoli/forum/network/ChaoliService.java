@@ -24,7 +24,7 @@ import rx.Observable;
  */
 public interface ChaoliService {
     @GET("index.php/conversation/index.json/{conversationId}/p{page}")
-    Call<PostListResult> listPosts(@Path("conversationId") int conversationId, @Path("page") int page);
+    Observable<PostListResult> listPosts(@Path("conversationId") int conversationId, @Path("page") int page);
     @GET("index.php/conversations/index.json/{channel}")
     Observable<ConversationListResult> listConversations(@Path("channel") String channel, @Query("search") String search);
     @GET("index.php/user/login.json")
